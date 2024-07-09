@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cropper.js Demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.css">
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-6">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title">Product Images</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <% for (let i=1; i <=4; i++) { %>
+                                <div class="col-lg-3 col-md-6 mb-3 d-flex flex-column align-items-center">
+                                    <div class="rounded-image-preview mb-2" style="width: 200px; height: 200px;">
+                                        <img id="imagePreview<%= i %>" class="img-fluid"
+                                            style="max-width: 100%; max-height: 100%;">
+                                    </div>
+                                    <label for="imageInput<%= i %>" class="btn btn-sm btn-outline-primary waves-effect">
+                                        Browse image
+                                    </label>
+                                    <input name="images" type="file" accept="image/*" id="imageInput<%= i %>"
+                                        class="imageInput" onchange="previewImage(this, 'imagePreview<%= i %>')"
+                                        style="display: none;">
+                                    <button type="button" id="cropButton<%= i %>" class="btn btn-sm btn-outline-primary waves-effect"
+                                        onclick="cropImage(this, 'imagePreview<%= i %>')">Crop
+                                        Image</button>
+                                </div>
+                                <% } %>
+                        </div>
+                        <p id="imagesErr" style="color: red; display: none;">Please upload exactly 4 images.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Media -->
+
+    <script>
+        function previewImage(input, imageId) {
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const img = document.getElementById(imageId);
+                img.src = e.target.result;
+                createCropper(img);
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function createCropper(img) {
+            img.cropper = new Cropper(img, {
+                aspectRatio: 1,
+                viewMode: 3,
+                preview: '.preview'
+            });
+        }
+
+        function cropImage(button, imageId) {
+            var img = document.getElementById(imageId);
+            var cropper = img.cropper;
+
+            cropper.getCroppedCanvas({
+                width: 200,
+                height: 200,
+            }).toBlob(function (blob) {
+                var url = URL.createObjectURL(blob);
+                img.src = url;
+                cropper.destroy();
+                button.disabled = false;
+            });
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.js"></script>
+</body>
+
+</html>

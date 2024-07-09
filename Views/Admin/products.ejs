@@ -1,0 +1,492 @@
+<%- include('../Layouts/Admin/header') -%>
+
+
+  <!-- Vendors CSS -->
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+  
+
+  <!-- Page CSS -->
+
+
+  <!-- Helpers -->
+  <script src="/Admin/assets/vendor/js/helpers.js"></script>
+
+  <script src="/Admin/assets/js/config.js"></script>
+
+  <style>
+    .error-message {
+        color: red !important;
+    }
+    
+    
+</style>
+
+  </head>
+
+  
+
+
+  <%- include('../Layouts/Admin/navbar') -%>
+
+
+
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+
+      <!-- Content -->
+
+      <div class="container-xxl flex-grow-1 container-p-y">
+
+
+        <div class="card">
+          <!-- <div class="card-header">
+    <h5 class="mb-0">Filter</h5>
+    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+      <div class="col-md-4 product_status"><select id="ProductStatus" class="form-select text-capitalize">
+          <option value="">Select Status</option>
+          <option value="Scheduled">Scheduled</option>
+          <option value="Publish">Publish</option>
+          <option value="Inactive">Inactive</option>
+        </select></div>
+      <div class="col-md-4 product_category"><select id="ProductCategory" class="form-select text-capitalize">
+          <option value="">Category</option>
+          <option value="Household">Household</option>
+          <option value="Office">Office</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Shoes">Shoes</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Game">Game</option>
+        </select></div>
+      <div class="col-md-4 product_stock"><select id="ProductStock" class="form-select text-capitalize">
+          <option value=""> Stock </option>
+          <option value="Out_of_Stock">Out of Stock</option>
+          <option value="In_Stock">In Stock</option>
+        </select></div>
+    </div>
+  </div> -->
+          <div class="card-datatable table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+              <div class="card-header d-flex border-top rounded-0 flex-wrap py-0 pb-5 pb-md-0">
+                <div class="me-5 ms-n2">
+                  <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                        class="form-control form-control-sm" placeholder="Search"
+                        aria-controls="DataTables_Table_0"></label>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                  <div
+                    class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+                    <!-- <div class="dataTables_length my-0" id="DataTables_Table_0_length">
+              <label>
+                <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
+                  <option value="7">7</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="70">70</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div> -->
+                    <div class="dt-buttons btn-group flex-wrap d-flex">
+                      <a href="/admin/products/addProduct"
+                        class="btn btn-secondary add-new btn-primary waves-effect waves-light" tabindex="0"
+                        aria-controls="DataTables_Table_0">
+                        <span>
+                          <i class="ri-add-line ri-16px me-0 me-sm-1_5"></i>
+                          <span class="d-none d-sm-inline-block">Add Product</span>
+                        </span>
+                      </a>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <table class="datatables-products table dataTable no-footer dtr-column collapsed" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
+                <thead>
+                  <tr>
+                    <th style="width: 10px;">SI</th>
+                    <th class="text-center">Image</th>
+                    <th class="text-center" style="width: 100px;">Name</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Gender</th>
+                    <th class="text-center">Category</th>
+                    <th class="text-center">Brand</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if ( products.length> 0) { %>
+                    <% products.forEach((product, index)=> { %>
+                      <tr>
+                        <td>
+                          <%= index + 1 %>
+                        </td>
+                        <td>
+                          <div class="avatar-wrapper" style="width: 50px; height: 70px;">
+                            <% if (product.variants.length> 0 && product.variants[0].images.length > 0) { %>
+                              <img src="/Admin/assets/Products-Cropped/<%= product.variants[0].images[0] %>"
+                                alt="Product image" class="img-fluid" style="max-width: 100%; max-height: 100%;">
+                              <% } else { %>
+                                <img src="default-image.jpg" alt="No Image" class="product-image">
+                                <% } %>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex flex-column">
+                            <a href="/admin/products/variants/<%= product._id %>" class="text-heading text-truncate">
+                              <span class="fw-medium">
+                                <%= product.name %>
+                              </span>
+                            </a>
+                            <!-- <small>
+                      
+                    </small> -->
+                          </div>
+
+                        </td>
+                        <td class="text-center">
+                          <%= product.price %>
+                        </td>
+                        <td class="text-center">
+                          <%= product.gender %>
+                        </td>
+                        <td class="text-center">
+                          <%= product.category.name %>
+                        </td>
+                        <td class="text-center">
+                          <%= product.brand.name %>
+                        </td>
+                        <td class="text-center">
+                          <% let totalQuantity=0; %>
+                            <% product.variants.forEach(variant=> { %>
+                              <% totalQuantity +=variant.quantity; %>
+                                <% }); %>
+                                  <%= totalQuantity %>
+                        </td>
+                        <td class="text-center">
+                          <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= product._id %>"
+                            data-bs-toggle="modal" data-bs-target="#editModal<%= product._id %>">Edit</a>
+                          <% if (!product.isListed) { %>
+                            <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
+                              data-category-id="<%= product._id %>">List</a>
+                            <% } else { %>
+                              <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
+                                data-category-id="<%= product._id %>">Unlist</a>
+                              <% } %>
+                        </td>
+                      </tr>
+
+
+                      <!-- Modal -->
+                      <!-- Modal -->
+                      <div class="modal fade" id="editModal<%= product._id %>" tabindex="-1"
+                        aria-labelledby="editModalLabel<%= product._id %>" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                          <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                              <h5 id="editModalLabel<%= product._id %>" class="modal-title">Edit Product Details</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                              <form id="edit-product-<%= product._id %>" action="/admin/products/editProduct" method="POST">
+                                <p id="modal-message-<%= product._id %>" class="text-danger text-center"></p>
+                                <!-- Name -->
+                                <div class="form-floating form-floating-outline mb-5">
+                                  <input type="hidden" name="id" value="<%= product._id %>">
+                                  <input type="text" class="form-control" id="product-name-<%= product._id %>"
+                                    placeholder="Enter product name" name="name" aria-label="product name" value="<%= product.name %>">
+                                  <label for="product-name-<%= product._id %>" id="productNameError-<%= product._id %>">Name</label>
+                                  <div class="invalid-feedback" id="productNameError-<%= product._id %>"></div>
+                                </div>
+                                <!-- Gender, Category, Brand, Price -->
+                                <div class="row mb-5">
+                                  <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline mb-5">
+                                      <select id="product-gender-<%= product._id %>" class="form-select" aria-label="Gender" name="gender">
+                                        <option value="">Select gender</option>
+                                        <option value="Men" <% if (product.gender==='Men' ) { %>selected<% } %>>Men</option>
+                                        <option value="Women" <% if (product.gender==='Women' ) { %>selected<% } %>>Women</option>
+                                      </select>
+                                      <label for="product-gender-<%= product._id %>" id="productGenderError-<%= product._id %>">Gender</label>
+                                      <div class="invalid-feedback" id="productGenderError-<%= product._id %>"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline mb-5">
+                                      <select id="product-category-<%= product._id %>" class="form-select" aria-label="Category"
+                                        name="category">
+                                        <option value="">Select category</option>
+                                        <% categories.forEach(category=> { %>
+                                          <option value="<%= category._id %>" <% if (product.category &&
+                                            product.category.toString()===category._id.toString()) { %>selected<% } %>><%= category.name %>
+                                          </option>
+                                          <% }); %>
+                                      </select>
+                                      <label for="product-category-<%= product._id %>"
+                                        id="productCategoryError-<%= product._id %>">Category</label>
+                                      <div class="invalid-feedback" id="productCategoryError-<%= product._id %>"></div>
+                                    </div>
+
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline mb-5">
+                                      <select id="product-brand-<%= product._id %>" class="form-select" aria-label="Brand" name="brand">
+                                        <option value="">Select brand</option>
+                                        <% brands.forEach(brand=> { %>
+                                          <option value="<%= brand._id %>" <% if (product.brand &&
+                                            product.brand.toString()===brand._id.toString()) { %>selected<% } %>><%= brand.name %>
+                                          </option>
+                                          <% }); %>
+                                      </select>
+                                      <label for="product-brand-<%= product._id %>" id="productBrandError-<%= product._id %>">Brand</label>
+                                      <div class="invalid-feedback" id="productBrandError-<%= product._id %>"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline mb-5">
+                                      <input type="text" class="form-control" id="product-price-<%= product._id %>" placeholder="Enter price"
+                                        name="price" aria-label="product price" value="<%= product.price %>">
+                                      <label for="product-price-<%= product._id %>" id="productPriceError-<%= product._id %>">Price</label>
+                                      <div class="invalid-feedback" id="productPriceError-<%= product._id %>"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- Description -->
+                                <div class="form-floating form-floating-outline mb-5">
+                                  <textarea id="product-description-<%= product._id %>" class="form-control" placeholder="Enter description"
+                                    aria-label="description" style="height: 200px;" name="description"
+                                    rows="4"><%= product.description %></textarea>
+                                  <label for="product-description-<%= product._id %>"
+                                    id="productDesError-<%= product._id %>">Description</label>
+                                  <div class="invalid-feedback" id="productDesError-<%= product._id %>"></div>
+                                </div>
+                                <!-- Submit and reset -->
+                                <div class="mb-4">
+                                  <button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Update</button>
+                                  <button type="reset" class="btn btn-outline-danger waves-effect" data-bs-dismiss="modal">Discard</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+
+                      <% }); %>
+                        <% } else { %>
+                          <tr>
+                            <td colspan="6">No products found.</td>
+                          </tr>
+                          <% } %>
+                </tbody>
+              </table>
+
+              <div style="width: 1%;"></div>
+              <div style="width: 1%;"></div>
+            </div>
+          </div>
+        </div>
+
+
+        
+      </div>
+      <!-- / Content -->
+
+
+
+
+
+      <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+    </div>
+    <!-- / Layout page -->
+    </div>
+
+
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+
+    </div>
+    <!-- / Layout wrapper -->
+
+
+
+
+
+
+    <!-- Core JS -->
+    <!-- bui:Admin assets/vendor/js/core.js -->
+    <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+    <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+    <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+    <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+    <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+    <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+    <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+
+
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+
+    <!-- Main JS -->
+    <script src="/Admin/assets/js/main.js"></script>
+
+
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const forms = document.querySelectorAll('form[id^="edit-product-"]');
+  
+          forms.forEach(form => {
+              form.addEventListener('submit', function (event) {
+                  event.preventDefault();
+  
+                  const productId = this.id.split('edit-product-')[1];
+                  const name = document.getElementById(`product-name-${productId}`).value.trim();
+                  const description = document.getElementById(`product-description-${productId}`).value.trim();
+                  const gender = document.getElementById(`product-gender-${productId}`).value;
+                  const price = document.getElementById(`product-price-${productId}`).value.trim();
+                  const category = document.getElementById(`product-category-${productId}`).value;
+                  const brand = document.getElementById(`product-brand-${productId}`).value;
+  
+                  const nameLabel = document.getElementById(`productNameError-${productId}`);
+                  const descriptionLabel = document.getElementById(`productDesError-${productId}`);
+                  const genderLabel = document.getElementById(`productGenderError-${productId}`);
+                  const priceLabel = document.getElementById(`productPriceError-${productId}`);
+                  const categoryLabel = document.getElementById(`productCategoryError-${productId}`);
+                  const brandLabel = document.getElementById(`productBrandError-${productId}`);
+  
+                  const nameRegex = /^\S+$/;
+  
+                  let isValid = true;
+  
+                  // Validate Name
+                  if (name === '') {
+                      console.log('name error')
+                      nameLabel.innerText = 'Name cannot be empty';
+                      nameLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      nameLabel.innerText = 'Name';
+                      nameLabel.classList.remove('error-message');
+                  }
+  
+                  // Validate Description
+                  if (description ==='') {
+                      descriptionLabel.innerText = "Description cannot be empty";
+                      descriptionLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      descriptionLabel.innerText = 'Description';
+                      descriptionLabel.classList.remove('error-message');
+                  }
+  
+                  // Validate Gender
+                  if (gender === '') {
+                      genderLabel.innerText = 'Please select a gender';
+                      genderLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      genderLabel.innerText = 'Gender';
+                      genderLabel.classList.remove('error-message');
+                  }
+
+                  // Validate Brand
+                  if (brand === '') {
+                      brandLabel.innerText = 'Please select a brand';
+                      brandLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      brandLabel.innerText = 'Brand';
+                      brandLabel.classList.remove('error-message');
+                  }
+
+                  // Validate Category
+                  if (category === '') {
+                      categoryLabel.innerText = 'Please select a brand';
+                      categoryLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      categoryLabel.innerText = 'Category';
+                      categoryLabel.classList.remove('error-message');
+                  }
+
+                  // Validate price
+                  if ( !price || isNaN(price) || price < 0) {
+                      priceLabel.innerText = 'Invalid Price';
+                      priceLabel.classList.add('error-message');
+                      isValid = false;
+                  } else {
+                      priceLabel.innerText = 'Price';
+                      priceLabel.classList.remove('error-message');
+                  }
+
+
+                  if (isValid) {
+                      // const formData = { id: categoryId, name, description, gender };
+                      // updateCategory(formData);
+                      forms.submit()
+                  }
+              });
+          });
+      });
+  
+      // function updateCategory(data) {
+      //         console.log(data)
+      //         fetch('/admin/categories/editCategory', {
+      //             method: 'PUT',
+      //             headers: {
+      //                 'Content-Type': 'application/json'
+      //             },
+      //             body: JSON.stringify(data)
+      //         })
+      //             .then(response => response.json())
+      //             .then(data => {
+      //                 if (data.success) {
+      //                     window.location.reload();
+      //                 } else {
+      //                     const modalMessage = document.getElementById(`modal-message-${data.id}`).innerText = data.message;
+                          
+      //                 }
+      //             })
+      //             .catch(error => {
+      //                 console.error('Error:', error);
+      //                 document.getElementById(`modal-message-${data.id}`).innerText = 'An error occurred.';
+      //             });
+      //     }
+  </script>
+
+
+    </body>
+
+
+    <!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-product-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:30 GMT -->
+
+    </html>
+
+    <!-- beautify ignore:end -->

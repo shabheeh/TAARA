@@ -1,0 +1,502 @@
+
+<%- include('../Layouts/Admin/header') -%>
+
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/typography.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/katex.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/editor.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/dropzone/dropzone.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/flatpickr/flatpickr.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/tagify/tagify.css" />
+
+    <!-- Page CSS -->
+
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+    
+    <script src="/Admin/assets/js/config.js"></script>
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+    <style>
+        .error-message {
+            color: red !important;
+        }
+    </style>
+
+    </head>
+
+    <body>
+
+        <%- include('../Layouts/Admin/navbar') -%>
+
+
+
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+
+                <!-- Content -->
+
+                <div class="container-xxl flex-grow-1 container-p-y">
+
+
+                    <div class="app-ecommerce">
+                        <form id="addProductForm" action="/admin/addProduct" method="POST"
+                            enctype="multipart/form-data">
+                            <!-- Add Product -->
+                            <div
+                                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 gap-4 gap-md-0">
+                                <div class="d-flex flex-column justify-content-center">
+                                    <h4 class="mb-1">Add a new Product</h4>
+                                </div>
+                                <div class="d-flex align-content-center flex-wrap gap-4">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="resetForm()">Discard</button>
+                                    <button type="submit" class="btn btn-primary">Publish product</button>
+                                </div>
+                                
+                            </div>
+                            <p class="text-danger"><%= locals.message ? message : '' %></p>
+                            <div class="row">
+                                <!-- First column-->
+                                <div class="col-12 col-lg-8">
+                                    <!-- Product Information -->
+                                    <div class="card mb-6">
+                                        <div class="card-header">
+                                            <h5 class="card-tile mb-0">Product information</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-floating form-floating-outline mb-5">
+                                                <input type="text" class="form-control" id="productName"
+                                                    placeholder="Product title" name="productName"
+                                                    aria-label="Product title">
+                                                <label for="productName" id="nameLabel">Name</label>
+                                            </div>
+
+                                            <div class="row gx-5 mb-5">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="productGender" name="productGender"
+                                                            class="select2 form-select" data-placeholder="Option"
+                                                            data-allow-clear="true">
+                                                            <option value="">Gender</option>
+                                                            <option value="Men">Men</option>
+                                                            <option value="Women">Women</option>
+                                                        </select>
+                                                        <label for="productGender" id="genderLabel">Gender</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="productCategory" name="productCategory" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
+                                                            <option value="">Category</option>
+                                                            <% categories.forEach(category => { %>
+                                                              <option value="<%= category._id %>"><%= category.name %></option>
+                                                            <% }); %>
+                                                          </select>
+                                                        <label for="productCategory" id="categoryLabel">Category</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="productBrand" name="productBrand" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
+                                                            <option value="">Brand</option>
+                                                            <% brands.forEach(brand => { %>
+                                                                <option value="<%= brand._id %>"><%= brand.name %></option>
+                                                            <% }); %>
+                                                        </select>
+                                                        <label for="productbrand" id="brandLabel">Brand</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-floating form-floating-outline mb-5">
+                                                <textarea class="form-control" id="productDescription"
+                                                    name="productDescription" placeholder="Enter product description"
+                                                    style="height: 253px;"></textarea>
+                                                <label for="productDescription"
+                                                    id="descriptionLabel">Description</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Product Information -->
+                                </div>
+                                <!-- /First column -->
+
+                                <!-- Second column -->
+                                <div class="col-12 col-lg-4">
+                                    <!-- Pricing Card -->
+                                    <div class="card mb-6">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">Pricing</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Base Price -->
+                                            <div class="form-floating form-floating-outline mb-5">
+                                                <input type="number" class="form-control" id="productPrice"
+                                                    placeholder="Price" name="productPrice" aria-label="Product price">
+                                                <label for="productPrice" id="priceLabel">Best Price</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Pricing Card -->
+
+                                    <!-- Variants -->
+                                    <div class="card mb-6">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-3">Variant</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div data-repeater-list="group-a">
+                                                <div data-repeater-item>
+                                                    <div class="row gx-5 align-items-center">
+                                                        <div class="mb-6">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <select id="variantColor" class="select2 form-select"
+                                                                    name="productColor" data-placeholder="Color"
+                                                                    data-allow-clear="true">
+                                                                    <option value="">Color</option>
+                                                                    <option value="Black">Black</option>
+                                                                    <option value="White">White</option>
+                                                                    <option value="Brown">Brown</option>
+                                                                    <option value="Blue">Blue</option>
+                                                                    <option value="Green">Green</option>
+                                                                    <option value="Gold">Gold</option>
+                                                                    <option value="Orange">Orange</option>
+                                                                    <option value="Pink">Pink</option>
+                                                                    <option value="Maroon">Maroon</option>
+                                                                    <option value="Teal">Teal</option>
+                                                                </select>
+                                                                <label for="variantColor" id="colorLabel">Color</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-6">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <select id="variantSize" class="select2 form-select"
+                                                                    data-placeholder="Size" data-allow-clear="true"
+                                                                    name="productSizes[]" multiple="multiple">
+                                                                    <option value="XS">Extra Small</option>
+                                                                    <option value="S">Small</option>
+                                                                    <option value="M">Medium</option>
+                                                                    <option value="L">Large</option>
+                                                                    <option value="XL">Extra Large</option>
+                                                                </select>
+                                                                <label for="variantSize" id="sizeLabel">Size</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-6">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <input type="number"
+                                                                    class="form-control form-control-sm"
+                                                                    id="variantQuantity" placeholder="Add to Stock"
+                                                                    name="productStock" aria-label="Add to Stock">
+                                                                <label for="variantQuantity"
+                                                                    id="quantityLabel">Quantity</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Variants -->
+                                </div>
+                                <!-- /Second column -->
+                            </div>
+
+                            <!-- Media -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card mb-6">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0 card-title">Product Images</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <% for (let i=1; i <=4; i++) { %>
+                                                        <div class="col-lg-3 col-md-6 mb-3 d-flex flex-column align-items-center">
+                                                            <div class="rounded-image-preview mb-2" style="width: 257px; height: 361px;">
+                                                                <img id="imagePreview<%= i %>" class="img-fluid"
+                                                                    style="max-width: 100%; max-height: 100%;">
+                                                            </div>
+                                                            <label for="imageInput<%= i %>" class="btn btn-sm btn-outline-primary waves-effect">
+                                                                Browse image
+                                                            </label>
+                                                            <input name="productImage<%= i %>" type="file" accept="image/*" id="imageInput<%= i %>"
+                                                                class="imageInput" onchange="previewImage(this, 'imagePreview<%= i %>')"
+                                                                style="display: none;">
+                                                        </div>
+                                                        <% } %>
+                                                </div>
+                                                <p id="imagesErr" style="color: red; display: none;">Please upload exactly 4 images.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /Media -->
+                        </form>
+                    </div>
+
+
+                </div>
+                <!-- / Content -->
+
+
+
+
+
+
+
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
+            </div>
+
+
+
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+
+
+            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+            <div class="drag-target"></div>
+
+            </div>
+            <!-- / Layout wrapper -->
+
+
+
+
+            <!-- Core JS -->
+            <!-- build:js /Admin/assets/vendor/js/core.js -->
+            <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+            <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+            <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+            <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+            <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+            <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+            <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+            <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+            <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+            <!-- endbuild -->
+
+            <!-- Vendors JS -->
+            <script src="/Admin/assets/vendor/libs/quill/katex.js"></script>
+            <script src="/Admin/assets/vendor/libs/quill/quill.js"></script>
+            <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+            <script src="/Admin/assets/vendor/libs/dropzone/dropzone.js"></script>
+            <script src="/Admin/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
+            <script src="/Admin/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+            <script src="/Admin/assets/vendor/libs/tagify/tagify.js"></script>
+
+            <!-- Main JS -->
+            <script src="/Admin/assets/js/main.js"></script>
+
+
+            <!-- Page JS -->
+            <script src="/Admin/assets/js/app-ecommerce-product-add.js"></script>
+
+
+            <script>
+                function previewImage(input, previewId) {
+                        const file = input.files[0];
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const img = document.getElementById(previewId);
+                            img.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+            </script>
+
+            <!-- <script>
+                function previewImage(input, imageId) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const img = document.getElementById(imageId);
+                        img.src = e.target.result;
+                        createCropper(img);
+                        console.log(img);
+                    };
+
+                    if (file) {
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                function createCropper(img) {
+                    img.cropper = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 3,
+                        preview: '.preview'
+                    });
+                }
+
+                function cropImage(button, imageId) {
+                        var img = document.getElementById(imageId);
+                        var cropper = img.cropper;
+
+                        cropper.getCroppedCanvas({
+                            width: 200,
+                            height: 200,
+                        }).toBlob(function (blob) {
+                            var url = URL.createObjectURL(blob);
+                            img.src = url;
+                            cropper.destroy();
+                            button.disabled = false;
+
+                            // Create a new FormData object
+                            var formData = new FormData();
+
+                            // Create a new file object from the blob
+                            var file = new File([blob], `croppedImage.jpg`, {
+                                type: 'image/jpeg',
+                            });
+
+                            // Append the file to the FormData object
+                            formData.append('croppedImage', file);
+
+                            // Send the FormData object to the server
+                            fetch('/admin/addProduct', {
+                                method: 'POST',
+                                body: formData,
+                            })
+                                .then(response => response.json())
+                                .then(data => console.log(data))
+                                .catch(error => console.error(error));
+                        });
+                    }
+            </script> -->
+
+            
+
+            <script>
+                $(document).ready(function () {
+                    $('#size-select').select2({
+                        placeholder: "Select Sizes",
+                        allowClear: true
+                    });
+                });
+            </script>
+
+            <script>
+                document.getElementById('addProductForm').addEventListener('submit', function (event) {
+                    event.preventDefault(); // Prevent form submission
+
+                    // Clear previous error messages
+                    document.getElementById('imagesErr').style.display = 'none';
+
+                    //  form fields
+                    let isValid = true;
+                    let productName = document.getElementById('productName').value.trim();
+                    let productGender = document.getElementById('productGender').value.trim();
+                    let productCategory = document.getElementById('productCategory').value.trim();
+                    let productDescription = document.getElementById('productDescription').value.trim();
+                    let productPrice = document.getElementById('productPrice').value.trim();
+                    let variantColor = document.getElementById('variantColor').value.trim();
+                    let variantSize = $('#variantSize').val(); // For multi-select, use jQuery to get the value
+                    let variantQuantity = document.getElementById('variantQuantity').value.trim();
+
+                    //labels
+                    const nameLabel = document.getElementById('nameLabel');
+                    const genderLabel = document.getElementById('genderLabel');
+                    const categoryLabel = document.getElementById('categoryLabel');
+                    const descriptionLabel = document.getElementById('descriptionLabel');
+                    const priceLabel = document.getElementById('priceLabel');
+                    const colorLabel = document.getElementById('colorLabel');
+                    const sizeLabel = document.getElementById('sizeLabel');
+                    const quantityLabel = document.getElementById('quantityLabel');
+
+
+
+
+                    if (!productName) {
+                        nameLabel.innerText = 'Name cannot be empty';
+                        nameLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!productGender) {
+                        genderLabel.innerText = 'Gender cannot be empty';
+                        genderLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!productCategory) {
+                        categoryLabel.innerText = 'Category cannot be empty';
+                        categoryLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!productDescription) {
+                        descriptionLabel.innerText = 'Description cannot be empty';
+                        descriptionLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!productPrice || isNaN(productPrice) || productPrice <= 0) {
+                        priceLabel.innerText = 'Invalid Price';
+                        priceLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!variantColor) {
+                        colorLabel.innerText = 'Color cannot be empty';
+                        colorLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!variantSize || variantSize.length === 0) {
+                        sizeLabel.innerText = 'Size cannot be empty';
+                        sizeLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (!variantQuantity || isNaN(variantQuantity) || variantQuantity <= 0) {
+                        quantityLabel.innerText = 'Invalid Quantity';
+                        quantityLabel.classList.add('error-message');
+                        isValid = false;
+                    }
+
+                    if (isValid) {
+
+                        this.submit();
+                    }
+                });
+
+                function resetForm() {
+                    document.getElementById('addProductForm').reset();
+                    $('.select2').val(null).trigger('change'); // Reset select2 fields
+                    document.getElementById('imagesErr').style.display = 'none';
+                    // Clear image previews
+                    for (let i = 1; i <= 4; i++) {
+                        document.getElementById(`imagePreview${i}`).src = '';
+                    }
+                }
+            </script>
+
+
+
+    </body>
+
+
+    <!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-product-add.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:31 GMT -->
+
+    </html>
+
+    <!-- beautify ignore:end -->

@@ -1,0 +1,575 @@
+<%- include('../Layouts/Admin/header') -%>
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/%40form-validation/form-validation.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/typography.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/katex.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/editor.css">
+
+    <!-- Page CSS -->
+
+    <link rel="stylesheet" href="/Admin/assets/vendor/css/pages/app-ecommerce.css">
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <!-- <script src="/Admin/assets/vendor/js/template-customizer.js"></script> -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="/Admin/assets/js/config.js"></script>
+
+
+    <style>
+        .error-message {
+            color: red !important;
+        }
+    </style>
+
+    </head>
+
+    <%- include('../Layouts/Admin/navbar') -%>
+
+
+
+
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+
+            <!-- Content -->
+            <div class="container-xxl flex-grow-1 container-p-y">
+
+
+                <div class="app-ecommerce-brand">
+                    <!-- Brand List Table -->
+                    <div class="card">
+                        <div class="card-datatable table-responsive">
+                            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                                <div class="card-header d-flex rounded-0 flex-wrap py-0 pb-5 pb-md-0">
+                                    <div class="me-5 ms-n2">
+                                        <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input
+                                                    type="search" class="form-control form-control-sm"
+                                                    placeholder="Search" aria-controls="DataTables_Table_0"></label>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                                        <div
+                                            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center mb-0 gap-4 pt-0">
+
+                                            <div class="dt-buttons btn-group flex-wrap">
+
+                                                <button
+                                                    class="btn btn-secondary add-new btn-primary ms-n1 waves-effect waves-light"
+                                                    tabindex="0" aria-controls="DataTables_Table_0" type="button"
+                                                    data-bs-toggle="modal" data-bs-target="#ecommerceBrandModal">
+                                                    <span>
+                                                        <i class="ri-add-line me-0 me-sm-1"></i>
+                                                        <span class="d-none d-sm-inline-block">Add Brand</span>
+                                                    </span>
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="datatables-users table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                                    aria-describedby="DataTables_Table_0_info">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10px;">SI</th>
+                                            <th class="name-column" style="width: 500px;">Name</th>
+                                            <th class="gender-column">Gender</th>
+                                            <th class="text-center action-column">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (brands.length> 0) { %>
+                                            <% brands.forEach((brand, index)=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= index + 1 %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex justify-content-start align-items-center user-name">
+                                                            <div class="d-flex flex-column">
+                                                                <a href="app-user-view-account.html" class="text-heading text-truncate">
+                                                                    <span class="fw-medium">
+                                                                        <%= brand.name %>
+                                                                    </span>
+                                                                </a>
+                                                                <small>
+                                                                    <%= brand.description %>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <%= brand.name %>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= brand._id %>"
+                                                            data-bs-toggle="modal" data-bs-target="#editModal<%= brand._id %>">Edit</a>
+                                                        <% if (!brand.isListed) { %>
+                                                            <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
+                                                                data-brand-id="<%= brand._id %>">List</a>
+                                                            <% } else { %>
+                                                                <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
+                                                                    data-brand-id="<%= brand._id %>">Unlist</a>
+                                                                <% } %>
+                                                    </td>
+                                                </tr>
+
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="editModal<%= brand._id %>" tabindex="-1"
+                                                    aria-labelledby="editModalLabel<%= brand._id %>" aria-hidden="true">
+                                                    <div class="modal-dialog modal-sm">
+                                                        <div class="modal-content">
+                                                            <!-- Modal Header -->
+                                                            <div class="modal-header">
+                                                                <h5 id="editModalLabel<%= brand._id %>" class="modal-title">Edit Category</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <!-- Modal Body -->
+                                                            <div class="modal-body">
+                                                                <p id="modal-message-<%= brand._id %>" class="text-danger text-center"></p>
+                                                                <form id="edit-brand-<%= brand._id %>">
+                                                                    <!-- Title -->
+                                                                    <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                        <input type="text" class="form-control" id="brand-name-<%= brand._id %>"
+                                                                            placeholder="Enter brand name" name="name" aria-label="brand title"
+                                                                            value="<%= brand.name %>">
+                                                                        <label for="brand-name-<%= brand._id %>" id="brandNameError-<%= brand._id %>">Name</label>
+                                                                    </div>
+                                                                    <!-- Description -->
+                                                                    <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                        <textarea id="brand-description-<%= brand._id %>" class="form-control"
+                                                                            placeholder="Enter description" aria-label="description" name="description"
+                                                                            rows="4"><%= brand.description %></textarea>
+                                                                        <label for="brand-description-<%= brand._id %>" id="brandDesError-<%= brand._id %>">Description</label>
+                                                                    </div>                                                          
+                                                                    <!-- Submit and reset -->
+                                                                    <div class="mb-4">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Save</button>
+                                                                        <button type="reset" class="btn btn-outline-danger waves-effect"
+                                                                            data-bs-dismiss="modal">Cancel</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No categories found.</td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                                <div class="row mx-1">
+                                    <div class="col-sm-12 col-md-6">
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="dataTables_paginate paging_simple_numbers"
+                                            id="DataTables_Table_0_paginate">
+                                            <ul class="pagination">
+                                                <% for ( let i=1; i <=totalPages; i++ ) { %>
+                                                    <li
+                                                        class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                                                        <a href="#" onclick="fetchPage(<%= i %>)" class="page-link">
+                                                            <%= i %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="width: 1%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add brand modal -->
+                    <div class="modal fade" id="ecommerceBrandModal" tabindex="-1"
+                        aria-labelledby="ecommerceBrandModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm ">
+                            <div class="modal-content">
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h5 id="ecommerceBrandModalLabel" class="modal-title">Add Brand</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+                                    <p id="modal-message" class="text-danger text-center"></p>
+                                    <form id="add-brand">
+                                        <!-- Title -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <input type="text" class="form-control" id="brand-name"
+                                                placeholder="Enter brand name" name="name"
+                                                aria-label="brand title">
+                                            <label for="brand-name" id="brandNameError">Name</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <!-- Description -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <textarea id="brand-description" class="form-control"
+                                                placeholder="Enter description" aria-label="description"
+                                                name="description" rows="4"></textarea>
+                                            <label for="brand-description" id="brandDesError">Description</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                    
+
+                                        <!-- Status -->
+                                        <div class="form-floating form-floating-outline mb-5">
+                                            <select id="brand-status" class="form-select" aria-label="Status"
+                                                name="isListed">
+                                                <option value="">Select status</option>
+                                                <option value="true">List</option>
+                                                <option value="false">Unlist</option>
+                                            </select>
+                                            <label for="brand-status" id="brandStatusError">Status</label>
+                                        </div>
+                                        <!-- Submit and reset -->
+                                        <div class="mb-4">
+                                            <button type="submit"
+                                                class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Add</button>
+                                            <button type="reset" class="btn btn-outline-danger waves-effect"
+                                                data-bs-dismiss="modal">Discard</button>
+                                        </div>
+                                        <input type="hidden">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Confirmation Modal -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to perform this action?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="confirmAction()">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <!-- / Content -->
+
+            <!-- Core JS -->
+            <!-- build:js /Admin/assets/vendor/js/core.js -->
+            <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+            <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+            <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+            <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+            <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+            <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+            <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+            <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+            <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+            <!-- Vendors JS -->
+            <script src="/Admin/assets/vendor/libs/moment/moment.js"></script>
+            <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+            <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+            <script src="/Admin/assets/vendor/libs/%40form-validation/popular.js"></script>
+            <script src="/Admin/assets/vendor/libs/%40form-validation/bootstrap5.js"></script>
+            <script src="/Admin/assets/vendor/libs/%40form-validation/auto-focus.js"></script>
+            <script src="/Admin/assets/vendor/libs/quill/katex.js"></script>
+            <script src="/Admin/assets/vendor/libs/quill/quill.js"></script>
+
+            <!-- Main JS -->
+            <script src="/Admin/assets/js/main.js"></script>
+
+            <script>
+
+                function fetchPage(page) {
+                    window.location.href = `/admin/brands?page=${page}`;
+                }
+
+                document.getElementById('add-brand').addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const isValid = validateAddBrand();
+
+                    if (isValid) {
+                        // If form is valid, proceed with fetch API to send data to server
+                        const formData = {
+                            name: document.getElementById('brand-name').value.trim(),
+                            description: document.getElementById('brand-description').value.trim(),
+                            status: document.getElementById('brand-status').value
+                        };
+
+                        fetch('/admin/brands/addBrand', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+
+                                    window.location.reload();
+
+                                } else {
+
+                                    document.getElementById('modal-message').innerText = data.message;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                document.getElementById('modal-message').innerText = 'An error occurred.';
+                                document.getElementById('modal-message').classList.add('text-danger');
+                            });
+                    }
+
+                });
+
+                function validateAddBrand() {
+                    const name = document.getElementById('brand-name').value.trim();
+                    const status = document.getElementById('brand-status').value;
+                    const description = document.getElementById('brand-description').value.trim();
+
+                    const nameLabel = document.getElementById('brandNameError');
+                    const descriptionLabel = document.getElementById('brandDesError');
+                    const statusLabel = document.getElementById('brandStatusError');
+
+                    const nameRegex = /^(\S+\s?){1,3}$/;
+
+                    let isValid = true;
+
+                    // Validate Name
+                    if (name === '') {
+                        nameLabel.innerText = 'Name cannot be empty';
+                        nameLabel.classList.add('error-message');
+                        isValid = false;
+                    } else if (!nameRegex.test(name)) {
+                        nameLabel.innerText = 'Name should be one word without spaces';
+                        nameLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        nameLabel.innerText = 'Name';
+                    }
+
+                    if (description.length > 150) {
+                        descriptionLabel.innerText = "description shouldn't exceed 150 char";
+                        descriptionLabel.classList.add('error-message');
+
+                        isValid = false;
+                    } else {
+                        descriptionLabel.innerText = 'Description'; // Clear error message if valid
+                    }
+                    if (status === '') {
+                        statusLabel.innerText = 'Please select a status';
+                        statusLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        statusLabel.innerText = 'Status';
+                    }
+
+                    return isValid;
+                }
+
+            </script>
+
+            <script>
+
+                // Function to show confirmation modal
+                function showConfirmationModal(brandId) {
+                    $('#confirmationModal').data('brandId', brandId);
+                    $('#confirmationModal').modal('show');
+                }
+
+                // Function to confirm list/unlist action
+                function confirmAction() {
+                    const brandId = $('#confirmationModal').data('brandId');
+                    const action = $('#confirmationModal').data('action');
+
+
+                    if (action === 'List') {
+                        listBrand(brandId);
+                    } else if (action === 'Unlist') {
+                        unlistBrand(brandId);
+                    }
+
+                    $('#confirmationModal').modal('hide');
+                }
+
+                //  list brand request
+                function listBrand(brandId) {
+                    fetch(`/admin/brands/listBrand`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ brandId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.isListed) {
+                                $(`a[data-brand-id="${brandId}"]`)
+                                    .removeClass('bg-label-success')
+                                    .addClass('bg-label-danger')
+                                    .text('Unlist');
+                            } else {
+                                console.error('Error listing brand:', data.message);
+                            }
+                        })
+                        .catch(error => console.error('Error listing brand:', error));
+                }
+
+                //  unlist brand request
+                function unlistBrand(brandId) {
+                    fetch(`/admin/brands/unlistBrand`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ brandId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.isListed) {
+                                $(`a[data-brand-id="${brandId}"]`)
+                                    .removeClass('bg-label-danger')
+                                    .addClass('bg-label-success')
+                                    .text('List');
+                            } else {
+                                console.error('Error unlisting brand:', data.message);
+                            }
+                        })
+                        .catch(error => console.error('Error unlisting brand:', error));
+                }
+
+                // Event listener for list/unlist buttons
+                $(document).ready(function () {
+                    $('.listButton').click(function (event) {
+                        event.preventDefault();
+                        const brandId = $(this).data('brand-id');
+                        const action = $(this).text()
+
+                        $('#confirmationModal').data('action', action);
+                        showConfirmationModal(brandId);
+                    });
+                });
+
+            </script>
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const forms = document.querySelectorAll('form[id^="edit-brand-"]');
+
+                    forms.forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            const brandId = this.id.split('edit-brand-')[1];
+                            const name = document.getElementById(`brand-name-${brandId}`).value.trim();
+                            const description = document.getElementById(`brand-description-${brandId}`).value.trim();
+
+                            const nameLabel = document.getElementById(`brandNameError-${brandId}`);
+                            const descriptionLabel = document.getElementById(`brandDesError-${brandId}`);
+
+                            const nameRegex = /^(\S+\s?){1,3}$/;
+
+                            let isValid = true;
+
+                            // Validate Name
+                            if (name === '') {
+                                console.log('name error')
+                                nameLabel.innerText = 'Name cannot be empty';
+                                nameLabel.classList.add('error-message');
+                                isValid = false;
+                            } else if (!nameRegex.test(name)) {
+                                nameLabel.innerText = 'Name should be one word without spaces';
+                                nameLabel.classList.add('error-message');
+                                isValid = false;
+                            } else {
+                                nameLabel.innerText = 'Name';
+                            }
+
+                            // Validate Description
+                            if (description.length > 150) {
+                                descriptionLabel.innerText = "Description shouldn't exceed 150 characters";
+                                descriptionLabel.classList.add('error-message');
+                                isValid = false;
+                            } else {
+                                descriptionLabel.innerText = 'Description';
+                            }
+
+                           
+
+                            if (isValid) {
+                                const formData = { id: brandId, name, description };
+                                updateBrand(formData);
+                            }
+                        });
+                    });
+                });
+
+                function updateBrand(data) {
+                    console.log(data)
+                    fetch('/admin/brands/editBrand', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            } else {
+                                document.getElementById(`modal-message-${data.id}`).innerText = data.message;
+                               
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById(`modal-message-${data.id}`).innerText = 'An error occurred.';
+                        });
+                }
+            </script>
+
+
+            </body>
+
+            </html>

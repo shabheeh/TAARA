@@ -1,0 +1,384 @@
+
+
+<%- include('../Layouts/Admin/header') -%>
+    
+     <!-- Vendors CSS -->
+     <link rel="stylesheet" href="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+     <link rel="stylesheet" href="../../assets/vendor/libs/typeahead-js/typeahead.css" /> 
+     <link rel="stylesheet" href="../../assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+ <link rel="stylesheet" href="../../assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+ <link rel="stylesheet" href="../../assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css">
+ <link rel="stylesheet" href="../../assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+ <link rel="stylesheet" href="../../assets/vendor/libs/select2/select2.css" />
+ <link rel="stylesheet" href="../../assets/vendor/libs/%40form-validation/form-validation.css" />
+ 
+     <!-- Page CSS -->
+     
+ 
+     <!-- Helpers -->
+     <script src="../../assets/vendor/js/helpers.js"></script>
+     <
+     <script src="../../assets/js/config.js"></script>
+     
+    
+
+</head>
+
+<%- include('../Layouts/Admin/navbar') -%>
+
+
+
+ <!-- Content wrapper -->
+ <div class="content-wrapper">
+
+    <!-- Content -->
+    
+    <div class="flex-grow-1 container-p-y container-fluid">
+            
+            
+
+        <div class="row g-6 mb-6">
+          <div class="col-sm-6 col-xl-3">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div class="me-1">
+                    <p class="text-heading mb-1">Total Users</p>
+                    <div class="d-flex align-items-center">
+                      <h4 class="mb-1 me-2"><%= totalUsers %></h4>
+                      <!-- <p class="text-success mb-1">(+29%)</p> -->
+                    </div>
+                    <!-- <small class="mb-0">Total Users</small> -->
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-primary rounded">
+                      <div class="ri-group-line ri-26px"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div class="me-1">
+                    <p class="text-heading mb-1">Active Users</p>
+                    <div class="d-flex align-items-center">
+                      <h4 class="mb-1 me-2" id="activeUsersCount"><%= activeUsersCount %></h4>
+                    </div>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-success rounded">
+                      <div class="ri-user-follow-line ri-26px"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-3">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div class="me-1">
+                    <p class="text-heading mb-1">Blocked Users</p>
+                    <div class="d-flex align-items-center">
+                      <h4 class="mb-1 me-2" id="blockedUsersCount"><%= blockedUsersCount %></h4>
+                      <!-- <p class="text-success mb-1">(+18%)</p> -->
+                    </div>
+                    <!-- <small class="mb-0">Last week analytics</small> -->
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-danger rounded">
+                      <div class="ri-user-forbid-line ri-26px scaleX-n1"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- Users List Table -->
+        <!-- usersList.ejs or usersList.html -->
+        <div class="card">
+          <div class="card-datatable table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+              <div class="row mx-1">
+                <div class="col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4">
+                  <div class="dt-action-buttons mt-4 mt-md-0">
+                    <div class="col-sm-12 col-md-6">
+                      <div class="dataTables_length" id="DataTables_Table_0_length">
+                        <label>Show
+                          <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm"
+                            onchange="changeLimit(this.value)">
+                            <option value="10" <% if (limit===10) { %> selected <% } %>>10</option>
+                            <option value="25" <% if (limit===25) { %> selected <% } %>>25</option>
+                            <option value="50" <% if (limit===50) { %> selected <% } %>>50</option>
+                            <option value="100" <% if (limit===100) { %> selected <% } %>>100</option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-10">
+                  <div class="d-flex align-items-center justify-content-md-end justify-content-center">
+                    <div class="me-4">
+                      <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                        <label><input type="search" class="form-control form-control-sm" placeholder="Search User"
+                            aria-controls="DataTables_Table_0" oninput="searchUser(this.value)"></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <table class="datatables-users table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                  <tr>
+                    <th>SI</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Date Of Joined</th>
+                    <th>Orders</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (users.length> 0) { %>
+                    <% users.forEach((user, index)=> { %>
+                      <tr>
+                        <td>
+                          <%= (page - 1) * limit + index + 1 %>
+                        </td>
+                        <td>
+                          <div class="d-flex justify-content-start align-items-center user-name">
+                            <div class="avatar-wrapper">
+                              <div class="avatar avatar-sm me-4">
+                                <img src="assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                              </div>
+                            </div>
+                            <div class="d-flex flex-column">
+                              <a href="app-user-view-account.html" class="text-heading text-truncate">
+                                <span class="fw-medium">
+                                  <%= user.firstName ? user.firstName : 'First Name' %>
+                                </span>
+                              </a>
+                              <small>
+                                <%= user.lastName ? user.lastName : 'Last Name' %>
+                              </small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <%= user.email %>
+                        </td>
+                        <td>
+                          <%= user.dateOfJoined %>
+                        </td>
+                        <td>
+                          <%= user.orders.length %>
+                        </td>
+                        <td>
+                          <% if (!user.isBlocked) { %>
+                            <a href="#" class="badge rounded-pill bg-label-danger blockButton"
+                              data-user-id="<%= user._id %>">Block</a>
+                            <% } else { %>
+                              <a href="#" class="badge rounded-pill bg-label-success blockButton"
+                                data-user-id="<%= user._id %>">Unblock</a>
+                              <% } %>
+                        </td>
+                      </tr>
+                      <% }); %>
+                        <% } else { %>
+                          <tr>
+                            <td colspan="6">No users found.</td>
+                          </tr>
+                          <% } %>
+                </tbody>
+              </table>
+              <div class="row mx-1">
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                    Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalUsers) %> of <%= totalUsers %>
+                          entries
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                    <ul class="pagination">
+                      <% for (let i=1; i <= totalPages; i++) { %>
+                        <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                          <a href="#" onclick="fetchPage(<%= i %>)" class="page-link">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+
+          <!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              Are you sure you want to perform this action?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="confirmAction()">Confirm</button>
+          </div>
+      </div>
+  </div>
+</div>
+        
+                  </div>
+      <!-- / Content -->
+
+      
+
+<!-- Core JS -->
+  <!-- build:js assets/vendor/js/core.js -->
+  <script src="../../assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="../../assets/vendor/libs/popper/popper.js"></script>
+  <script src="../../assets/vendor/js/bootstrap.js"></script>
+  <script src="../../assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="../../assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="../../assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="../../assets/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="../../assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="../../assets/vendor/libs/moment/moment.js"></script>
+<script src="../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="../../assets/vendor/libs/select2/select2.js"></script>
+<script src="../../assets/vendor/libs/%40form-validation/popular.js"></script>
+<script src="../../assets/vendor/libs/%40form-validation/bootstrap5.js"></script>
+<script src="../../assets/vendor/libs/%40form-validation/auto-focus.js"></script>
+<script src="../../assets/vendor/libs/cleavejs/cleave.js"></script>
+<script src="../../assets/vendor/libs/cleavejs/cleave-phone.js"></script>
+
+  <!-- Main JS -->
+  <script src="../../assets/js/main.js"></script>
+  
+
+
+  <script>
+     function fetchPage(page) {
+        window.location.href = `/admin/users?page=${page}&limit=10`;
+      }
+
+      function changeLimit(limit) {
+        window.location.href = `/admin/users?page=1&limit=${limit}`;
+      }
+
+
+    // Function to show confirmation modal
+    function showConfirmationModal(userId) {
+        $('#confirmationModal').modal('show');
+        $('#confirmationModal').data('userId', userId);
+    }
+
+    // Function to confirm block/unblock action
+    function confirmAction() {
+        const userId = $('#confirmationModal').data('userId');
+        const action = $('#confirmationModal').data('action');
+
+        if (action === 'Block') {
+            blockUser(userId);
+        } else if (action === 'Unblock') {
+            unblockUser(userId);
+        }
+
+        $('#confirmationModal').modal('hide');
+    }
+
+    // Function to handle block user request
+    function blockUser(userId) {
+        fetch(`/admin/blockUser`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.isBlocked) {
+                
+                $(`a[data-user-id="${userId}"]`).removeClass('bg-label-danger').addClass('bg-label-success').text('Unblock');
+                // Update counts
+                document.getElementById('activeUsersCount').innerText = data.activeUsersCount;
+                document.getElementById('blockedUsersCount').innerText = data.blockedUsersCount;
+      
+            } else {
+                console.error('Error blocking user:', data.message);
+            }
+        })
+        .catch(error => console.error('Error blocking user:', error));
+    }
+
+    // Function to handle unblock user request
+    function unblockUser(userId) {
+        fetch(`/admin/unblockUser`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isBlocked) {
+                
+                $(`a[data-user-id="${userId}"]`).removeClass('bg-label-success').addClass('bg-label-danger').text('Block');
+                // Update counts
+                document.getElementById('activeUsersCount').innerText = data.activeUsersCount;
+                document.getElementById('blockedUsersCount').innerText = data.blockedUsersCount;
+                
+            } else {
+                console.error('Error unblocking user:', data.message);
+            }
+        })
+        .catch(error => console.error('Error unblocking user:', error));
+    }
+
+    // Event listener blockbutton
+    $(document).ready(function() {
+        $('.blockButton').click(function(event) {
+            event.preventDefault();
+            const userId = $(this).data('user-id');
+            const action = $(this).text()
+
+            $('#confirmationModal').data('action', action);
+            showConfirmationModal(userId);
+        });
+    });
+  </script>
+
+  
+</body>
+
+
+<!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-user-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:49 GMT -->
+</html>
+
+<!-- beautify ignore:end -->

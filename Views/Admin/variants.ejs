@@ -1,0 +1,226 @@
+
+<%- include('../Layouts/Admin/header') -%>
+    
+     <!-- Vendors CSS -->
+     <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+     <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
+     <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+ <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+ <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+ <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+ <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+ 
+     <!-- Page CSS -->
+     
+ 
+     <!-- Helpers -->
+     <script src="/Admin/assets/vendor/js/helpers.js"></script>
+     
+     <script src="/Admin/assets/js/config.js"></script>
+
+
+</head>
+
+
+<%- include('../Layouts/Admin/navbar') -%>
+
+      
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        
+          <div class="container-xxl flex-grow-1 container-p-y">
+            
+            
+<div class="card">
+  <!-- <div class="card-header">
+    <h5 class="mb-0">Filter</h5>
+    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+      <div class="col-md-4 product_status"><select id="ProductStatus" class="form-select text-capitalize">
+          <option value="">Select Status</option>
+          <option value="Scheduled">Scheduled</option>
+          <option value="Publish">Publish</option>
+          <option value="Inactive">Inactive</option>
+        </select></div>
+      <div class="col-md-4 product_category"><select id="ProductCategory" class="form-select text-capitalize">
+          <option value="">Category</option>
+          <option value="Household">Household</option>
+          <option value="Office">Office</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Shoes">Shoes</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Game">Game</option>
+        </select></div>
+      <div class="col-md-4 product_stock"><select id="ProductStock" class="form-select text-capitalize">
+          <option value=""> Stock </option>
+          <option value="Out_of_Stock">Out of Stock</option>
+          <option value="In_Stock">In Stock</option>
+        </select></div>
+    </div>
+  </div> -->
+  <div class="card-datatable table-responsive">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="card-header d-flex border-top rounded-0 flex-wrap py-0 pb-5 pb-md-0">
+        <div class="me-5 ms-n2">
+          <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label>
+          </div>
+        </div>
+        <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+          <div
+            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+            <!-- <div class="dataTables_length my-0" id="DataTables_Table_0_length">
+              <label>
+                <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
+                  <option value="7">7</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="70">70</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div> -->
+                <div class="dt-buttons btn-group flex-wrap d-flex">
+                  <a href="/admin/products/variants/addVariant" class="btn btn-secondary add-new btn-primary waves-effect waves-light" tabindex="0"
+                    aria-controls="DataTables_Table_0">
+                    <span>
+                      <i class="ri-add-line ri-16px me-0 me-sm-1_5"></i>
+                      <span class="d-none d-sm-inline-block">Add Variant</span>
+                    </span>
+                  </a>
+                </div>
+
+          </div>
+        </div>
+      </div>
+      <table class="datatables-products table dataTable no-footer dtr-column collapsed" id="DataTables_Table_0"
+        aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
+        <thead>
+          <tr>
+            <th style="width: 10px;">SI</th>
+            <th class="text-center" >Image</th>
+            <!-- <th style="width: 400px;">Name</th> -->
+            <th class="text-center">Color</th>
+            <th class="text-center">Sizes</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if ( variants.length> 0) { %>
+            <% variants.forEach((variant, index)=> { %>
+              <tr>
+                <td>
+                  <%= index + 1 %>
+                </td>
+                <td>
+                  <div class="avatar-wrapper d-flex" style="width: 100%; height: 70px;">
+                    <% if (variant.images.length > 0) { %>
+                      <% variant.images.forEach(image => { %>
+                        <img src="/Admin/assets/Products-Cropped/<%= image %>" alt="Product image" class="img-fluid me-2" style="max-width: 50px; max-height: 70px;">
+                      <% }); %>
+                    <% } else { %>
+                      <img src="default-image.jpg" alt="No Image" class="product-image" style="max-width: 50px; max-height: 70px;">
+                    <% } %>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <%= variant.color %>
+                </td>
+                <td class="text-center">
+                  <%= variant.sizes %>
+                </td>
+                <td class="text-center">
+                  <%= variant.quantity %>
+                </td>
+                
+                <td class="text-center">
+                  <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= variant._id %>"
+                      data-bs-toggle="modal" data-bs-target="#editModal<%= variant._id %>">Edit</a>
+                  <% if (!variant.isListed) { %>
+                      <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
+                          data-variant-id="<%= variant._id %>">List</a>
+                      <% } else { %>
+                          <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
+                              data-category-id="<%= variant._id %>">Unlist</a>
+                          <% } %>
+              </td>
+              </tr>
+              <% }); %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6">No Variants found.</td>
+                  </tr>
+                  <% } %>
+        </tbody>
+      </table>
+      
+      <div style="width: 1%;"></div>
+      <div style="width: 1%;"></div>
+    </div>
+  </div>
+</div>
+
+          </div>
+          <!-- / Content -->
+
+          
+          
+
+          
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+      </div>
+      <!-- / Layout page -->
+    </div>
+
+    
+    
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    
+    
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    
+  </div>
+  <!-- / Layout wrapper -->
+
+  
+  
+
+  
+
+<!-- Core JS -->
+  <!-- bui:Admin assets/vendor/js/core.js -->
+  <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+  <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="/Admin/assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+
+  <!-- Main JS -->
+  <script src="/Admin/assets/js/main.js"></script>
+  
+  
+</body>
+
+
+<!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-product-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:30 GMT -->
+</html>
+
+<!-- beautify ignore:end -->
