@@ -42,7 +42,10 @@
       <!-- Content -->
 
       <div class="container-xxl flex-grow-1 container-p-y">
-
+        <div class="container-xxl flex-grow-1 container-p-y">
+          <div class="d-flex flex-column justify-content-center">
+            <h4 class="mb-1">Products</h4>
+        </div>
 
         <div class="card">
           <!-- <div class="card-header">
@@ -142,9 +145,10 @@
                         </td>
                         <td>
                           <div class="d-flex flex-column">
-                            <a href="/admin/products/variants/<%= product._id %>" class="text-heading text-truncate">
+                            <a href="/admin/products/variants/single/<%= product._id %>" class="text-heading text-truncate">
                               <span class="fw-medium">
-                                <%= product.name %>
+                                <%= product.name ? product.name : "No Name" %>
+
                               </span>
                             </a>
                             <!-- <small>
@@ -154,16 +158,16 @@
 
                         </td>
                         <td class="text-center">
-                          <%= product.price %>
+                          <%= product.price ? product.price  : 0 %>
                         </td>
                         <td class="text-center">
-                          <%= product.gender %>
+                          <%= product.gender ? product.gender : 'N/A' %>
                         </td>
                         <td class="text-center">
-                          <%= product.category.name %>
+                          <%= product.category ? product.category.name : 'No Category' %>
                         </td>
                         <td class="text-center">
-                          <%= product.brand.name %>
+                          <%= product.brand ? product.brand.name : 'No Brand'  %>
                         </td>
                         <td class="text-center">
                           <% let totalQuantity=0; %>
@@ -173,16 +177,18 @@
                                   <%= totalQuantity %>
                         </td>
                         <td class="text-center">
-                          <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= product._id %>"
-                            data-bs-toggle="modal" data-bs-target="#editModal<%= product._id %>">Edit</a>
-                          <% if (!product.isListed) { %>
-                            <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
-                              data-category-id="<%= product._id %>">List</a>
-                            <% } else { %>
-                              <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
-                                data-category-id="<%= product._id %>">Unlist</a>
+                          <div class="d-flex justify-content-center align-items-center">
+                              <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= product._id %>"
+                                  data-bs-toggle="modal" data-bs-target="#editModal<%= product._id %>">Edit</a>
+                              <% if (!product.isListed) { %>
+                                  <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
+                                      data-category-id="<%= product._id %>">List</a>
+                              <% } else { %>
+                                  <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
+                                      data-category-id="<%= product._id %>">Unlist</a>
                               <% } %>
-                        </td>
+                          </div>
+                      </td>
                       </tr>
 
 
@@ -199,11 +205,11 @@
                             </div>
                             <!-- Modal Body -->
                             <div class="modal-body">
-                              <form id="edit-product-<%= product._id %>" action="/admin/products/editProduct" method="POST">
-                                <p id="modal-message-<%= product._id %>" class="text-danger text-center"></p>
+                              <form id="edit-product-<%= product._id %>" >
+                                
                                 <!-- Name -->
                                 <div class="form-floating form-floating-outline mb-5">
-                                  <input type="hidden" name="id" value="<%= product._id %>">
+                                  <input type="hidden" name="productId" value="<%= product._id %>">
                                   <input type="text" class="form-control" id="product-name-<%= product._id %>"
                                     placeholder="Enter product name" name="name" aria-label="product name" value="<%= product.name %>">
                                   <label for="product-name-<%= product._id %>" id="productNameError-<%= product._id %>">Name</label>
@@ -344,8 +350,8 @@
     <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
     <script src="/Admin/assets/vendor/js/menu.js"></script>
 
-    <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
-
+    
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- endbuild -->
 
@@ -381,7 +387,7 @@
                   const categoryLabel = document.getElementById(`productCategoryError-${productId}`);
                   const brandLabel = document.getElementById(`productBrandError-${productId}`);
   
-                  const nameRegex = /^\S+$/;
+                  
   
                   let isValid = true;
   
@@ -448,45 +454,76 @@
 
 
                   if (isValid) {
-                      // const formData = { id: categoryId, name, description, gender };
-                      // updateCategory(formData);
-                      forms.submit()
+                      const formData = { id: productId, name, brand, category, description, gender };
+                      updateProduct(formData);
+                      
                   }
               });
           });
       });
-  
-      // function updateCategory(data) {
-      //         console.log(data)
-      //         fetch('/admin/categories/editCategory', {
-      //             method: 'PUT',
-      //             headers: {
-      //                 'Content-Type': 'application/json'
-      //             },
-      //             body: JSON.stringify(data)
-      //         })
-      //             .then(response => response.json())
-      //             .then(data => {
-      //                 if (data.success) {
-      //                     window.location.reload();
-      //                 } else {
-      //                     const modalMessage = document.getElementById(`modal-message-${data.id}`).innerText = data.message;
-                          
-      //                 }
-      //             })
-      //             .catch(error => {
-      //                 console.error('Error:', error);
-      //                 document.getElementById(`modal-message-${data.id}`).innerText = 'An error occurred.';
-      //             });
-      //     }
+
+      function updateProduct(data) {
+        
+
+        fetch('/admin/products/editProduct', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
+                console.log(modal)
+                modal.hide();
+
+                // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `/admin/products`;
+                    }
+                });
+            } else {
+                // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred while updating the product.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        });
+      }
   </script>
 
 
     </body>
 
 
-    <!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-product-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:30 GMT -->
+    
 
     </html>
 
     <!-- beautify ignore:end -->
+
+    

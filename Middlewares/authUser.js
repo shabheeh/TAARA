@@ -4,7 +4,7 @@ const isLogin = async (req, res, next) => {
 
     try {
         if (req.session.user) {
-            const userId = req.session.user_id || null;
+            const userId = req.session.user || null;
             req.userId = userId;
             next();
         } else {

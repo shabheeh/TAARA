@@ -49,10 +49,14 @@
 
     <!-- Content -->
     <div class="container-xxl flex-grow-1 container-p-y">
-
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="d-flex flex-column justify-content-center">
+              <h4 class="mb-1">Categories</h4>
+          </div>
 
         <div class="app-ecommerce-category">
             <!-- Category List Table -->
+             
             <div class="card">
                 <div class="card-datatable table-responsive">
                     <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
@@ -315,6 +319,8 @@
 <!-- Main JS -->
 <script src="/Admin/assets/js/main.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 
     function fetchPage(page) {
@@ -386,6 +392,7 @@
                 isValid = false;
             } else {
                 nameLabel.innerText = 'Name'; 
+                nameLabel.classList.remove('error-message');
             }
 
             if (description.length > 200) {
@@ -394,7 +401,8 @@
 
                 isValid = false;
             } else {
-                descriptionLabel.innerText = 'Description'; // Clear error message if valid
+                descriptionLabel.innerText = 'Description';
+                descriptionLabel.classList.remove('error-message');
             }
 
 
@@ -406,6 +414,7 @@
                 isValid = false;
             } else {
                 genderLabel.innerText = 'Gender'; 
+                genderLabel.classList.remove('error-message');
             }
 
 
@@ -530,6 +539,7 @@
                     isValid = false;
                 } else {
                     nameLabel.innerText = 'Name';
+                    nameLabel.classList.remove('error-message');
                 }
 
                 // Validate Description
@@ -539,6 +549,7 @@
                     isValid = false;
                 } else {
                     descriptionLabel.innerText = 'Description';
+                    descriptionLabel.classList.remove('error-message');
                 }
 
                 // Validate Gender
@@ -548,6 +559,7 @@
                     isValid = false;
                 } else {
                     genderLabel.innerText = 'Gender';
+                    genderLabel.classList.remove('error-message');
                 }
 
                 if (isValid) {
@@ -569,18 +581,46 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        const modalMessage = document.getElementById(`modal-message-${data.id}`).innerText = data.message;
-                        
+            if (data.success) {
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
+                console.log(modal)
+                modal.hide();
+
+                // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `/admin/categories`;
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById(`modal-message-${data.id}`).innerText = 'An error occurred.';
                 });
-        }
+            } else {
+                // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred while updating the product.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        });
+      }
 </script>
 
 

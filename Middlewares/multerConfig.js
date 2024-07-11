@@ -3,7 +3,7 @@ const path = require("path");
 
 // Set storage engine
 const storage = multer.diskStorage({
-  destination: "./uploads/", // Specify your upload directory
+  destination: "./Public/Admin/assets/Products-Images", // Specify your upload directory
   filename: function (req, file, cb) {
     cb(
       null,
@@ -15,9 +15,9 @@ const storage = multer.diskStorage({
 // Initialize upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5000000 }, // Limit file size to 1MB
+  limits: { fileSize:  1024 * 1024 * 5 },// 5MB
   fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png|gif/;
+    const filetypes = /jpeg|jpg|png|gif|webp/;
     const extname = filetypes.test(
       path.extname(file.originalname).toLowerCase()
     );

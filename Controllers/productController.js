@@ -69,9 +69,10 @@ const addProduct = async (req, res) => {
     const brand = req.body.productBrand;
     const price = req.body.productPrice;
 
-    const color = req.body.productColor;
-    const sizes = req.body.productSizes;
-    const quantity = req.body.productStock;
+    const color = req.body.variantColor;
+    const colorCode = req.body.variantColorCode;
+    const sizes = req.body.variantSize;
+    const quantity = req.body.variantQuantity;
 
     // Save product details to database
     const product = new Product({
@@ -91,26 +92,10 @@ const addProduct = async (req, res) => {
     Object.keys(req.files).forEach((fieldName) => {
       const files = req.files[fieldName];
       files.forEach((file) => {
-        const imagePath = path.join(
-          __dirname,
-          "..",
-          "Public",
-          "Admin",
-          "assets",
-          "products-Images",
-          file.filename
-        );
-        const resizedImagePath = path.join(
-          __dirname,
-          "..",
-          "Public",
-          "Admin",
-          "assets",
-          "Products-Cropped",
-          file.filename
-        );
+        const imagePath = path.join(__dirname, "../Public/Admin/assets/Products-Images", file.filename);
+        const resizedImagePath = path.join(__dirname, "../Public/Admin/assets/Products-Cropped", file.filename);
 
-        // Resize Sharp
+        // Resize image using Sharp
         sharp(imagePath)
           .resize({ width: 303, height: 454 })
           .toFile(resizedImagePath);
@@ -121,6 +106,7 @@ const addProduct = async (req, res) => {
 
     const variant = new Variant({
       color,
+      colorCode,
       sizes,
       quantity,
       images,
@@ -134,13 +120,51 @@ const addProduct = async (req, res) => {
 
     await product.save();
 
-    res.redirect('/admin/products')
-
+    res.json({
+      id: product._id,
+      success: true,
+      message: "Varintes Added successfully",
+    });
 
   } catch (error) {
-    console.log("Error adding product", error);
-    
-    res.redirect('/admin/addProduct')
+    console.log("Error Adding Variant", error.message);
+    res.json({
+      success: false,
+      message: "An error occurred while adding the variant",
+    });
+  }
+};
+
+// ------Edit Product-------->
+
+const editProduct = async (req, res) => {
+  try {
+    const { id, name, gender, category, brand, price, description } = req.body;
+
+    const updateProduct = await Product.findByIdAndUpdate(
+      id,
+      { name, gender, category, brand, price, description },
+      { new: true }
+    );
+
+    if (!updateProduct) {
+      return res.json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.json({
+      id,
+      success: true,
+      message: "Product updated successfully",
+    });
+  } catch (error) {
+    console.log("Error Editing Product", error.message);
+    res.json({
+      success: false,
+      message: "An error occurred while updating the product",
+    });
   }
 };
 
@@ -161,38 +185,198 @@ const variants = async (req, res) => {
 }
 
 
-// ------Edit Product-------->
-
-const editProduct = async ( req, res) => {
-
-  try {
-      const {id, name, gender, category, brand, price, description} = req.body
-
-      const updateProduct = Product.findByIdAndUpdate(id,{name, gender, category, brand, price, description}, {new: true})
-    
-      if(!updateProduct){
-        return res.render()
-      }
-  } catch (error) {
-    console.log("Error Editing Product", error.message)
-    
-  }
-}
-
 // ------Load Add Variants------>
 
-const addVariant = async (req, res) => {
+const loadAddVariant = async (req, res) => {
 
   try {
-    
-    
 
-    res.render('variants', { product, variants });
+    const product = await Product.findById(req.params.id);
+
+    res.render('addVariant', {
+      product,
+    });
 
     
   } catch (error) {
     console.log('Error loading add variants' , error)
   }
+}
+
+// --------Add variant------>
+
+const addVariant = async ( req, res ) => {
+
+  try {
+    
+    
+    const id = req.body.productId;
+    const color = req.body.variantColor;
+    const colorCode = req.body.variantColorCode;
+    const sizes = req.body.variantSize;
+    const quantity = req.body.variantQuantity
+
+    
+    const images = [];
+
+    Object.keys(req.files).forEach((fieldName) => {
+      const files = req.files[fieldName];
+      files.forEach((file) => {
+        const imagePath = path.join(__dirname, "../Public/Admin/assets/Products-Images", file.filename);
+        const resizedImagePath = path.join(__dirname, "../Public/Admin/assets/Products-Cropped", file.filename);
+
+        // Resize image using Sharp
+        sharp(imagePath)
+          .resize({ width: 303, height: 454 })
+          .toFile(resizedImagePath);
+
+        images.push(file.filename);
+      });
+    });
+
+    const variant = new Variant({
+      color,
+      colorCode,
+      sizes,
+      quantity,
+      images,
+      product: id,
+      isListed: true,
+    });
+
+    await variant.save();
+
+    res.json({
+      id,
+      success: true,
+      message: "Varintes Added successfully",
+    });
+
+  } catch (error) {
+    console.log("Error Adding Variant", error.message);
+    res.json({
+      success: false,
+      message: "An error occurred while adding the variant",
+    });
+  }
+}
+
+// -------Load Edit Variant------>
+
+const loadEditVariant = async ( req, res) => {
+
+  try {
+
+    const variant = await Variant.findById(req.params.id);
+
+    res.render('editVariant', {
+      variant,
+    });
+
+    
+  } catch (error) {
+    console.log('Error loading edit variants' , error)
+  }
+}
+
+// ------Edit Variant------>
+
+const editVariant = async ( req, res ) => {
+
+  try {
+    
+    const { variantId, variantColor, variantColorCode, variantSize, variantQuantity} = req.body
+
+    const images = [];
+
+    for (let i = 1; i <= 4; i++) {
+      if (req.files && req.files[`productImage${i}`]) {
+          const file = req.files[`productImage${i}`][0]; // Access the first file from the array
+          const imagePath = path.join(__dirname, "../Public/Admin/assets/Products-Images", file.filename);
+          const resizedImagePath = path.join(__dirname, "../Public/Admin/assets/Products-Cropped", file.filename);
+
+          // Resize image using Sharp
+          sharp(imagePath)
+              .resize({ width: 303, height: 454 })
+              .toFile(resizedImagePath );
+
+          images.push(file.filename);
+      } else {
+          images.push(req.body[`existingImage${i}`]); // Use req.body for existing images
+      }
+  }
+
+    const updateVariant = await Variant.findByIdAndUpdate({ _id: variantId }, {
+
+        color: variantColor,
+        colorCode: variantColorCode,
+        sizes: variantSize,
+        quantity: variantQuantity,
+        images: images,
+        }, { new: true,});
+
+        if (!updateVariant) {
+          return res.json({
+            success: false,
+            message: "Variant not found",
+          });
+        }
+
+        const variant = await Variant.findById({_id: variantId})
+
+        res.json({
+          id: variant.product._id,
+          success: true,
+          message: "Variant updated successfully",
+        });
+      } catch (error) {
+        console.log("Error Editing Variant", error.message);
+        res.json({
+          success: false,
+          message: "An error occurred while updating the Variant",
+        });
+      }
+}
+
+// ------Products Men---->
+
+const productsMen = async ( req, res ) => {
+
+  try {
+
+    const products = await Product.find().populate('variants');
+
+    const brands = await Brand.find();
+    const categories = await Category.aggregate([
+      {
+          $lookup: {
+              from: 'products', 
+              localField: '_id',
+              foreignField: 'category',
+              as: 'products'
+          }
+      },
+      {
+          $project: {
+              _id: 1,
+              name: 1,
+              count: { $size: '$products' } 
+          }
+      }
+  ]);
+
+    
+    res.render('men', {
+      products,
+      brands,
+      categories,
+    })
+    
+  } catch (error) {
+    console.log("Error listing products Men", error.message);
+
+  }
+
 }
 
 
@@ -201,6 +385,14 @@ module.exports = {
     products,
     loadAddProduct,
     addProduct,
-    variants
+    editProduct,
+    variants,
+    loadAddVariant,
+    addVariant,
+    loadEditVariant,
+    editVariant,
+    productsMen,
 
 }
+
+

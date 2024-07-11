@@ -44,7 +44,10 @@
 
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
-
+                <div class="container-xxl flex-grow-1 container-p-y">
+                    <div class="d-flex flex-column justify-content-center">
+                      <h4 class="mb-1">Brands</h4>
+                  </div>
 
                 <div class="app-ecommerce-brand">
                     <!-- Brand List Table -->
@@ -385,6 +388,7 @@
                         isValid = false;
                     } else {
                         nameLabel.innerText = 'Name';
+                        nameLabel.classList.remove('error-message');
                     }
 
                     if (description.length > 150) {
@@ -393,7 +397,8 @@
 
                         isValid = false;
                     } else {
-                        descriptionLabel.innerText = 'Description'; // Clear error message if valid
+                        descriptionLabel.innerText = 'Description';
+                        descriptionLabel.classList.remove('error-message');
                     }
                     if (status === '') {
                         statusLabel.innerText = 'Please select a status';
@@ -401,6 +406,7 @@
                         isValid = false;
                     } else {
                         statusLabel.innerText = 'Status';
+                        statusLabel.classList.remove('error-message');
                     }
 
                     return isValid;
@@ -523,6 +529,7 @@
                                 isValid = false;
                             } else {
                                 nameLabel.innerText = 'Name';
+                                nameLabel.classList.remove('error-message');
                             }
 
                             // Validate Description
@@ -532,6 +539,7 @@
                                 isValid = false;
                             } else {
                                 descriptionLabel.innerText = 'Description';
+                                descriptionLabel.classList.remove('error-message');
                             }
 
                            

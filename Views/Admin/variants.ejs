@@ -32,9 +32,12 @@
         <!-- Content -->
         
           <div class="container-xxl flex-grow-1 container-p-y">
-            
+            <div class="d-flex flex-column justify-content-center">
+              <h4 class="mb-1"><%= product.name %></h4>
+          </div>
             
 <div class="card">
+  
   <!-- <div class="card-header">
     <h5 class="mb-0">Filter</h5>
     <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
@@ -84,7 +87,7 @@
               </label>
             </div> -->
                 <div class="dt-buttons btn-group flex-wrap d-flex">
-                  <a href="/admin/products/variants/addVariant" class="btn btn-secondary add-new btn-primary waves-effect waves-light" tabindex="0"
+                  <a href="/admin/products/variants/addVariant/<%= product.id %>" class="btn btn-secondary add-new btn-primary waves-effect waves-light" tabindex="0"
                     aria-controls="DataTables_Table_0">
                     <span>
                       <i class="ri-add-line ri-16px me-0 me-sm-1_5"></i>
@@ -138,8 +141,8 @@
                 </td>
                 
                 <td class="text-center">
-                  <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= variant._id %>"
-                      data-bs-toggle="modal" data-bs-target="#editModal<%= variant._id %>">Edit</a>
+                  <a href="/admin/products/variants/editVariant/<%= variant._id %>" class="badge rounded-pill bg-label-primary align-items-center editButton" 
+                    id="<%= variant._id %>" >Edit</a>
                   <% if (!variant.isListed) { %>
                       <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
                           data-variant-id="<%= variant._id %>">List</a>

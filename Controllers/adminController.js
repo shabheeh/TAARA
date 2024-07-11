@@ -251,18 +251,24 @@ const editCategory = async (req, res) => {
 
         if (!updatedCategory) {
             return res.json({
-              id: id,
+              id,
+              success: false,
               message: "Category not found",
             });
         }
 
-        res.json({ success: "Category edited", category: updatedCategory });
-    } catch (error) {
-        console.error(error.message);
         res.json({
-        message: "Server error",
-        });
-  }
+            id,
+            success: true,
+            message: "Category updated successfully",
+          });
+        } catch (error) {
+          console.log("Error updating Product", error.message);
+          res.json({
+            success: false,
+            message: "An error occurred while updating the category",
+          });
+        }
 };
 
 

@@ -17,6 +17,10 @@ const variantSchema = new mongoose.Schema({
       type: String,
     },
 
+    colorCode: {
+      type: String,
+    },
+
     sizes: {
       type: [String], //("S", "M", "L")
     },

@@ -2,8 +2,8 @@ const express = require('express');
 const app = express()
 const path = require('path');
 
-// const upload = require("../Middlewares/multerConfig");
-const multer = require("multer");
+const upload = require("../Middlewares/multerConfig");
+
 
 
 
@@ -25,28 +25,6 @@ const productController = require("../Controllers/productController")
 
 
 
-// Multer Configuration for  add productImgaes
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        return cb(null, path.join(__dirname, '..', 'Public', 'Admin', 'assets', 'products-Images'));
-    },
-    filename: function (req, file, cb) {
-        return cb(null, `${Date.now()}-${file.originalname}`)
-    }
-});
-const upload = multer({ storage: storage, });
-
-/// Multer Configuration for Coupon background
-const couponStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '..', 'public', 'assets', 'couponBgImages'));
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-
-const couponBgImageUpload = multer({ storage: couponStorage });
 
 
 
@@ -86,7 +64,29 @@ app.post("/products/addProduct", authAdmin.isLogin,
   ]),
   productController.addProduct
 );
-app.get('/products/variants/:id', authAdmin.isLogin, productController.variants)
+
+app.put('/products/editProduct', productController.editProduct)
+
+app.get('/products/variants/single/:id', authAdmin.isLogin, productController.variants)
+app.get('/products/variants/addVariant/:id', authAdmin.isLogin, productController.loadAddVariant)
+app.post('/products/variants/addVariant', authAdmin.isLogin, 
+    upload.fields([
+        { name: "productImage1", maxCount: 1 },
+        { name: "productImage2", maxCount: 1 },
+        { name: "productImage3", maxCount: 1 },
+        { name: "productImage4", maxCount: 1 },
+      ]),
+       productController.addVariant);
+
+app.get('/products/variants/editVariant/:id', authAdmin.isLogin, productController.loadEditVariant)
+app.put('/products/variants/editVariant', 
+  upload.fields([
+    { name: "productImage1", maxCount: 1 },
+    { name: "productImage2", maxCount: 1 },
+    { name: "productImage3", maxCount: 1 },
+    { name: "productImage4", maxCount: 1 },
+  ]),
+   productController.editVariant)
 
 
 

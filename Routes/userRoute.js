@@ -9,11 +9,12 @@ const passport = require('passport');
 
 // Set view engine
 app.set('view engine', 'ejs');
-app.set('views', './Views/User');
-app.use(express.static('Public/User'));
+app.set('views', path.join(__dirname, '..', 'Views', 'User'));
 
+app.use(express.static(path.join(__dirname, '..', 'Public')));
 
 const userController = require("../Controllers/userController");
+const productController = require('../Controllers/productController')
 const authUser = require("../Middlewares/authUser")
 
 app.get('/', userController.loadHome)
@@ -29,7 +30,7 @@ app.get('/forgotPass', authUser.isLogout, userController.forgotPass)
 app.post('/forgotPass', userController.forgotPassVerify)
 
 
-app.get('/products/men', )
+app.get('/products/men', productController.productsMen)
 
 
 app.get('/auth/google', passport.authenticate('google', {
