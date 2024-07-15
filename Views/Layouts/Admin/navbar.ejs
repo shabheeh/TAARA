@@ -369,7 +369,7 @@
               </li>
               <li>
                 <div class="d-grid px-4 pt-2 pb-1">
-                  <a class="btn btn-danger d-flex" href="auth-login-cover.html" target="_blank">
+                  <a class="btn btn-danger d-flex" id="adminLogout" href="#" target="_blank">
                     <small class="align-middle">Logout</small>
                     <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
                   </a>
@@ -396,5 +396,33 @@
 </nav>
 
 <!-- / Navbar -->
+
+<script>
+  document.getElementById('adminLogout').addEventListener('click', (event) => {
+    event.preventDefault();
+
+
+    fetch('/admin/logout', {
+                        method: 'POST'
+                       
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                          window.location.href = `/admin/login`;
+                        } 
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while Logout try again later.',
+                            icon: 'error',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+  })
+</script>
 
       

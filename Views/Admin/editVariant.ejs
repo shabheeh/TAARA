@@ -82,7 +82,7 @@
                                                                     <% 
                                                                     const colors = [
                                                                         { name: 'Black', code: '#000000' },
-                                                                        { name: 'White', code: '#FFFFFF' },
+                                                                        { name: 'White', code: '#fff1f1' },
                                                                         { name: 'Red', code: '#FF0000' },
                                                                         { name: 'Green', code: '#00FF00' },
                                                                         { name: 'Blue', code: '#0000FF' },
@@ -396,7 +396,7 @@
                         formData.append('variantId', variantId);
                         formData.append('variantColor', variantColor);
                         formData.append('variantColorCode', variantColorCode);
-                        formData.append('variantSize', variantSize); // Converting array to JSON string
+                        formData.append('variantSize', JSON.stringify(variantSize));
                         formData.append('variantQuantity', variantQuantity);
 
                         let imageCount = 0;

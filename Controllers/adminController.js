@@ -75,7 +75,20 @@ const verifySignIn = async ( req, res) => {
     }
 }
 
+// -------Admin Logout----->
 
+const logout = async (req, res) => {
+    try {
+        req.session.admin = false;
+    res.json({
+        success: true
+    })
+
+        } catch (error) {
+            console.log(error.message + ' admin logout');
+        }
+
+    }
 // ------List Users------>
 
 const loadUsers = async ( req, res ) => {
@@ -461,97 +474,12 @@ const editBrand = async (req, res) => {
   }
 };
 
-
-
-
-// ------Products List------>
-
-const products = async (req, res) => {
-
-    try {
-        const products = await Product.find()
-        
-        res.render("products", {
-            products
-        });
-    } catch (error) {
-    console.log('Error loading products', error.message);
-    }
-};
-
-// ------load add Products------>
-
-const loadAddProduct = async (req, res) => {
-
-    try {
-        
-        res.render("addProduct");
-
-    } catch (error) {
-    console.log("Error loading add products", error.message);
-    }
-};
-
-
-// ------Add Products------>
-
-const addProduct = async (req, res) => {
-
-    try {
-        
-        // product
-        const name = req.body.productName;
-        const description = req.body.productDescription;
-        const gender = req.body.productGender;
-        const category = req.body.productCategory;
-        const brand = req.body.productBrand;
-        // variant
-        const images = req.body.productImages;
-        const color = req.body.productColor;
-        const sizes = req.body.productSizes;
-        const quantity = req.body.productQuantity;
-        const price = req.body.productPrice;  
-
-        // Create the product
-        const newProduct = await Product.create({
-            name,
-            description,
-            gender,
-            category,
-            brand,
-            isListed: true,
-        });
-
-        // Create the initial variant and associate it with the product
-        const newVariant = await Variant.create({
-            productId: newProduct._id,
-            images,
-            color,
-            sizes,
-            quantity,
-            price,
-        });
-
-        res
-            .status(201)
-            .json({ success: true, product: newProduct, variant: newVariant });
-    } catch (error) {
-      console.error(error);
-        res.status(500)
-            .json({
-            success: false,
-            message: "Failed to add product with initial variant",
-            });
-    }
-};
-
-
-
 module.exports = {
     login,
     loadHome, 
     loadSignin,
     verifySignIn,
+    logout,
     loadUsers,
     blockUser,
     unBlockUser,
@@ -564,8 +492,5 @@ module.exports = {
     addBrand,
     editBrand,
     unlistBrand,
-    listBrand,
-   
-    
-
-} 
+    listBrand
+}

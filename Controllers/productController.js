@@ -2,6 +2,7 @@ const Category = require("../Models/categoryModel");
 const Product = require("../Models/productModel");
 const Brand = require("../Models/brandModel");
 const Variant = require("../Models/variantModel")
+const User = require('../Models/userModel')
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -71,7 +72,7 @@ const addProduct = async (req, res) => {
 
     const color = req.body.variantColor;
     const colorCode = req.body.variantColorCode;
-    const sizes = req.body.variantSize;
+    const sizes = JSON.parse(req.body.variantSize);
     const quantity = req.body.variantQuantity;
 
     // Save product details to database
@@ -213,7 +214,7 @@ const addVariant = async ( req, res ) => {
     const id = req.body.productId;
     const color = req.body.variantColor;
     const colorCode = req.body.variantColorCode;
-    const sizes = req.body.variantSize;
+    const sizes = JSON.parse(req.body.variantSize);
     const quantity = req.body.variantQuantity
 
     
@@ -245,6 +246,11 @@ const addVariant = async ( req, res ) => {
     });
 
     await variant.save();
+
+    const product = await Product.findByIdAndUpdate(id, {
+      $push: { variants: variant._id },
+    });
+
 
     res.json({
       id,
@@ -285,7 +291,9 @@ const editVariant = async ( req, res ) => {
 
   try {
     
-    const { variantId, variantColor, variantColorCode, variantSize, variantQuantity} = req.body
+    const { variantId, variantColor, variantColorCode, variantQuantity} = req.body
+
+    const sizes = JSON.parse(req.body.variantSize);
 
     const images = [];
 
@@ -297,9 +305,13 @@ const editVariant = async ( req, res ) => {
 
           // Resize image using Sharp
           sharp(imagePath)
-              .resize({ width: 303, height: 454 })
-              .toFile(resizedImagePath );
-
+            .resize({
+                width: 303,
+                height: 454,
+                withoutEnlargement: true,
+                upsample: false,
+              })
+            .toFile(resizedImagePath);
           images.push(file.filename);
       } else {
           images.push(req.body[`existingImage${i}`]); // Use req.body for existing images
@@ -310,7 +322,7 @@ const editVariant = async ( req, res ) => {
 
         color: variantColor,
         colorCode: variantColorCode,
-        sizes: variantSize,
+        sizes: sizes,
         quantity: variantQuantity,
         images: images,
         }, { new: true,});
@@ -338,16 +350,25 @@ const editVariant = async ( req, res ) => {
       }
 }
 
-// ------Products Men---->
+// ------Products Grid---->
 
-const productsMen = async ( req, res ) => {
+const productsGrid = async ( req, res ) => {
 
   try {
 
-    const products = await Product.find().populate('variants');
+    const gender = req.params.gender
+
+
+    const products = await Product.find({gender}).populate('variants').populate('category')
+
+    
 
     const brands = await Brand.find();
     const categories = await Category.aggregate([
+      {$match:{
+        gender: gender,
+        isListed: true
+      }},
       {
           $lookup: {
               from: 'products', 
@@ -365,8 +386,17 @@ const productsMen = async ( req, res ) => {
       }
   ]);
 
-    
-    res.render('men', {
+
+  
+  let user = null;
+  if (req.userId) {
+      user = await User.findById(req.userId);
+  }
+
+
+    res.render('productsGrid', {
+      user,
+      title: gender,
       products,
       brands,
       categories,
@@ -378,6 +408,51 @@ const productsMen = async ( req, res ) => {
   }
 
 }
+
+// ------Product View------>
+
+const product = async (req, res) => {
+
+  try {
+    const productId = req.params.id;
+    const variantId = req.params.variantId;
+  
+
+    const product = await Product.findById(productId).populate('variants').populate('category');
+
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    let variant = product.variants.find((variant) => variant._id == variantId)
+
+
+    if (!variant) {
+      return res.status(404).send('Variant not found');
+    }
+
+    const category = product.category._id;
+
+    const similarProducts = await Product.find({ category }).populate('variants').populate('category').populate('brand');
+
+    
+  let user = null;
+  if (req.userId) {
+      user = await User.findById(req.userId);
+  }
+
+
+    res.render('productSingle', {
+      user: user,
+      product,
+      variant,
+      similarProducts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 
 
@@ -391,7 +466,8 @@ module.exports = {
     addVariant,
     loadEditVariant,
     editVariant,
-    productsMen,
+    product,
+    productsGrid,
 
 }
 

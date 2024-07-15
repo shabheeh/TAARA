@@ -8,35 +8,36 @@ const variantSchema = new mongoose.Schema({
     required: true,
   },
 
-    images: {
-      type: [String], 
-      required: true,
-    },
-
-    color: {
-      type: String,
-    },
-
-    colorCode: {
-      type: String,
-    },
-
-    sizes: {
-      type: [String], //("S", "M", "L")
-    },
-
-    quantity: {
-      type: Number,
-    },
-
-    isListed: {
-      type: Boolean,
+  images: {
+    type: [String], 
+    required: true,
   },
 
-    createdAt: {
-      type: String,
-      default: new Date().toLocaleDateString()
-    },
+  color: {
+    type: String,
+  },
+
+  colorCode: {
+    type: String,
+  },
+
+  sizes: {
+    type: [String],
+  },
+
+  quantity: {
+    type: Number,
+  },
+
+  isListed: {
+    type: Boolean,
+},
+
+  createdAt: {
+    type: String,
+    default: new Date().toLocaleDateString()
+  },
+  
 });
 
 module.exports = mongoose.model("Variant", variantSchema);

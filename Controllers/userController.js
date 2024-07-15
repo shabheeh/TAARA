@@ -1,6 +1,7 @@
 
 const User = require("../Models/userModel");
 const Token = require("../Models/resetToken");
+const Cart = require('../Models/cartModel')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -24,22 +25,53 @@ const transporter = nodemailer.createTransport({
 // ------Home Page------>
 
 const loadHome = async (req, res) => {
+
     try {
-        if (!req.session.user) {
-            return res.render('home');
+        if (!req.userId) {
+            return res.render('home',{
+                cart: { products: [] } 
+            });
         }
-        const user = await User.findById({_id:req.session.user._id});
-        res.render('home', { user });
+
+        const user = await User.findById(req.userId);
+
+        
+        const cart = await Cart.findOne({ user: req.userId }).populate('products.product').populate('products.variant');
+
+        if (!cart || cart.products.length === 0) {
+            // Handle case where cart is empty
+            return res.render('home', {
+                user,
+                cart: { products: [] }  
+            });
+        }
+
+        let totalPrice = 0;
+
+      cart.products.forEach((product) => {
+        totalPrice += product.product.price * product.quantity;
+      });
+
+        res.render('home', {
+            user,
+            cart,
+            totalPrice
+        });
     } catch (error) {
+
         console.log('Error loading home:', error.message);
+        res.status(500).send('Server error');
     }
-}
+};
+
 
 
 // ------SiginIn and SignUp------>
 
 const authentication = async ( req, res) => {
     try {
+
+        
         
         res.render('signin-signup', {
             activeTab: 'signin',
@@ -55,11 +87,14 @@ const authentication = async ( req, res) => {
 
 const userAccount = async ( req, res) => {
     try {
-        if (req.session.user){
-            res.render('userAccount', {user: req.session.user})
-            } else {
-                res.redirect('/authentication')
-            }
+        if (req.userId) {
+            const user = await User.findById(req.userId)
+            return res.render('user', {
+                user,
+            });
+        } else {
+            return res.redirect('/authentication');
+        }
 
         }catch (erroe){
             console.log(error.message + ' user userAccount');

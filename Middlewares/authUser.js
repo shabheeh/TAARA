@@ -4,9 +4,11 @@ const isLogin = async (req, res, next) => {
 
     try {
         if (req.session.user) {
-            const userId = req.session.user || null;
-            req.userId = userId;
+
+            req.userId = req.session.user;
+
             next();
+
         } else {
             res.redirect(`/authentication`);
         }
@@ -26,14 +28,19 @@ const isLogout = async (req, res, next) => {
     }
 }
 
-const noAuth = async (req, res, next) => {
+const authorization = async (req, res, next) => {
     try {
 
-        const userId = req.session.user_id || null;
-        req.userId = userId;
+        if (req.session.user) {
+            req.userId = req.session.user;
+        }
+
         next();
+
     } catch (error) {
+
         console.log(error.message);
+        res.status(500).send('Server error');
     }
 };
 
@@ -41,5 +48,5 @@ const noAuth = async (req, res, next) => {
 module.exports={
     isLogin,
     isLogout,
-    noAuth
+    authorization
 }
