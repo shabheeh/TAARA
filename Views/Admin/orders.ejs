@@ -1,0 +1,292 @@
+
+<%- include('../Layouts/Admin/header') -%>
+
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+
+    <!-- Page CSS -->
+    
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+    
+    <script src="/Admin/assets/js/config.js"></script>
+    
+</head>
+
+<body>
+
+ 
+    <%- include('../Layouts/Admin/navbar') -%>
+      
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        
+          <div class="container-xxl flex-grow-1 container-p-y">
+            
+            
+<!-- Order List Widget -->
+
+<div class="card mb-6">
+  <div class="card-widget-separator-wrapper">
+    <div class="card-body card-widget-separator">
+      <div class="row gy-4 gy-sm-1">
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-4 pb-sm-0">
+            <div>
+              <h4 class="mb-0">56</h4>
+              <p class="mb-0">Pending Payment</p>
+            </div>
+            <div class="avatar me-sm-6">
+              <span class="avatar-initial rounded bg-label-secondary text-heading">
+                <i class="ri-calendar-2-line ri-24px"></i>
+              </span>
+            </div>
+          </div>
+          <hr class="d-none d-sm-block d-lg-none me-6">
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-4 pb-sm-0">
+            <div>
+              <h4 class="mb-0">12,689</h4>
+              <p class="mb-0">Completed</p>
+            </div>
+            <div class="avatar me-lg-6">
+              <span class="avatar-initial rounded bg-label-secondary text-heading">
+                <i class="ri-check-double-line ri-24px"></i>
+              </span>
+            </div>
+          </div>
+          <hr class="d-none d-sm-block d-lg-none">
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex justify-content-between align-items-start border-end pb-4 pb-sm-0 card-widget-3">
+            <div>
+              <h4 class="mb-0">124</h4>
+              <p class="mb-0">Refunded</p>
+            </div>
+            <div class="avatar me-sm-6">
+              <span class="avatar-initial rounded bg-label-secondary text-heading">
+                <i class="ri-wallet-3-line ri-24px"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h4 class="mb-0">32</h4>
+              <p class="mb-0">Failed</p>
+            </div>
+            <div class="avatar">
+              <span class="avatar-initial rounded bg-label-secondary text-heading">
+                <i class="ri-error-warning-line ri-24px"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order List Table -->
+<div class="card">
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div
+                class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center py-0 pb-5 pb-md-0">
+                <div>
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm ms-0" placeholder="Search Order"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                <div class="d-flex align-items-md-baseline justify-content-md-end gap-4">
+                    <div class="dataTables_length my-0" id="DataTables_Table_0_length"><label><select
+                                name="DataTables_Table_0_length" aria-controls="DataTables_Table_0"
+                                class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="40">40</option>
+                                <option value="60">60</option>
+                                <option value="80">80</option>
+                                <option value="100">100</option>
+                            </select></label></div>
+                    <div class="dt-action-buttons pt-0">
+                        <div class="dt-buttons btn-group flex-wrap">
+                            <div class="btn-group"><button
+                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                                    aria-expanded="false"><span><i class="ri-download-line ri-16px me-2"></i> <span
+                                            class="d-none d-sm-inline-block">Export</span></span></button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-order table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
+                <thead>
+                    <tr>
+                        <th>order</th>
+                        <th>date</th>
+                        <th>customers</th>
+                        <th>payment</th>
+                        <th>status</th>
+                        <th>method</th>
+                        <th>actions</th>
+                      </tr>
+                </thead>
+                <tbody>
+                    <% if ( orders.length> 0) { %>
+                        <% orders.forEach((order, index)=> { %>
+                    <tr>
+                        <td><a href="app-ecommerce-order-details.html"><span><%= order.orderId %></span></a></td>
+                        <td class="sorting_1"><span class="text-nowrap"><%= order.orderedAt %></span></td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="d-flex flex-column"><a href="pages-profile-user.html"
+                                        class="text-truncate text-heading"><span class="fw-medium"><%= order.user.firstName ? order.user.firstName : 'Name' %></span></a><small class="text-truncate"><%= order.user.email %></small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <h6 class="mb-0 w-px-100 d-flex align-items-center text-warning"><i
+                                    class="ri-circle-fill ri-10px me-1"></i>Pending</h6>
+                        </td>
+                        <td><span class="badge px-2 rounded-pill bg-label-success" text-capitalized="">Delivered</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center text-nowrap"><span><%= order.payment %></span></div>
+                        </td>
+                        <td>
+                            <div><button
+                                    class="btn btn-sm btn-icon btn-text-secondary text-body waves-effect rounded-pill dropdown-toggle hide-arrow"
+                                    data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0"><a
+                                        href="app-ecommerce-order-details.html" class="dropdown-item">View</a><a
+                                        href="javascript:0;" class="dropdown-item delete-record">Delete</a></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                    <td colspan="6">No orders found.</td>
+                    </tr>
+                <% } %>
+                    
+                </tbody>
+            </table>
+            <div class="row mx-1">
+                <div class="col-sm-12 col-md-6">
+                    <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                        Displaying 1 to 10 of 100 entries</div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                        <ul class="pagination">
+                            <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a
+                                    aria-controls="DataTables_Table_0" aria-disabled="true" role="link"
+                                    data-dt-idx="previous" tabindex="-1" class="page-link">Previous</a></li>
+                            <li class="paginate_button page-item active"><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" aria-current="page" data-dt-idx="0" tabindex="0" class="page-link">1</a>
+                            </li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" data-dt-idx="1" tabindex="0" class="page-link">2</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" data-dt-idx="2" tabindex="0" class="page-link">3</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" data-dt-idx="3" tabindex="0" class="page-link">4</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" data-dt-idx="4" tabindex="0" class="page-link">5</a></li>
+                            <li class="paginate_button page-item disabled" id="DataTables_Table_0_ellipsis"><a
+                                    aria-controls="DataTables_Table_0" aria-disabled="true" role="link"
+                                    data-dt-idx="ellipsis" tabindex="-1" class="page-link">…</a></li>
+                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                                    role="link" data-dt-idx="9" tabindex="0" class="page-link">10</a></li>
+                            <li class="paginate_button page-item next" id="DataTables_Table_0_next"><a href="#"
+                                    aria-controls="DataTables_Table_0" role="link" data-dt-idx="next" tabindex="0"
+                                    class="page-link">Next</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 1%;"></div>
+        </div>
+    </div>
+</div>
+
+          </div>
+          <!-- / Content -->
+
+          
+          
+
+
+          
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+      </div>
+      <!-- / Layout page -->
+    </div>
+
+    
+    
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    
+    
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    
+  </div>
+  <!-- / Layout wrapper -->
+
+  
+  
+  
+
+  
+
+  <!-- Core JS -->
+  <!-- build:js assets/vendor/js/core.js -->
+  <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+  <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="/Admin/assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+
+  <!-- Main JS -->
+  <script src="/Admin/assets/js/main.js"></script>
+  
+
+  <!-- Page JS -->
+
+  
+</body>
+
+
+<!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-order-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:33 GMT -->
+</html>
+
+<!-- beautify ignore:end -->
+

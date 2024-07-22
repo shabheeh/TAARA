@@ -387,7 +387,7 @@
                   const categoryLabel = document.getElementById(`productCategoryError-${productId}`);
                   const brandLabel = document.getElementById(`productBrandError-${productId}`);
   
-                  
+
   
                   let isValid = true;
   
@@ -454,7 +454,7 @@
 
 
                   if (isValid) {
-                      const formData = { id: productId, name, brand, category, description, gender };
+                      const formData = { id: productId, name, brand, price, category, description, gender };
                       updateProduct(formData);
                       
                   }

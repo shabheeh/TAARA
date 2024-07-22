@@ -3,6 +3,7 @@ const Product = require("../Models/productModel");
 const Brand = require("../Models/brandModel");
 const Variant = require("../Models/variantModel")
 const User = require('../Models/userModel')
+const Cart = require('../Models/cartModel')
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -333,6 +334,22 @@ const editVariant = async ( req, res ) => {
             message: "Variant not found",
           });
         }
+
+        // update product quantity in carts according to the quantity of that products.
+        const carts = await Cart.find({'products.variant': variantId});
+
+        
+
+        for (const cart of carts) {
+            for (const item of cart.products) {
+                if (item.variant == variantId && item.quantity > updateVariant.quantity) {
+                    item.quantity = updateVariant.quantity;
+                }
+            }
+            await cart.save();
+        }
+
+          
 
         const variant = await Variant.findById({_id: variantId})
 

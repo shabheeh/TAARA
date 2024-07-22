@@ -36,12 +36,12 @@
                                     
                                 </li>
                                 <li>
-                                    <a href="/products/gender/Men" class="">MEN</a>
+                                    <a href="/products/Men" class="">MEN</a>
 
                                     
                                 </li>
                                 <li>
-                                    <a href="/products/gender/Women" class="">WOMEN</a>
+                                    <a href="/products/Women" class="">WOMEN</a>
 
                                     
                                 </li>
@@ -90,7 +90,7 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <% if (cart.products.length > 0) { %>
                                     <div class="dropdown-cart-products">
-                                        <% cart.products.forEach(current => { %>
+                                        <% cart.products.slice(0, 3).forEach(current => { %>
                                             <div class="product">
                                                 <div class="product-cart-details">
                                                     <h4 class="product-title">

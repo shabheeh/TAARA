@@ -18,6 +18,7 @@ const authAdmin = require("../Middlewares/authAdmin");
 //            controllers
 const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController")
+const orderController = require('../Controllers/orderController')
 
 //           admin login and dashboard
 app.get("/", authAdmin.isLogin, adminController.login)
@@ -79,6 +80,10 @@ app.put('/products/variants/editVariant',
     { name: "productImage4", maxCount: 1 },
   ]),
    productController.editVariant)
+
+
+//              order management
+app.get('/orders', authAdmin.isLogin, orderController.orders)
 
 
 

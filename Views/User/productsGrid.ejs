@@ -6,6 +6,7 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="/User/assets/css/style.css">
     <link rel="stylesheet" href="/User/assets/css/plugins/nouislider/nouislider.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
 
     <style>
         .color-preview {
@@ -126,7 +127,12 @@
                                         <div class="col-6 col-md-4 col-lg-4">
                                     <div class="product product-7 text-center">
                                       <figure class="product-media">
-                                        <span class="product-label label-new">New</span>
+                                        <% if (product.variants[0].quantity == 0) { %>
+                                            <span class="product-label label-sale">Out of Stock</span>
+                                        <% } else { %>
+                                            <span class="product-label label-new">New</span>
+                                        <% } %>
+                    
                                         <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
                                           <img src="/Admin/assets/Products-Cropped/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
                                         </a>
@@ -138,7 +144,7 @@
                                         </div><!-- End .product-action-vertical -->
                               
                                         <div class="product-action">
-                                          <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                          <a href="#" id="addToCart-<%= product.variants[0]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
                                         </div><!-- End .product-action -->
                                       </figure><!-- End .product-media -->
                               
@@ -761,6 +767,79 @@
             </div><!-- End .modal-content -->
         </div><!-- End .modal-dialog -->
     </div><!-- End .modal -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+    const addToCartButtons = document.querySelectorAll('.btn-cart');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); 
+
+
+            const variantId = this.id.replace('addToCart-', '');
+
+            const data = {
+                variantId: variantId,
+                quantity: 1
+            }
+            addToCart(data);
+        });
+    });
+});
+
+function addToCart(data) {
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var notyf = new Notyf({
+                        position: {
+                            x: 'center',
+                            y: 'center'
+                        }
+                        });
+                    notyf.success(data.message)
+                } 
+                else if (!data.user) {
+
+                    window.location.href = '/authentication';
+                } else {
+                    // Show error alert
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while adding the product to the cart.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+
+    </script>
 
     <!-- Plugins JS File -->
     <script src="/User/assets/js/jquery.min.js"></script>

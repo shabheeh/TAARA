@@ -2,6 +2,8 @@
 const User = require("../Models/userModel");
 const Token = require("../Models/resetToken");
 const Cart = require('../Models/cartModel')
+const Address = require('../Models/addressModel')
+const Order = require('../Models/orderModel')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -80,25 +82,6 @@ const authentication = async ( req, res) => {
             console.log('Error loading authentication:', error.message);
         }
             
-}
-
-
-// ------User Account------>
-
-const userAccount = async ( req, res) => {
-    try {
-        if (req.userId) {
-            const user = await User.findById(req.userId)
-            return res.render('user', {
-                user,
-            });
-        } else {
-            return res.redirect('/authentication');
-        }
-
-        }catch (erroe){
-            console.log(error.message + ' user userAccount');
-        }
 }
 
 
@@ -296,6 +279,14 @@ const verifySignIn = async (req, res) => {
         const userData = await User.findOne({ email });
 
         if ( userData ) {
+
+            if(!userData.password){
+                return res.render('signin-signup', {
+                    activeTab: 'signin',
+                    formDataSignin: email,
+                    signinMessage: 'Please login with google'
+                });
+            }
             const isPassMatch = await bcrypt.compare(password, userData.password);
 
             if ( isPassMatch ) {
@@ -442,6 +433,7 @@ const resetPass = async (req, res) => {
     }
 };
 
+// -------reset password verify------>
 
 const resetPassVerify = async ( req, res) => {
 
@@ -488,6 +480,224 @@ const resetPassVerify = async ( req, res) => {
     }
 }
 
+// ------User Account------>
+
+const userAccount = async ( req, res) => {
+    try {
+        if (req.userId) {
+            const userId = req.userId
+            const user = await User.findById(userId)
+            const addresses = await Address.find({user: req.userId})
+            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant').populate('address')
+
+               return res.render('user', {
+                    user,
+                    addresses: addresses ? addresses : null,
+                    orders: orders ? orders : null
+                    })
+            
+
+        } else {
+            return res.redirect('/authentication');
+        }
+
+        }catch (error){
+            console.log(error.message + ' user userAccount');
+        }
+}
+
+
+// -----Update Profile----->
+
+const updateProfile = async (req, res) => {
+    try {
+        const { firstName, lastName, email, phone } = req.body
+
+        const userId = req.userId;
+
+        const user = await User.findById(userId); 
+
+        if(!user){
+            return res.json({
+                success: false,
+                message: 'User not found'
+            })
+        }
+
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.email = email;
+        user.phone = Number(phone)
+        await user.save();
+        res.json({
+            success: true,
+            message: 'Profile updated successfully'
+        })
+        } catch (error) {
+            console.log('Error updating profile:', error.message);
+            res.json({
+                success: false,
+                message: 'Error updating profile'
+            })
+       }
+}
+
+// -------Change password----->
+
+const changePassword = async ( req, res ) => {
+    try {
+
+        const { currentPassword, password } = req.body
+
+        console.log(req.body)
+
+        const userId = req.userId;
+
+        if(!userId){
+            return res.json({
+                success: false,
+                message: 'User not found'
+                })
+        }
+
+        const user = await User.findById(userId)
+
+        if(user.password){
+
+            const isPassMatch = await bcrypt.compare(currentPassword, user.password);
+
+            if(!isPassMatch){
+                return res.json({
+                    success: false,
+                    message: 'Current password is incorrect'
+                })
+            } else {
+                user.password = await bcrypt.hash(password, 10)
+                await user.save();
+                res.json({
+                    success: true,
+                    message: 'Password updated successfully'
+                })
+            }
+
+            
+    
+        } else {
+            res.json({
+                success: false,
+                message: `You can't change password you signed up with google`
+            })
+        }
+
+    } catch (error) {
+        console.log('Error updating password:', error.message);
+        res.json({
+            success: false,
+            message: 'Error updating password'
+            })
+        
+    }
+}
+
+// --------Add Address------->
+
+const addAddress = async ( req, res ) => {
+
+    try {
+        
+        const { name, phone, address, street, city, landmark, state, pincode} = req.body
+
+        const userId = req.userId;
+
+        const addAddress = new Address({
+            user: userId,
+            name, phone, address, street, city, landmark, state, pincode, 
+        })
+
+        await addAddress.save();
+
+        res.json({
+            success: true,
+            address: addAddress,
+            message: 'Address added successfully'
+            })
+
+
+
+    } catch (error) {
+        console.log('Error adding address:', error.message);
+        res.json({
+            success: false,
+            message: 'Error adding address'
+            })
+        
+    }
+}
+
+// ------Address for Editing---->
+
+const editAddress = async ( req, res ) => {
+
+    try {
+        const { addressId, name, phone, address, street, city, landmark, state, pincode} = req.body
+
+
+        const updateAddress = await Address.findOneAndUpdate(
+            { _id: addressId },
+            { name, phone, address, street, city, landmark, state, pincode },
+            { new: true }
+        );
+
+        if(!updateAddress){
+            return res.json({
+                success: false,
+                message: 'Address not found'
+                })
+        }
+
+        
+        res.json({
+            success: true,
+            address: updateAddress,
+            message: 'Address updated successfully'
+            })
+
+
+    } catch (error) {
+        console.log('Error finding address:', error.message);
+        res.json({
+            success: false,
+            message: 'Error finding address'
+            })
+        
+    }
+}
+
+// -------Delete Address-------> 
+
+const deleteAddress = async ( req, res ) => {
+
+    try {
+
+        const addressId = req.body.addressId
+        const deleteAddress = await Address.findOneAndDelete({ _id: addressId });
+
+        if(!deleteAddress){
+            return res.json({
+                success: false,
+                message: 'Address not found'
+             })
+        }
+        res.json({
+            success: true,
+            message: 'Address deleted successfully'
+        })
+            
+    } catch (error) {
+        console.log('Error finding address:', error.message);
+        
+    }
+}
 
 
 
@@ -495,7 +705,6 @@ module.exports = {
     loadHome,
     insertUser,
     authentication,
-    userAccount,
     loadOtp,
     verifyOtp,
     resendOtp,
@@ -503,6 +712,14 @@ module.exports = {
     forgotPass,
     forgotPassVerify,
     resetPass,
-    resetPassVerify
+    resetPassVerify,
+
+    userAccount,
+    updateProfile,
+    changePassword,
+    addAddress,
+    editAddress,
+    deleteAddress,
+
 
 }

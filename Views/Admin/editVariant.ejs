@@ -378,7 +378,7 @@
                         sizeLabel.classList.remove('error-message');
                     }
 
-                    if (!variantQuantity || isNaN(variantQuantity) || variantQuantity <= 0) {
+                    if (!variantQuantity || isNaN(variantQuantity) || variantQuantity < 0) {
                         quantityLabel.innerText = 'Invalid Quantity';
                         quantityLabel.classList.add('error-message');
                         isValid = false;

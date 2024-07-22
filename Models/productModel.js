@@ -35,11 +35,9 @@ const productSchema = new mongoose.Schema({
     isListed: {
         type: Boolean,
     },
-    
-    createdAt: {
-        type: String,
-        default: new Date().toLocaleDateString()
-    },
-});
+
+},
+{ timestamps: true }
+);
 
 module.exports = mongoose.model("Product", productSchema);

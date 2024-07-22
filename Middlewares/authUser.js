@@ -1,4 +1,4 @@
-
+const User = require('../Models/userModel')
 
 const isLogin = async (req, res, next) => {
 
@@ -44,9 +44,34 @@ const authorization = async (req, res, next) => {
     }
 };
 
+const isBlocked = async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            const userId = req.session.user;
+            const user = await User.findById(userId);
+
+            if (user.isBlocked) {
+                delete req.session.user;
+                return res.redirect('/authentication'); 
+            }
+        } else {
+            return res.redirect('/authentication'); 
+        }
+
+        next(); 
+    } catch (error) {
+        console.log(error.message);
+  
+    }
+};
+
+
+
 
 module.exports={
     isLogin,
     isLogout,
-    authorization
+    authorization,
+    isBlocked
+
 }

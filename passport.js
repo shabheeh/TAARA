@@ -10,7 +10,7 @@ passport.use(new GoogleStrategy({
   async (accessToken, refreshToken, profile, done) => {
 
     try {
-      const { id, emails, name, gender } = profile;
+      const { id, emails, name } = profile;
   
       // Find the user by email
       let user = await User.findOne({ email: emails[0].value });
@@ -25,7 +25,6 @@ passport.use(new GoogleStrategy({
         // user.googleId = id;
         user.firstName = name.givenName;
         user.lastName = name.familyName || '';
-        user.gender = gender || user.gender;
   
         await user.save();
       } else {
@@ -35,7 +34,6 @@ passport.use(new GoogleStrategy({
           firstName: name.givenName,
           lastName: name.familyName || '',
           email: emails[0].value,
-          gender: gender || '',
           dateOfJoined: new Date().toLocaleDateString('en-GB'),
           isBlocked: false  
         });

@@ -22,10 +22,6 @@ const userSchema = mongoose.Schema({
         type: Number,
     },    
 
-    gender: {
-        type: String,
-        },
-
     password: {
         type: String,
         },
@@ -39,10 +35,6 @@ const userSchema = mongoose.Schema({
         
     },
 
-    dateOfJoined: {
-        type: String,
-    },
-
     isBlocked: {
         type: Boolean,
         default: false,
@@ -50,13 +42,10 @@ const userSchema = mongoose.Schema({
 
     orders: {
         type: Array,
-    }
-
-
-
-
-
-});
+    },
+},
+{ timestamps: true }
+);
 
 
 module.exports = mongoose.model("User", userSchema)

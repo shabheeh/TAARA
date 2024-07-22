@@ -9,11 +9,19 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="/User/assets/css/style.css">
     <link rel="stylesheet" href="/User/assets/css/plugins/nouislider/nouislider.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
 
     <style>
         .error-message {
             color: red !important;
     
+        }
+
+        .btn-disabled {
+
+      cursor: not-allowed;
+      pointer-events: none;
+      color: white; 
         }
     
     </style>
@@ -129,7 +137,12 @@
                                     </div><!-- End .details-filter-row -->
 
                                     <div class="product-details-action">
-                                        <a href="#" id="addToCart" class="btn-product btn-cart"><span>add to cart</span></a>
+                                        <% if (variant.quantity == 0) { %>
+                                            <a href="#" class="btn-product btn-danger btn-cart btn-disabled"><span>Out of Stock</span></a>
+                                        <% } else { %>
+                                            <a href="#" id="addToCart" class="btn-product btn-cart"><span>add to cart</span></a>
+                                            <% } %>
+                                        
 
                                         <div class="details-action-wrapper">
                                             <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
@@ -299,9 +312,7 @@
                         </div><!-- End .row -->
                     </div><!-- End .product-details-top -->
 
-                    <hr class="mt-3 mb-5">
-
-                    <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
+                    
                     <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
     data-owl-options='{
         "nav": false, 
@@ -330,6 +341,9 @@
     }'>
     <% similarProducts.forEach(function(similarProduct) { %>
         <% if (similarProduct._id.toString() !== product._id.toString()) { %>
+            <hr class="mt-3 mb-5">
+
+                    <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
             <div class="product product-7">
                 <figure class="product-media">
                     <% if (similarProduct.isNew) { %>
@@ -743,6 +757,7 @@
 
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
     
     <script>
         document.getElementById('addToCart').addEventListener('click', (event) => {
@@ -786,7 +801,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/cart';
+                    
+                    var notyf = new Notyf({
+                        position: {
+                            x: 'center',
+                            y: 'center'
+                        }
+                        });
+                    notyf.success(data.message)
                 } 
                 else if (!data.user) {
                     // Show success alert
@@ -818,7 +840,7 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+
 
     <!-- Plugins JS File -->
     <script src="/User/assets/js/jquery.min.js"></script>

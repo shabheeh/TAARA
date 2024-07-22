@@ -33,11 +33,8 @@ const variantSchema = new mongoose.Schema({
     type: Boolean,
 },
 
-  createdAt: {
-    type: String,
-    default: new Date().toLocaleDateString()
-  },
-  
-});
+},
+{ timestamps: true }
+);
 
 module.exports = mongoose.model("Variant", variantSchema);

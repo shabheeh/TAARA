@@ -28,24 +28,24 @@
                             <i class="icon-bars"></i>
                         </button>
 
-                        <a href="index.html" class="logo">
+                        <a href="/" class="logo">
                             Taara
                         </a>
 
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
                                 <li class="megamenu-container active">
-                                    <a href="index.html" class="">HOME</a>
+                                    <a href="/" class="">HOME</a>
 
                                     
                                 </li>
                                 <li>
-                                    <a href="category.html" class="">MEN</a>
+                                    <a href="/products/Men" class="">MEN</a>
 
                                     
                                 </li>
                                 <li>
-                                    <a href="product.html" class="">WOMEN</a>
+                                    <a href="/products/Women" class="">WOMEN</a>
 
                                     
                                 </li>
@@ -629,7 +629,7 @@
         }
         
         function validateSignupPassword(password, passwordError) {
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            const passwordRegex = 	/^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$/
         
             if (!password) {
                 passwordError.textContent = 'Password is required';
@@ -638,7 +638,7 @@
             }
         
             if (!passwordRegex.test(password)) {
-                passwordError.textContent = 'Password must be at least 8 characters long and include a mix of uppercase and lowercase letters, numbers, and special characters';
+                passwordError.textContent = 'Password must contain at least one letter, at least one number, and be longer than six charaters.';
                 passwordError.classList.add('error-message');
                 return false;
             }

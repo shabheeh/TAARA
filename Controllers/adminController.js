@@ -474,6 +474,8 @@ const editBrand = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
     login,
     loadHome, 
@@ -492,5 +494,5 @@ module.exports = {
     addBrand,
     editBrand,
     unlistBrand,
-    listBrand
+    listBrand,
 }
