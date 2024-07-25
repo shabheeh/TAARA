@@ -42,7 +42,7 @@ const orderShcema = new mongoose.Schema({
 
             status: {
                 type: String,
-                default: 'pending',
+                default: 'Pending',
             },
 
             cancelDate: {
@@ -57,7 +57,7 @@ const orderShcema = new mongoose.Schema({
                 type: Date
             },
         
-            returnDate: {
+            returnReason: {
                 type: String
             },
         }        

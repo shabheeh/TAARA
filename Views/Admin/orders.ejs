@@ -6,17 +6,21 @@
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
-<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
-<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
-<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+    
 
     <!-- Page CSS -->
     
-
+    <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
     <!-- Helpers -->
     <script src="/Admin/assets/vendor/js/helpers.js"></script>
     
     <script src="/Admin/assets/js/config.js"></script>
+
+    
     
 </head>
 
@@ -35,13 +39,20 @@
             
             
 <!-- Order List Widget -->
+<div class="d-flex  justify-content-between">
+  <h4 class="mb-1">Orders</h4>
+  
 
+</div>
 <div class="card mb-6">
+  
   <div class="card-widget-separator-wrapper">
     <div class="card-body card-widget-separator">
       <div class="row gy-4 gy-sm-1">
         <div class="col-sm-6 col-lg-3">
+          
           <div class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-4 pb-sm-0">
+            
             <div>
               <h4 class="mb-0">56</h4>
               <p class="mb-0">Pending Payment</p>
@@ -101,36 +112,39 @@
 
 <!-- Order List Table -->
 <div class="card">
-    <div class="card-datatable table-responsive">
-        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
-            <div
-                class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center py-0 pb-5 pb-md-0">
-                <div>
-                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
-                                class="form-control form-control-sm ms-0" placeholder="Search Order"
-                                aria-controls="DataTables_Table_0"></label></div>
-                </div>
-                <div class="d-flex align-items-md-baseline justify-content-md-end gap-4">
-                    <div class="dataTables_length my-0" id="DataTables_Table_0_length"><label><select
-                                name="DataTables_Table_0_length" aria-controls="DataTables_Table_0"
-                                class="form-select form-select-sm">
-                                <option value="10">10</option>
-                                <option value="40">40</option>
-                                <option value="60">60</option>
-                                <option value="80">80</option>
-                                <option value="100">100</option>
-                            </select></label></div>
-                    <div class="dt-action-buttons pt-0">
-                        <div class="dt-buttons btn-group flex-wrap">
-                            <div class="btn-group"><button
-                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary waves-effect waves-light"
-                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
-                                    aria-expanded="false"><span><i class="ri-download-line ri-16px me-2"></i> <span
-                                            class="d-none d-sm-inline-block">Export</span></span></button></div>
-                        </div>
-                    </div>
-                </div>
+  <div class="card-datatable table-responsive">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="row mx-1">
+        <div class="col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4">
+          <div class="dt-action-buttons mt-4 mt-md-0">
+            <div class="col-sm-12 col-md-6">
+              <div class="dataTables_length" id="DataTables_Table_0_length">
+                <label>Show
+                  <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm"
+                      onchange="window.location.href = '?page=<%= page %>&limit=' + this.value">
+                      <option value="10" <% if (limit === 10) { %> selected <% } %>>10</option>
+                      <option value="25" <% if (limit === 25) { %> selected <% } %>>25</option>
+                      <option value="50" <% if (limit === 50) { %> selected <% } %>>50</option>
+                      <option value="100" <% if (limit === 100) { %> selected <% } %>>100</option>
+                  </select>
+
+                </label>
+              </div>
             </div>
+          </div>
+        </div>
+        <div class="col-md-10">
+          <div class="d-flex align-items-center justify-content-md-end justify-content-center">
+            <div class="me-4">
+              <div class="dataTables_filter">
+                <label>
+                  <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                </label>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
             <table class="datatables-order table dataTable no-footer dtr-column" id="DataTables_Table_0"
                 aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
                 <thead>
@@ -139,17 +153,17 @@
                         <th>date</th>
                         <th>customers</th>
                         <th>payment</th>
-                        <th>status</th>
                         <th>method</th>
-                        <th>actions</th>
+                        <th>status</th>
+                        <!-- <th>actions</th> -->
                       </tr>
                 </thead>
                 <tbody>
                     <% if ( orders.length> 0) { %>
                         <% orders.forEach((order, index)=> { %>
                     <tr>
-                        <td><a href="app-ecommerce-order-details.html"><span><%= order.orderId %></span></a></td>
-                        <td class="sorting_1"><span class="text-nowrap"><%= order.orderedAt %></span></td>
+                        <td><a href="/admin/order/<%= order._id %>"><span><%= order.orderId %></span></a></td>
+                        <td class="sorting_1"><span class="text-nowrap"><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></span></td>
                         <td>
                             <div class="d-flex justify-content-start align-items-center user-name">
                                 <div class="d-flex flex-column"><a href="pages-profile-user.html"
@@ -161,12 +175,13 @@
                             <h6 class="mb-0 w-px-100 d-flex align-items-center text-warning"><i
                                     class="ri-circle-fill ri-10px me-1"></i>Pending</h6>
                         </td>
-                        <td><span class="badge px-2 rounded-pill bg-label-success" text-capitalized="">Delivered</span>
-                        </td>
                         <td>
                             <div class="d-flex align-items-center text-nowrap"><span><%= order.payment %></span></div>
                         </td>
                         <td>
+                          <span class="badge px-2 rounded-pill bg-label-success">Delivered</span>
+                        </td>
+                        <!-- <td>
                             <div><button
                                     class="btn btn-sm btn-icon btn-text-secondary text-body waves-effect rounded-pill dropdown-toggle hide-arrow"
                                     data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></button>
@@ -174,7 +189,7 @@
                                         href="app-ecommerce-order-details.html" class="dropdown-item">View</a><a
                                         href="javascript:0;" class="dropdown-item delete-record">Delete</a></div>
                             </div>
-                        </td>
+                        </td> -->
                     </tr>
 
                     <% }); %>
@@ -187,38 +202,35 @@
                 </tbody>
             </table>
             <div class="row mx-1">
-                <div class="col-sm-12 col-md-6">
-                    <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
-                        Displaying 1 to 10 of 100 entries</div>
+              <div class="col-sm-12 col-md-6">
+                <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                  Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalOrders) %> of <%= totalOrders %>
+                        entries
                 </div>
-                <div class="col-sm-12 col-md-6">
-                    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
-                        <ul class="pagination">
-                            <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a
-                                    aria-controls="DataTables_Table_0" aria-disabled="true" role="link"
-                                    data-dt-idx="previous" tabindex="-1" class="page-link">Previous</a></li>
-                            <li class="paginate_button page-item active"><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" aria-current="page" data-dt-idx="0" tabindex="0" class="page-link">1</a>
-                            </li>
-                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" data-dt-idx="1" tabindex="0" class="page-link">2</a></li>
-                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" data-dt-idx="2" tabindex="0" class="page-link">3</a></li>
-                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" data-dt-idx="3" tabindex="0" class="page-link">4</a></li>
-                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" data-dt-idx="4" tabindex="0" class="page-link">5</a></li>
-                            <li class="paginate_button page-item disabled" id="DataTables_Table_0_ellipsis"><a
-                                    aria-controls="DataTables_Table_0" aria-disabled="true" role="link"
-                                    data-dt-idx="ellipsis" tabindex="-1" class="page-link">…</a></li>
-                            <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
-                                    role="link" data-dt-idx="9" tabindex="0" class="page-link">10</a></li>
-                            <li class="paginate_button page-item next" id="DataTables_Table_0_next"><a href="#"
-                                    aria-controls="DataTables_Table_0" role="link" data-dt-idx="next" tabindex="0"
-                                    class="page-link">Next</a></li>
-                        </ul>
-                    </div>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div class="dataTables_paginate" >
+                  <ul class="pagination">
+                    <li class="paginate_button page-item  <%= page === 1 ? 'disabled' : '' %>">
+                      <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                        class="page-link">Previous</a>
+                    </li>
+                    <% for (let i=1; i <=totalPages; i++) { %>
+                      <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                        <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                          class="page-link">
+                          <%= i %>
+                        </a>
+                      </li>
+                      <% } %>
+                        <li class="paginate_button page-item  <%= page === totalPages ? 'disabled' : '' %>">
+                          <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                            class="page-link">Next</a>
+                        </li>
+                  </ul>
                 </div>
+            
+              </div>
             </div>
             <div style="width: 1%;"></div>
         </div>
@@ -254,7 +266,30 @@
 
   
   
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+   
   
+    function performSearch() {
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm) {
+        // If there's a search term, add it to the URL and navigate
+        window.location.href = `/admin/orders?search=${encodeURIComponent(searchTerm)}`;
+      } else {
+        // If no search term, just load all products
+        window.location.href = '/admin/orders';
+      }
+    }
+  
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+    });
+  });
+  </script>
 
   
 

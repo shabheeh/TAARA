@@ -114,12 +114,13 @@
                       <div class="dataTables_length" id="DataTables_Table_0_length">
                         <label>Show
                           <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm"
-                            onchange="changeLimit(this.value)">
-                            <option value="10" <% if (limit===10) { %> selected <% } %>>10</option>
-                            <option value="25" <% if (limit===25) { %> selected <% } %>>25</option>
-                            <option value="50" <% if (limit===50) { %> selected <% } %>>50</option>
-                            <option value="100" <% if (limit===100) { %> selected <% } %>>100</option>
+                              onchange="window.location.href = '?page=<%= page %>&limit=' + this.value">
+                              <option value="10" <% if (limit === 10) { %> selected <% } %>>10</option>
+                              <option value="25" <% if (limit === 25) { %> selected <% } %>>25</option>
+                              <option value="50" <% if (limit === 50) { %> selected <% } %>>50</option>
+                              <option value="100" <% if (limit === 100) { %> selected <% } %>>100</option>
                           </select>
+
                         </label>
                       </div>
                     </div>
@@ -128,10 +129,11 @@
                 <div class="col-md-10">
                   <div class="d-flex align-items-center justify-content-md-end justify-content-center">
                     <div class="me-4">
-                      <div id="DataTables_Table_0_filter" class="dataTables_filter">
-                        <label><input type="search" class="form-control form-control-sm" placeholder="Search User"
-                            aria-controls="DataTables_Table_0" oninput="searchUser(this.value)"></label>
-                      </div>
+                      <div class="dataTables_filter">
+                        <label>
+                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                        </label>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -211,15 +213,26 @@
                 <div class="col-sm-12 col-md-6">
                   <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
                     <ul class="pagination">
-                      <% for (let i=1; i <= totalPages; i++) { %>
+                      <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
+                        <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                          class="page-link">Previous</a>
+                      </li>
+                      <% for (let i=1; i <=totalPages; i++) { %>
                         <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
-                          <a href="#" onclick="fetchPage(<%= i %>)" class="page-link">
+                          <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                            class="page-link">
                             <%= i %>
                           </a>
                         </li>
                         <% } %>
+                          <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
+                            <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                              class="page-link">Next</a>
+                          </li>
                     </ul>
                   </div>
+              
+                </div>
                 </div>
               </div>
             </div>
@@ -282,13 +295,7 @@
 
 
   <script>
-     function fetchPage(page) {
-        window.location.href = `/admin/users?page=${page}&limit=10`;
-      }
-
-      function changeLimit(limit) {
-        window.location.href = `/admin/users?page=1&limit=${limit}`;
-      }
+     
 
 
     // Function to show confirmation modal
@@ -373,6 +380,32 @@
         });
     });
   </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchInput');
+ 
+
+  function performSearch() {
+    const searchTerm = searchInput.value.trim();
+    if (searchTerm) {
+      // If there's a search term, add it to the URL and navigate
+      window.location.href = `/admin/users?search=${encodeURIComponent(searchTerm)}`;
+    } else {
+      // If no search term, just load all products
+      window.location.href = '/admin/users';
+    }
+  }
+
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch();
+    }
+  });
+});
+</script>
+
 
   
 </body>

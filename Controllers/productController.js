@@ -14,22 +14,51 @@ const sharp = require("sharp");
 
 
 
-// ------Products List------>
+// ------Products List Admin side----->
 
 const products = async (req, res) => {
 
     try {
 
-      const products = await Product.find().populate('variants').populate('category').populate('brand');
+      const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+        let searchTerm = '';
+        let query = {};
 
-      const brands = await Brand.find()
-      const categories = await Category.find()
+        if (req.query.search) {
+            searchTerm = req.query.search.trim();
+            query = { 
+                $or: [
+                    { name: new RegExp(searchTerm, 'i') },
+                    { description: new RegExp(searchTerm, 'i') }
+                ]
+            };
+        }
 
-      res.render('products', {
-        products,
-        brands,
-        categories
-      });
+        const products = await Product.find(query)
+            .populate('variants')
+            .populate('category')
+            .populate('brand')
+            .skip(skip)
+            .limit(limit);
+
+        const totalProducts = await Product.countDocuments(query);
+
+        const brands = await Brand.find();
+        const categories = await Category.find();
+
+        res.render('products', {
+            products,
+            brands,
+            categories,
+            page,
+            totalPages: Math.ceil(totalProducts / limit),
+            searchTerm,
+            limit,
+            totalProducts
+        });
+
 
 
     } catch (error) {
@@ -169,6 +198,52 @@ const editProduct = async (req, res) => {
     });
   }
 };
+
+
+// ------unlist Product------>
+
+const unlistProduct = async (req, res) => {
+  try {
+      const productId = req.body.productId;
+      
+      
+      const unlistProduct = await Product.findByIdAndUpdate(productId, { isListed: false }, { new: true });
+      
+      if (!unlistProduct.isListed) {
+          
+          res.json({ isListed: false });
+      } else {
+          res.json({ isListed: true, message: 'Error unlisting product' });
+      }
+  } catch (error) {
+      console.error('Error unlisting product:', error.message);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// ------list product------>
+
+const listProduct = async (req, res) => {
+  try {
+      const productId = req.body.productId;
+      const listProduct = await Product.findByIdAndUpdate( productId, { isListed: true }, { new: true });
+
+      if ( listProduct.isListed) {
+
+          res.json({ isListed: true });
+
+      } else {
+          res.json({ isListed: false, message: 'Error listing product' });
+      }
+  } catch (error) {
+      console.error('Error listing product:', error.message);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+
+
 
 // ------Products Variants------>
 
@@ -373,54 +448,124 @@ const productsGrid = async ( req, res ) => {
 
   try {
 
-    const gender = req.params.gender
-
-
-    const products = await Product.find({gender}).populate('variants').populate('category')
-
     
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+      const skip = (page - 1) * limit;
+      
+    const { gender } = req.params;
+    const { categories, brands, sizes, color,  sortProducts } = req.query;
 
-    const brands = await Brand.find();
-    const categories = await Category.aggregate([
-      {$match:{
-        gender: gender,
-        isListed: true
-      }},
-      {
-          $lookup: {
-              from: 'products', 
-              localField: '_id',
-              foreignField: 'category',
-              as: 'products'
-          }
-      },
-      {
-          $project: {
-              _id: 1,
-              name: 1,
-              count: { $size: '$products' } 
-          }
-      }
-  ]);
+    // Build the query
+    let query = { gender: gender };
 
+    // Apply filter if present
+    if (categories) {
+      query.category = { $in: Array.isArray(categories) ? categories : [categories] };
+    }
 
+    if (brands) {
+      query.brand = { $in: Array.isArray(brands) ? brands : [brands] };
+    }
+
+// Apply size and color filter if present
+if (sizes || color) {
+  query.variants = { $elemMatch: {} };
   
-  let user = null;
-  if (req.userId) {
-      user = await User.findById(req.userId);
+  if (sizes) {
+    query.variants.$elemMatch.sizes = { $in: Array.isArray(sizes) ? sizes : [sizes] };
   }
 
+  if (color) {
+    query.variants.$elemMatch.color = { $in: Array.isArray(color) ? color : [color] };
+  }
+}
 
-    res.render('productsGrid', {
-      user,
-      title: gender,
-      products,
-      brands,
-      categories,
-    })
+console.log(query.variants)
+      
+
+    // Build the sort object
+    let sort = {};
+    switch (sortProducts) {
+      case 'lowPrice':
+        sort = { price: 1 };
+        break;
+      case 'highPrice':
+        sort = { price: -1 };
+        break;
+      case 'a-to-z':
+        sort = { name: 1 };
+        break;
+      case 'z-to-a':
+        sort = { name: -1 };
+        break;
+      default:
+        // 'featured' or any other case
+        sort = { name: 1 }; // Assuming you have a 'featured' field
+    }
+
+    // Fetch products
+    const products = await Product.find(query).sort(sort).populate('variants').populate('category').populate('brand')
+    const totalProducts = await Product.countDocuments(query);
+
+    // Fetch all brands for the filter
+    const allBrands = await Brand.find({isListed: true});
+    const allCategories = await Category.find({isListed: true})
+
+    // Prepare data for rendering
+    const filteredBrands = brands ? (Array.isArray(brands) ? brands : [brands]) : [];
+    const filteredCategories = categories ? (Array.isArray(categories) ? categories : [categories]) : [];
+    const filteredSizes = sizes ? (Array.isArray(sizes) ? sizes : [sizes]) : [];
+    const filteredColors = color ? (Array.isArray(color) ? color : [color]) : [];
+
+
+
+
+      const size = ['XS', 'S', 'M', 'L', 'XL' ];
+      const colors = [
+        { name: 'Black', code: '#000000' },
+        { name: 'White', code: '#fff1f1' },
+        { name: 'Red', code: '#FF0000' },
+        { name: 'Yellow', code: '#FFFF00' },
+        { name: 'Blue', code: '#3399cc' },
+        { name: 'Green', code: '#669933' },
+        { name: 'Pink', code: '#f2719c' },
+        { name: 'Gray', code: '#808080' },
+        { name: 'Orange', code: '#FFA500' },
+        { name: 'Brown', code: '#A52A2A' },
+        { name: 'Purple', code: '#800080' },
+        { name: 'Teal', code: '#008080' },
+        { name: 'Navy', code: '#000080' },
+        { name: 'Gold', code: '#FFD700' },
+        { name: 'Cyan', code: '#00FFFF' }
+    ];
+
+      let user = null;
+      if (req.userId) {
+          user = await User.findById(req.userId);
+      }
+
+      res.render('productsGrid', {
+          user,
+          title: gender,        
+          products,
+          brands: allBrands,
+          categories: allCategories,
+          filteredBrands,
+          filteredCategories,
+          filteredSizes,
+          filteredColors,
+          size,
+          colors,
+          page,
+          totalPages: Math.ceil(totalProducts / limit),
+          totalProducts,
+          sorted : sortProducts,
+      });
+
     
   } catch (error) {
-    console.log("Error listing products Men", error.message);
+    console.log("Error listing products grid", error.message);
 
   }
 
@@ -478,6 +623,8 @@ module.exports = {
     loadAddProduct,
     addProduct,
     editProduct,
+    unlistProduct,
+    listProduct,
     variants,
     loadAddVariant,
     addVariant,

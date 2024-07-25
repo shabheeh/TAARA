@@ -77,9 +77,10 @@
             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
               <div class="card-header d-flex border-top rounded-0 flex-wrap py-0 pb-5 pb-md-0">
                 <div class="me-5 ms-n2">
-                  <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
-                        class="form-control form-control-sm" placeholder="Search"
-                        aria-controls="DataTables_Table_0"></label>
+                  <div class="dataTables_filter">
+                    <label>
+                      <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                    </label>
                   </div>
                 </div>
                 <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
@@ -182,17 +183,17 @@
                                   data-bs-toggle="modal" data-bs-target="#editModal<%= product._id %>">Edit</a>
                               <% if (!product.isListed) { %>
                                   <a href="#" class="badge rounded-pill mx-2 bg-label-success listButton"
-                                      data-category-id="<%= product._id %>">List</a>
+                                      data-product-id="<%= product._id %>">List</a>
                               <% } else { %>
                                   <a href="#" class="badge rounded-pill mx-2 bg-label-danger listButton"
-                                      data-category-id="<%= product._id %>">Unlist</a>
+                                      data-product-id="<%= product._id %>">Unlist</a>
                               <% } %>
                           </div>
                       </td>
                       </tr>
 
 
-                      <!-- Modal -->
+                      
                       <!-- Modal -->
                       <div class="modal fade" id="editModal<%= product._id %>" tabindex="-1"
                         aria-labelledby="editModalLabel<%= product._id %>" aria-hidden="true">
@@ -299,12 +300,62 @@
                 </tbody>
               </table>
 
-              <div style="width: 1%;"></div>
+              <div class="row mx-1">
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                    Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalProducts) %> of <%= totalProducts %>
+                          entries
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                    <ul class="pagination">
+                      <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
+                        <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                          class="page-link">Previous</a>
+                      </li>
+                      <% for (let i=1; i <=totalPages; i++) { %>
+                        <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                          <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                            class="page-link">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                          <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
+                            <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                              class="page-link">Next</a>
+                          </li>
+                    </ul>
+                  </div>
+              
+                </div>
+              </div>
               <div style="width: 1%;"></div>
             </div>
           </div>
         </div>
 
+
+        <!-- Confirmation Modal -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to perform this action?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="confirmAction()">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         
       </div>
@@ -515,6 +566,115 @@
         });
       }
   </script>
+
+
+  <script>
+
+// Function to show confirmation modal
+    function showConfirmationModal(productId) {
+        $('#confirmationModal').data('productId', productId);
+        $('#confirmationModal').modal('show');
+    }
+
+    // Function to confirm list/unlist action
+    function confirmAction() {
+        const productId = $('#confirmationModal').data('productId');
+        const action = $('#confirmationModal').data('action');
+
+        
+        if (action === 'List') {
+            listProduct(productId);
+        } else if (action === 'Unlist') {
+            unlistProduct(productId);
+        }
+
+        $('#confirmationModal').modal('hide');
+    }
+
+    // Function to handle list product request
+    function listProduct(productId) {
+            fetch(`/admin/products/listProduct`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isListed) {
+                        $(`a[data-product-id="${productId}"]`)
+                            .removeClass('bg-label-success')
+                            .addClass('bg-label-danger')
+                            .text('Unlist');
+                    } else {
+                        console.error('Error listing product:', data.message);
+                    }
+                })
+                .catch(error => console.error('Error listing product:', error));
+        }
+
+        // Function to handle unlist product request
+        function unlistProduct(productId) {
+            fetch(`/admin/products/unlistProduct`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.isListed) {
+                        $(`a[data-product-id="${productId}"]`)
+                            .removeClass('bg-label-danger')
+                            .addClass('bg-label-success')
+                            .text('List');
+                    } else {
+                        console.error('Error unlisting product:', data.message);
+                    }
+                })
+                .catch(error => console.error('Error unlisting product:', error));
+        }
+
+    // Event listener for list/unlist buttons
+    $(document).ready(function () {
+        $('.listButton').click(function (event) {
+            event.preventDefault();
+            const productId = $(this).data('product-id');
+            const action = $(this).text()
+
+            $('#confirmationModal').data('action', action);
+            showConfirmationModal(productId);
+        });
+    });
+
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchInput');
+ 
+
+  function performSearch() {
+    const searchTerm = searchInput.value.trim();
+    if (searchTerm) {
+      // If there's a search term, add it to the URL and navigate
+      window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
+    } else {
+      // If no search term, just load all products
+      window.location.href = '/admin/products';
+    }
+  }
+
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch();
+    }
+  });
+});
+</script>
 
 
     </body>

@@ -4,7 +4,7 @@
     <!-- Plugins CSS File -->
     <link rel="stylesheet" href="/User/assets/css/bootstrap.min.css">
     <!-- Main CSS File -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/User/assets/css/style.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
 
@@ -870,7 +870,7 @@ input[type="radio"]:checked + label::after {
                 form.addEventListener('submit', function (event) {
                     event.preventDefault();
     
-
+                    console.log('hekk')
                     //inputs
                     const addressId = this.id.split('edit-address-')[1];
                     const name = document.getElementById(`editName-${addressId}`).value.trim();
@@ -1308,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('checkout').addEventListener('click', (event) => {
         event.preventDefault();
-        console.log('hrloo');
+        
 
         // Get the selected address
         const selectedAddressRadio = document.querySelector('input[name="delivery-address"]:checked');
@@ -1369,16 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if(data.success){
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Your order has been placed successfully',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = '/user-account'
-                            }
-                })
+                window.location.href = `/user/checkout/success/${data.orderId}`
                 console.log('Success:', data.message);
             } else {
                 Swal.fire({

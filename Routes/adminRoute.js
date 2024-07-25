@@ -18,7 +18,8 @@ const authAdmin = require("../Middlewares/authAdmin");
 //            controllers
 const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController")
-const orderController = require('../Controllers/orderController')
+const orderController = require('../Controllers/orderController');
+const { auth } = require('firebase-admin');
 
 //           admin login and dashboard
 app.get("/", authAdmin.isLogin, adminController.login)
@@ -59,6 +60,8 @@ app.post("/products/addProduct", authAdmin.isLogin,
   productController.addProduct
 );
 app.put('/products/editProduct', productController.editProduct)
+app.patch('/products/listProduct' , productController.listProduct)
+app.patch('/products/unlistProduct', productController.unlistProduct)
 
 //             variant management
 app.get('/products/variants/single/:id', authAdmin.isLogin, productController.variants)
@@ -84,6 +87,8 @@ app.put('/products/variants/editVariant',
 
 //              order management
 app.get('/orders', authAdmin.isLogin, orderController.orders)
+app.get('/order/:orderId', authAdmin.isLogin, orderController.viewOrder)
+app.patch('/order/update-status', authAdmin.isLogin, orderController.updateStatus)
 
 
 

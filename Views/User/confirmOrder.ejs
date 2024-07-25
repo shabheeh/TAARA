@@ -5,288 +5,124 @@
     <link rel="stylesheet" href="/User/assets/css/bootstrap.min.css">
     <!-- Main CSS File -->
     <link rel="stylesheet" href="/User/assets/css/style.css">
-    <link rel="stylesheet" href="/User/assets/css/plugins/nouislider/nouislider.css">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
 
     <style>
-        .color-preview {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: none;
-            margin: 5px;
-            cursor: pointer;
-            border-radius: 50%;
+     
+     .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        .filter-colors label {
-            margin-bottom: 0; 
-            padding-bottom: 0;
+        .card-body {
+            padding: 1.5rem;
         }
-
-        input[type="checkbox"]:checked ~ .color-preview {
-        transform: scale(1.1); /* Scale up the selected color preview */
-        box-shadow: 0 0 0 1px #fff, 0 0 0 2px #333; /* Add a box shadow to the selected color preview */
-        }
-
+        .btn-block-custom {
+        width: auto;
+    }
+    .product-card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .address-section {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        background-color: #fff;
+        padding: 15px;
+    }
     </style>
 </head>
 
 <body>
     <div class="page-wrapper">
-
+        
         <%- include('../Layouts/User/navbar') -%>
 
         <main class="main">
         	<div class="page-header text-center" style="background-image: url('/User/assets/images/black-screen-6.jpg')">
         		<div class="container">
-        			<h1 class="page-title"><%= title.toUpperCase() %></h1>
+        			<h1 class="page-title">CHECKOUT</h1>
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><%= title %></li>
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                     </ol>
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
 
             <div class="page-content">
-                <div class="container">
-                	<div class="row">
-                		<div class="col-lg-9">
-                			<div class="toolbox">
-                				<div class="toolbox-left">
-                					<div class="toolbox-info">
-                						Showing <span>9 of 56</span> Products
-                					</div><!-- End .toolbox-info -->
-                				</div><!-- End .toolbox-left -->
-
-                				<div class="toolbox-right">
-                					<div class="toolbox-sort">
-                						<label for="sortby">Sort by:</label>
-                						<div class="select-custom">
-											<form id="sort-form">
-                                                <select name="sortProducts" id="sortProducts" class="form-control">
-                                                    <option value="featured" <%= sorted === 'featured' ? 'selected' : '' %>>Featured</option>
-                                                    <option value="lowPrice" <%= sorted === 'lowPrice' ? 'selected' : '' %>>Lowest price</option>
-                                                    <option value="highPrice" <%= sorted === 'highPrice' ? 'selected' : '' %>>Highest price</option>
-                                                    <option value="a-to-z" <%= sorted === 'a-to-z' ? 'selected' : '' %>>A - Z</option>
-                                                    <option value="z-to-a" <%= sorted === 'z-to-a' ? 'selected' : '' %>>Z - A</option>
-                                                </select>
-                                            </form>
-										</div>
-                					</div><!-- End .toolbox-sort -->
-                					
-                				</div><!-- End .toolbox-right -->
-                			</div><!-- End .toolbox -->
-
-                            <div class="products mb-3">
-                                
-                                <div class="row justify-content-center">
-                                    <% if (products && products.length > 0) { %>
-                                        <% products.forEach(product => { %>
-                                            <div class="col-6 col-md-4 col-lg-4">
-                                        <div class="product product-7 text-center">
-                                          <figure class="product-media">
-                                            <% if (product.variants[0].quantity == 0) { %>
-                                                <span class="product-label label-sale">Out of Stock</span>
-                                            <% } else { %>
-                                                <span class="product-label label-new">New</span>
-                                            <% } %>
-                        
-                                            <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
-                                              <img src="/Admin/assets/Products-Cropped/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
-                                            </a>
-                                  
-                                            <div class="product-action-vertical">
-                                              <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                              <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                              <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                                            </div><!-- End .product-action-vertical -->
-                                  
-                                            <div class="product-action">
-                                              <a href="#" id="addToCart-<%= product.variants[0]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
-                                            </div><!-- End .product-action -->
-                                          </figure><!-- End .product-media -->
-                                  
-                                          <div class="product-body">
-                                            <div class="product-cat">
-                                              <a href="#"><%= product.category.name %></a>
-                                            </div><!-- End .product-cat -->
-                                            <h3 class="product-title"><a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>"><%= product.name %></a></h3><!-- End .product-title -->
-                                            <div class="product-price">
-                                              Rs.<%= product.price %>
-                                            </div><!-- End .product-price -->
-                                  
-                                            <div class="product-nav product-nav-dots" style="text-align: left;">
-                                                <% product.variants.forEach(function(variant) { %>
-                                                    <a href="/product/<%= product._id %>/variant/<%= variant._id %>" class="<%= variant.isActive ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
-                                                        <span class="sr-only">Color name</span>
-                                                    </a>
-                                                <% }); %>
-                                            </div><!-- End .product-nav -->
-                                          </div><!-- End .product-body -->
-                                        </div><!-- End .product -->
-                                      </div><!-- End .col-sm-6 -->
-                                      <% }); %>
-                                      <% } else { %>
-                                        <div class="col-12 text-center align-items-center">
-                                            <p class="text-center">No Products Found</p>
-                                        </div>
+            	<div class="checkout">
+	                <div class="container">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Hey <%= user.firstName ? user.firstName : 'User' %>,</h5>
+                                    <p class="card-text">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        Your order is confirmed!
+                                    </p>
+                                    <% if (order.products.length > 1) { %>
+                                        <p class="card-text">Thanks for shopping! Your order <strong><%= order.products[0].product.name %></strong> and <%= order.products.length - 1 %> more items hasn't shipped yet, but we'll send you an email when it does.</p>
+                                    <% } else { %>
+                                        <p class="card-text">Thanks for shopping! Your order <strong><%= order.products[0].product.name %></strong> hasn't shipped yet, but we'll send you an email when it does.</p>
                                     <% } %>
-                                    
-                                </div><!-- End .row -->
-
-                                
-
-                              </div><!-- End .products -->
-
-
-                			<nav aria-label="Page navigation">
-							    <ul class="pagination justify-content-center">
-							        <li class="page-item disabled">
-							            <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
-							                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-							            </a>
-							        </li>
-							        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-							        <li class="page-item"><a class="page-link" href="#">2</a></li>
-							        <li class="page-item"><a class="page-link" href="#">3</a></li>
-							        <li class="page-item-total">of 6</li>
-							        <li class="page-item">
-							            <a class="page-link page-link-next" href="#" aria-label="Next">
-							                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-							            </a>
-							        </li>
-							    </ul>
-							</nav>
-
-                                      
-
-                		</div><!-- End .col-lg-9 -->
-                		<aside class="col-lg-3 order-lg-first">
-                            <form id="filter-form">
-                			<div class="sidebar sidebar-shop">
-                				<div class="widget widget-clean">
-                					<label>Filters:</label>
-                					<a href="#" class="sidebar-filter-clear">Clean All</a>
-                				</div><!-- End .widget widget-clean -->
-
-                				<div class="widget widget-collapsible">
-                                    <h3 class="widget-title">
-                                        <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
-                                            Category
+                                </div>
+                    
+                                <div class="card mt-3 address-section d-flex flex-row justify-content-between">
+                                    <div class=" align-items-start">
+                                        <p class="card-text mb-0">Order: #<%= order.orderId %></p>
+                                        <a href="/user-account?openTab=orders" class="btn-link">
+                                            <button class="btn btn-primary btn-block-custom mt-2">View or Manage Order</button>
                                         </a>
-                                    </h3><!-- End .widget-title -->
+                                    </div>
+                                    <div class=" text-right">
+                                        <h5 class="card-title">Shipping Address</h5>
+                                        <p class="card-text"><strong><%= order.address.name %></strong></p>
+                                        <p class="card-text"><%= order.address.phone %></p>
+                                        <p class="card-text"><%= order.address.street %></p>
+                                        <p class="card-text"><%= order.address.city %>, <%= order.address.state %> <%= order.address.pincode %></p>
+                                    </div>
+                                </div>
                                 
-                                    <div class="collapse show" id="widget-1">
-                                        <div class="widget-body">
-                                            <div class="filter-items filter-items-count">
-                                                <% categories.forEach((category, index) => { %>
-                                                    <div class="filter-item">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" name="categories" id="cat-<%= index + 1 %>" 
-                                                            value="<%= category._id %>" <%= filteredCategories.includes(category._id.toString()) ? 'checked' : '' %>>
-                                                            <label class="custom-control-label" for="cat-<%= index + 1 %>"><%= category.name %></label>
-                                                        </div><!-- End .custom-checkbox -->
-                                                        <span class="item-count"><%= category.count %></span>
-                                                    </div><!-- End .filter-item -->
-                                                <% }); %>
-                                            </div><!-- End .filter-items -->
-                                        </div><!-- End .widget-body -->
-                                    </div><!-- End .collapse -->
-                                </div><!-- End .widget -->
-                                
-
-        						<div class="widget widget-collapsible">
-    								<h3 class="widget-title">
-									    <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
-									        Size
-									    </a>
-									</h3><!-- End .widget-title -->
-
-									<div class="collapse show" id="widget-2">
-                                        <div class="widget-body">
-                                            <div class="filter-items">
-                                                <% size.forEach((size, index) => { %>
-                                                    <div class="filter-item">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" name="sizes" id="size-<%= index + 1 %>" value="<%= size %>" 
-                                                            <%= filteredSizes.includes(size) ? 'checked' : '' %>>
-                                                            <label class="custom-control-label" for="size-<%= index + 1 %>"><%= size %></label>
-                                                        </div><!-- End .custom-checkbox -->
-                                                    </div><!-- End .filter-item -->
-                                                <% }); %>
-                                            </div><!-- End .filter-items -->
-                                        </div><!-- End .widget-body -->
-                                    </div><!-- End .collapse -->
-                                    
-        						</div><!-- End .widget -->
-
-        						<div class="widget widget-collapsible">
-    								<h3 class="widget-title">
-									    <a data-toggle="collapse" href="#widget-3" role="button" aria-expanded="true" aria-controls="widget-3">
-									        Colour
-									    </a>
-									</h3><!-- End .widget-title -->
-
-									<div class="collapse show" id="widget-3">
-                                        <div class="widget-body">
-                                            <div class="filter-colors m-0">
-                                                <% colors.slice(0, 8).forEach(color => { %>
-                                                    <label>
-                                                        <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
-                                                        <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
-                                                        <span class="color-preview" style="background: <%= color.code %>;"></span>
-                                                    </label>
-                                                <% }); %>
-                                            </div><!-- End.filter-colors -->
-                                            <div class="filter-colors">
-                                                <% colors.slice(8).forEach(color => { %>
-                                                    <label>
-                                                        <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
-                                                        <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
-                                                        <span class="color-preview" style="background: <%= color.code %>;"></span>
-                                                    </label>
-                                                <% }); %>
-                                            </div><!-- End.filter-colors -->
-                                        </div><!-- End.widget-body -->
-                                    </div><!-- End.collapse -->
-        						</div><!-- End .widget -->
-
-        						<div class="widget widget-collapsible">
-                                    <h3 class="widget-title">
-                                        <a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">
-                                            Brand
-                                        </a>
-                                    </h3><!-- End .widget-title -->
-                                
-                                    <div class="collapse show" id="widget-4">
-                                        <div class="widget-body">
-                                            <div class="filter-items">
-                                                <% brands.forEach((brand, index) => { %>
-                                                    <div class="filter-item">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="brand-<%= index + 1 %>" name="brands" value="<%= brand._id %>" 
-                                                            <%= filteredBrands.includes(brand._id.toString()) ? 'checked' : '' %>>
-                                                            <label class="custom-control-label" for="brand-<%= index + 1 %>"><%= brand.name %></label>
-                                                        </div><!-- End .custom-checkbox -->
-                                                    </div><!-- End .filter-item -->
-                                                <% }); %>
-                                            </div><!-- End .filter-items -->
-                                        </div><!-- End .widget-body -->
-                                    </div><!-- End .collapse -->
-                                </div><!-- End .widget -->
-                                
-                			</div><!-- End .sidebar sidebar-shop -->
-                            <!--for title-->
-                            
-                          </form>
-                		</aside><!-- End .col-lg-3 -->
-                	</div><!-- End .row -->
-                </div><!-- End .container -->
+                    
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <% order.products.forEach(product => { %>
+                                            <div class="product-card mb-1 p-3 d-flex align-items-center">
+                                                <img src="/Admin/assets/Products-Cropped/<%= product.variant.images[0] %>" alt="<%= product.product.name %>" class="img-fluid mr-3" style="width: 80px;">
+                                                <div>
+                                                    <h6 class="mb-0"><%= product.product.name %></h6>
+                                                    
+                                                    <p class="mb-0">Quantity: <%= product.quantity %></p>
+                                                    <p class="mb-0">Price: $<%= product.product.price %></p>
+                                                    <p class="mb-0">Subtotal: $<%= (product.product.price * product.quantity) %></p>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                    
+                                    <div class="d-flex mb-2 align-items-end text-right">
+                                        <div class="col-6  text-right ">
+                                            <p class="card-text">Sub-total</p>
+                                            <p class="card-text">Shipping</p>
+                                            <h5 class="card-title">Total</h5>
+                                        </div>
+                                        <div class="col-5 me-5 text-right">
+                                            <p class="card-text">Rs.<%= order.totalPrice - order.shippingCharge %></p>
+                                            <p class="card-text">Rs.<%= order.shippingCharge %></p>
+                                            <h5 class="card-title">Rs.<%= order.totalPrice %></h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div><!-- End .checkout -->
             </div><!-- End .page-content -->
         </main><!-- End .main -->
 
@@ -653,111 +489,19 @@
         </div><!-- End .modal-dialog -->
     </div><!-- End .modal -->
 
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+   
 
-    const addToCartButtons = document.querySelectorAll('.btn-cart');
+        
 
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault(); 
+    
 
-
-            const variantId = this.id.replace('addToCart-', '');
-
-            const data = {
-                variantId: variantId,
-                quantity: 1
-            }
-            addToCart(data);
-        });
-    });
-});
-
-function addToCart(data) {
-
-        fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    var notyf = new Notyf({
-                        position: {
-                            x: 'center',
-                            y: 'center'
-                        }
-                        });
-                    notyf.success(data.message)
-                } 
-                else if (!data.user) {
-
-                    window.location.href = '/authentication';
-                } else {
-                    // Show error alert
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message,
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'An error occurred while adding the product to the cart.',
-                    icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
-                });
-            });
-        }
-
-    </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('filter-form').addEventListener('change', function() {
-            const sortForm = document.getElementById('sort-form');
-            const sortItem = document.getElementById('sortProducts').value;
-
-            const params = new URLSearchParams(new FormData(this));
-
-            if (sortItem) {
-                params.set('sortProducts', sortItem);
-            }
-
-            const title = "<%= title %>";
-            window.location.href = `/products/${title}?${params.toString()}`;
-        });
-
-        document.getElementById('sort-form').addEventListener('change', function() {
-            const filterForm = document.getElementById('filter-form');
-            const sortItem = document.getElementById('sortProducts').value;
-
-            const params = new URLSearchParams(new FormData(filterForm));
-
-            if (sortItem) {
-                params.set('sortProducts', sortItem);
-            }
-
-            const title = "<%= title %>";
-            window.location.href = `/products/${title}?${params.toString()}`;
-        });
-});
+        
 
 </script>
+
 
 
     <!-- Plugins JS File -->
@@ -767,14 +511,10 @@ function addToCart(data) {
     <script src="/User/assets/js/jquery.waypoints.min.js"></script>
     <script src="/User/assets/js/superfish.min.js"></script>
     <script src="/User/assets/js/owl.carousel.min.js"></script>
-    <script src="/User/assets/js/bootstrap-input-spinner.js"></script>
-    <script src="/User/assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="/User/assets/js/wNumb.js"></script>
-    <script src="/User/assets/js/nouislider.min.js"></script>
     <!-- Main JS File -->
     <script src="/User/assets/js/main.js"></script>
 </body>
 
 
-<!-- molla/category-2cols.html  22 Nov 2019 10:02:52 GMT -->
+<!-- molla/checkout.html  22 Nov 2019 09:55:06 GMT -->
 </html>

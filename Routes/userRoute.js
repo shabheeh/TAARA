@@ -57,9 +57,13 @@ app.post('/cart/add', authUser.authorization, cartController.addToCart)
 app.delete('/cart/remove/:index/:cartId', authUser.authorization, cartController.removeFromCart)
 app.put('/cart/update/:index/:cartId', authUser.authorization, cartController.updateCart)
 
-//                       checkout
+//                              checkout
 app.get('/user/checkout', authUser.authorization, authUser.isBlocked, orderController.loadCheckout)
 app.post('/user/checkout', authUser.authorization, orderController.checkout)
+app.get('/user/checkout/success/:orderId', authUser.isLogin, authUser.isBlocked, orderController.confirmOrder)
+
+//                             order
+app.put('/user/order/cancel', authUser.authorization , orderController.cancelOrder)
 
 //            google auth 
 app.get('/auth/google', passport.authenticate('google', {

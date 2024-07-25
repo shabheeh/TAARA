@@ -56,9 +56,10 @@
                             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
                                 <div class="card-header d-flex rounded-0 flex-wrap py-0 pb-5 pb-md-0">
                                     <div class="me-5 ms-n2">
-                                        <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input
-                                                    type="search" class="form-control form-control-sm"
-                                                    placeholder="Search" aria-controls="DataTables_Table_0"></label>
+                                        <div class="dataTables_filter">
+                                            <label>
+                                              <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                                            </label>
                                         </div>
                                     </div>
                                     <div
@@ -181,23 +182,35 @@
                                     </tbody>
                                 </table>
                                 <div class="row mx-1">
-                                    <div class="col-sm-12 col-md-6">
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div class="dataTables_paginate paging_simple_numbers"
-                                            id="DataTables_Table_0_paginate">
-                                            <ul class="pagination">
-                                                <% for ( let i=1; i <=totalPages; i++ ) { %>
-                                                    <li
-                                                        class="paginate_button page-item <%= i === page ? 'active' : '' %>">
-                                                        <a href="#" onclick="fetchPage(<%= i %>)" class="page-link">
-                                                            <%= i %>
-                                                        </a>
-                                                    </li>
-                                                    <% } %>
-                                            </ul>
+                                      <div class="col-sm-12 col-md-6">
+                                        <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                                          Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalBrands) %> of <%= totalBrands %>
+                                                entries
                                         </div>
-                                    </div>
+                                      </div>
+                                      <div class="col-sm-12 col-md-6">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                                          <ul class="pagination">
+                                            <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
+                                              <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                                                class="page-link">Previous</a>
+                                            </li>
+                                            <% for (let i=1; i <=totalPages; i++) { %>
+                                              <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                                                <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                                                  class="page-link">
+                                                  <%= i %>
+                                                </a>
+                                              </li>
+                                              <% } %>
+                                                <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
+                                                  <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                                                    class="page-link">Next</a>
+                                                </li>
+                                          </ul>
+                                        </div>
+                                    
+                                      </div>
                                 </div>
                                 <div style="width: 1%;"></div>
                             </div>
@@ -320,10 +333,7 @@
 
             <script>
 
-                function fetchPage(page) {
-                    window.location.href = `/admin/brands?page=${page}`;
-                }
-
+                
                 document.getElementById('add-brand').addEventListener('submit', function (event) {
                     event.preventDefault();
 
@@ -576,6 +586,31 @@
                         });
                 }
             </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+   
+  
+    function performSearch() {
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm) {
+        // If there's a search term, add it to the URL and navigate
+        window.location.href = `/admin/brands?search=${encodeURIComponent(searchTerm)}`;
+      } else {
+        // If no search term, just load all products
+        window.location.href = '/admin/brands';
+      }
+    }
+  
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+    });
+  });
+  </script>
 
 
             </body>

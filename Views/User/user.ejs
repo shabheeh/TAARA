@@ -149,7 +149,8 @@
 }
 
 .product-image {
-    width: 90px;
+    width: 134px;
+    height: auto;
     margin-right: 1rem;
 }
 
@@ -321,9 +322,7 @@
                                                 <li class="nav-item" role="presentation">
                                                     <a class="nav-link active" id="orders-all-tab" data-toggle="pill" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Orders</a>
                                                 </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link" id="orders-not-shipped-tab" data-toggle="pill" href="#orders-not-shipped" role="tab" aria-controls="orders-not-shipped" aria-selected="false">Not Yet Shipped</a>
-                                                </li>
+                                                
                                                 <li class="nav-item" role="presentation">
                                                     <a class="nav-link" id="orders-cancelled-tab" data-toggle="pill" href="#orders-cancelled" role="tab" aria-controls="orders-cancelled" aria-selected="false">Cancelled Orders</a>
                                                 </li>
@@ -350,7 +349,7 @@
                                                                     <div>
                                                                         <div>Order # <%= order.orderId %></div>
                                                                         <div>
-                                                                            <a href="#" class="mr-2" data-toggle="collapse" data-target="#order-details-<%= index %>">View order details</a>
+                                                                            <a href="#" class="mr-2" data-toggle="collapse" data-target="#order-details-<%= index %>" >View order details</a>
                                                                             <a href="#">View invoice</a>
                                                                         </div>
                                                                     </div>
@@ -358,11 +357,15 @@
                                                                 <div class="order-content collapse" id="order-details-<%= index %>">
                                                                     <% order.products.forEach(current => { %>
                                                                         <div class="product-item d-flex align-items-start mb-2">
-                                                                            <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="<%= current.product.name %>" class="product-image mr-3" style="width: 129px; height: auto;">
+                                                                            <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="<%= current.product.name %>" class="product-image mr-3" >
                                                                             <div class="product-details mb-0">
-                                                                                <h5 class="product-heading mb-0">
-                                                                                    <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
-                                                                                </h5>
+                                                                                <div class="d-flex justify-content-between">
+                                                                                    <h5 class="product-heading mb-0">
+                                                                                        <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
+                                                                                    </h5>
+                                                                                    <div class="align-items-end"><strong><%= current.status %></strong></div>
+                                                                                </div>
+                                                                                
                                                                                 <p class="product-price-1 mb-0">Rs.<%= current.product.price %></p>
                                                                                 <p class="product-total mb-0">Total Quantity: <%= current.quantity %></p>
                                                                                 <p class="product-total mb-0">Total: Rs.<%= current.product.price * current.quantity %></p>
@@ -370,12 +373,47 @@
                                                                                 <div class=" mt-1">
                                                                                     <a href="#" id="addToCart-<%= current.variant._id %>" class="btn btn-sm btn-outline-primary-2 mr-2">Buy again</a>
                                                                                     <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="btn btn-sm btn-outline-secondary mr-2">View item</a>
-                                                                                    <a href="#" class="btn btn-sm btn-outline-danger mr-2">Cancel</a>
+                                                                                    <% if (current.status === 'Delivered') { %>
+                                                                                        <a data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Return</a>
+                                                                                        <% } else if (current.status === 'Cancelled') { %>
+                                                                                            <% } else { %>
+                                                                                             
+                                                                                            <a data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Cancel</a>
+                                                                                    <% } %>
                                                                                     
                                                                                 </div>
                                                                             </div>
-                                                                            
                                                                         </div>
+
+                                                                        <!-- Cancel Modal -->
+                                                                        <div class="modal fade" id="cancelOrderModal<%= order._id %>-<%= current.variant._id %>" tabindex="-1" role="dialog"
+                                                                            aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                                                                            <div class="modal-dialog " role="document">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class="modal-title" id="editAddressModalLabel">Cancel Order</h5>
+                                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                            <span aria-hidden="true">&times;</span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <div class="modal-body m-5">
+                                                                                        <!-- Form Content -->
+                                                                                        <form id="cancel-order-<%= order._id %>-<%= current.product._id %>-<%= current.variant._id %>">
+                                                                                            <label id="cancelOrderLabel-<%= order._id %>-<%= current.variant._id %>">Reason for Cancel</label>
+                                                                                            <textarea name="resonForCancel" id="cancelOrder-<%= order._id %>-<%= current.variant._id %>" class="form-control"></textarea>
+                                                                                            
+                                                                                            <button type="submit" class="btn btn-primary">
+                                                                                                CONFIRM
+                                                                                            </button>
+                                                                                            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">DISCARD</button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+
+
                                                                     <% }); %>
                                                                     <div class="address-card my-2" >
                                                                         <div class="address-details">
@@ -394,11 +432,61 @@
                                                         <p>No orders found.</p>
                                                     <% } %>
                                                 </div>
-                                                <div class="tab-pane fade" id="orders-not-shipped" role="tabpanel" aria-labelledby="orders-not-shipped-tab">
-                                                    <p>No orders that are not yet shipped.</p>
-                                                </div>
+                                                
+
+
+
+                                                
                                                 <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
-                                                    <p>No cancelled orders.</p>
+                                                    <% if (cancelledOrders && cancelledOrders.length > 0) { %>
+                                                        <% cancelledOrders.forEach((order, index) => { %>
+                                                            <div class="order-item mb-2 order-container">
+                                                                <div class="order-header d-flex justify-content-between align-items-center mb-2">
+                                                                    <div>
+                                                                        <div>Order placed</div>
+                                                                        <div><strong><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></strong></div>
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <div>Ship to</div>
+                                                                        <div><strong><%= order.address.name %></strong></div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div>Order # <%= order.orderId %></div>
+                                                                        <div>
+                                                                            <a href="#" class="mr-2" data-toggle="collapse" data-target="#order-details-<%= index %>">View order details</a>
+                                                                            <a href="#">View invoice</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="order-content collapse" id="order-details-<%= index %>">
+                                                                    <% order.products.forEach(current => { %>
+                                                                        <div class="product-item d-flex align-items-start mb-2">
+                                                                            <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="<%= current.product.name %>" class="product-image mr-3" style="width: 129px; height: auto;">
+                                                                            <div class="product-details mb-0">
+                                                                                <div class="d-flex justify-content-between">
+                                                                                    <h5 class="product-heading mb-0">
+                                                                                        <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
+                                                                                    </h5>
+                                                                                    
+                                                                                </div>
+                                                                                <p class="product-price-1 mb-0">Rs.<%= current.product.price %></p>
+                                                                                <p class="product-total mb-0">Total Quantity: <%= current.quantity %></p>
+                                                                                <p class="product-total mb-0">Total: Rs.<%= current.product.price * current.quantity %></p>
+                                                                                <p class="mb-0">Cancelled Date: <%= new Date(current.cancelDate).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
+                                                                                <div class=" mt-1">
+                                                                                    <a href="#" id="addToCart-<%= current.variant._id %>" class="btn btn-sm btn-outline-primary-2 mr-2">Buy again</a>
+                                                                                    <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="btn btn-sm btn-outline-secondary mr-2">View item</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    <% }); %>
+                                                                </div>
+                                                            </div>
+                                                        <% }); %>
+                                                    <% } else { %>
+                                                        <div>No cancelled orders found.</div>
+                                                    <% } %>
                                                 </div>
                                             </div>
                                         </div>
@@ -1752,8 +1840,121 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+<script>
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('form[id^="cancel-order-"]');
 
+        forms.forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formId = this.id.split('cancel-order-')[1];
+                const [orderId, productId, variantId] = formId.split('-');
+            
+                const reason = document.getElementById(`cancelOrder-${orderId}-${variantId}`).value.trim()
+
+                const reasonLabel = document.getElementById(`cancelOrderLabel-${orderId}-${variantId}`)
+              
+
+                let isValid = true
+
+                if(!reason){
+                    reasonLabel.classList.add('error-message')
+                    reasonLabel.innerHTML = 'Reason is required'
+                    isValid = false
+                } else {
+                    reasonLabel.classList.remove('error-message')
+                    reasonLabel.innerHTML = 'Reason for Cancel'
+                }
+
+                
+
+                if(isValid){
+
+                    const data = {
+                        orderId,
+                        productId,
+                        variantId,
+                        reason
+                    }
+
+                    cancelOrder(data)
+                }
+            });
+        });
+    });
+
+    function cancelOrder(data) {
+            fetch('/user/order/cancel', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+
+                    
+                    $('#cancelOrderModal' + data.orderId + data.variantId).modal('hide');
+                    // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    
+                })
+
+                
+                    
+
+                } else {
+                    // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+                }
+            })
+            .catch(err => {
+                // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    
+
+    
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+    
+        // Check if the specific condition is met (e.g., a query parameter 'openTab' equals 'orders')
+        const openTab = getQueryParam('openTab');
+    
+        if (openTab === 'orders') {
+            const tabLink = document.querySelector('#tab-orders-link');
+            const tabContent = new bootstrap.Tab(tabLink);
+            tabContent.show();
+        }
+    });
+    </script>
 
 
 

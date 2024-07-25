@@ -490,10 +490,29 @@ const userAccount = async ( req, res) => {
             const addresses = await Address.find({user: req.userId})
             const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant').populate('address')
 
+            // creating deep copy for not manupulating the orders
+            const ordersCopy = JSON.parse(JSON.stringify(orders));
+
+            // cancelled orders
+            const cancelledOrders = ordersCopy.filter(order => {
+                let isCancelled = false;
+                order.products = order.products.filter(product => {
+                    if (product.status === 'Cancelled') {
+                        isCancelled = true;
+                        return true;
+                    }
+                    return false;
+                });
+                return isCancelled;
+            });
+
+            
+
                return res.render('user', {
                     user,
                     addresses: addresses ? addresses : null,
-                    orders: orders ? orders : null
+                    orders: orders ? orders : null,
+                    cancelledOrders: cancelledOrders ? cancelledOrders : null,
                     })
             
 

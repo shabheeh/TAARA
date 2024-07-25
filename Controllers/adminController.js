@@ -98,8 +98,20 @@ const loadUsers = async ( req, res ) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+        let searchTerm = '';
+        let query = {};
 
-        const users = await User.find().skip(skip).limit(limit);
+        if (req.query.search) {
+            searchTerm = req.query.search.trim();
+            query = { 
+                $or: [
+                    { firstName: new RegExp(searchTerm, 'i') },
+                    { lastName: new RegExp(searchTerm, 'i') }
+                ]
+            };
+        }
+
+        const users = await User.find(query).skip(skip).limit(limit);
         const totalUsers = await User.countDocuments();
         const activeUsersCount = await User.countDocuments({ isBlocked: false });
         const blockedUsersCount = await User.countDocuments({ isBlocked: true });
@@ -112,6 +124,7 @@ const loadUsers = async ( req, res ) => {
             page,
             totalPages: Math.ceil(totalUsers / limit),
             limit,
+            searchTerm,
             });
 
         } catch (error) {
@@ -172,15 +185,28 @@ const category = async ( req, res ) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
         const skip = (page - 1) * limit;
+        let searchTerm = '';
+        let query = {};
 
-        const categories = await Category.find().skip(skip).limit(limit);
+        if (req.query.search) {
+            searchTerm = req.query.search.trim();
+            query = { 
+                $or: [
+                    { name: new RegExp(searchTerm, 'i') },
+                    { description: new RegExp(searchTerm, 'i') }
+                ]
+            };
+        }
+        const categories = await Category.find(query).skip(skip).limit(limit);
         const totalCategories = await Category.countDocuments();
 
             res.render("categories", {
                 categories,
                 totalCategories,
                 page,
+                limit,
                 totalPages: Math.ceil(totalCategories / limit),
+                searchTerm
             });
 
     } catch (error) { 
@@ -335,15 +361,28 @@ const brand = async ( req, res ) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
         const skip = (page - 1) * limit;
+        let searchTerm = '';
+        let query = {};
 
-        const brands = await Brand.find().skip(skip).limit(limit);
+        if (req.query.search) {
+            searchTerm = req.query.search.trim();
+            query = { 
+                $or: [
+                    { name: new RegExp(searchTerm, 'i') },
+                    { description: new RegExp(searchTerm, 'i') }
+                ]
+            };
+        }
+        const brands = await Brand.find(query).skip(skip).limit(limit);
         const totalBrands = await Brand.countDocuments();
 
             res.render("brands", {
                 brands,
                 totalBrands,
                 page,
+                limit,
                 totalPages: Math.ceil(totalBrands / limit),
+                searchTerm,
             });
 
     } catch (error) { 
