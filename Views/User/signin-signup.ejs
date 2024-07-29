@@ -8,11 +8,28 @@
 <!-- Main CSS File -->
 <link rel="stylesheet" href="/User/assets/css/style.css">
 <link rel="stylesheet" href="/User/assets/css/demos/demo-15.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <style>
     .error-message{
         color: red;
     }
+    .password-input-wrapper {
+    position: relative;
+}
+
+.password-input-wrapper .form-control {
+    padding-right: 35px; /* Make room for the icon */
+}
+
+.password-input-wrapper .fas {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999; /* Adjust color as needed */
+}
 </style>
 
 </head>
@@ -68,13 +85,13 @@
                     <div class="header-right">
                         <div class="header-search header-search-extended header-search-visible">
                             <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                            <form action="#" method="get">
+                            <!-- <form action="#" method="get">
                                 <div class="header-search-wrapper">
                                     <label for="q" class="sr-only">Search</label>
                                     <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
                                     <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-                                </div><!-- End .header-search-wrapper -->
-                            </form>
+                                </div>End .header-search-wrapper -->
+                            </form> -->
                         </div><!-- End .header-search -->
                         
                         
@@ -109,9 +126,13 @@
                                         </div><!-- End .form-group -->
                 
                                         <div class="form-group">
-                                            <label for="signin-password-2" id="signinMessagePass" >Password *</label> 
-                                            <input type="password" class="form-control" id="signin-password-2" name="signinPassword" >
+                                            <label for="signin-password-2" id="signinMessagePass">Password *</label> 
+                                            <div class="password-input-wrapper">
+                                                <input type="password" class="form-control" id="signin-password-2" name="signinPassword">
+                                                <i class="fas fa-eye togglePassword" id="toggleSigninPassword"></i>
+                                            </div>
                                         </div><!-- End .form-group -->
+                                        
                 
                                         <div class="form-footer">
                                             <button type="submit" class="btn btn-outline-primary-2">
@@ -124,19 +145,14 @@
                                     </form>
                                     <div class="form-choice">
                                         <p class="text-center">or sign in with</p>
-                                        <div class="row">
-                                            <div class="col-sm-6">
+                                        <div class="row d-flex justify-content-center">
+                                            <div class="col-sm-10">
                                                 <a href="/auth/google" class="btn btn-login btn-g">
                                                     <i class="icon-google"></i>
                                                     Login With Google
                                                 </a>
                                             </div><!-- End .col-6 -->
-                                            <div class="col-sm-6">
-                                                <a href="#" class="btn btn-login btn-f">
-                                                    <i class="icon-facebook-f"></i>
-                                                    Login With Facebook
-                                                </a>
-                                            </div><!-- End .col-6 -->
+
                                         </div><!-- End .row -->
                                     </div><!-- End .form-choice -->
                                 </div><!-- .End .tab-pane -->
@@ -151,7 +167,10 @@
                 
                                         <div class="form-group">
                                             <label for="register-password-2" id="signupMessagePass">Password *</label>
-                                            <input type="password" class="form-control" id="register-password-2" name="signupPassword"  >
+                                            <div class="password-input-wrapper">
+                                                <input type="password" class="form-control" id="register-password-2" name="signupPassword">
+                                                <i class="fas fa-eye togglePassword" id="toggleSignupPassword"></i>
+                                            </div>
                                         </div><!-- End .form-group -->
                 
                                         <div class="form-footer">
@@ -160,27 +179,22 @@
                                                 <i class="icon-long-arrow-right"></i>
                                             </button>
                 
-                                            <div class="custom-control custom-checkbox">
+                                            <!-- <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="register-policy-2" required>
                                                 <label class="custom-control-label" for="register-policy-2">I agree to the <a href="#">privacy policy</a> *</label>
-                                            </div><!-- End .custom-checkbox -->
+                                            </div>End .custom-checkbox -->
                                         </div><!-- End .form-footer -->
                                     </form>
                                     <div class="form-choice">
                                         <p class="text-center">or sign in with</p>
-                                        <div class="row">
-                                            <div class="col-sm-6">
+                                        <div class="row d-flex justify-content-center">
+                                            <div class="col-sm-10">
                                                 <a href="/auth/google" class="btn btn-login btn-g">
                                                     <i class="icon-google"></i>
                                                     Login With Google
                                                 </a>
                                             </div><!-- End .col-6 -->
-                                            <div class="col-sm-6">
-                                                <a href="#" class="btn btn-login btn-f">
-                                                    <i class="icon-facebook-f"></i>
-                                                    Login With Facebook
-                                                </a>
-                                            </div><!-- End .col-6 -->
+
                                         </div><!-- End .row -->
                                     </div><!-- End .form-choice -->
                                 </div><!-- .End .tab-pane -->
@@ -672,7 +686,37 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
     </script>
+
     
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+    function togglePasswordVisibility(passwordField, toggleIcon) {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        toggleIcon.classList.toggle('fa-eye-slash');
+    }
+
+    // Signin password toggle
+    const toggleSigninPassword = document.querySelector('#toggleSigninPassword');
+    const signinPassword = document.querySelector('#signin-password-2');
+
+    if (toggleSigninPassword && signinPassword) {
+        toggleSigninPassword.addEventListener('click', function() {
+            togglePasswordVisibility(signinPassword, this);
+        });
+    }
+
+    // Signup password toggle
+    const toggleSignupPassword = document.querySelector('#toggleSignupPassword');
+    const signupPassword = document.querySelector('#register-password-2');
+
+    if (toggleSignupPassword && signupPassword) {
+        toggleSignupPassword.addEventListener('click', function() {
+            togglePasswordVisibility(signupPassword, this);
+        });
+    }
+});
+    </script>
     
 
     <%- include('../Layouts/User/footer') -%>

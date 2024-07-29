@@ -24,17 +24,13 @@
                             <i class="icon-bars"></i>
                         </button>
 
-                        <a href="index.html" class="logo">
+                        <a href="/" class="logo">
                             Taara
                         </a>
 
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
-                                <li class="megamenu-container active">
-                                    <a href="/" class="">HOME</a>
-
-                                    
-                                </li>
+                                
                                 <li>
                                     <a href="/products/Men" class="">MEN</a>
 
@@ -46,7 +42,7 @@
                                     
                                 </li>
                                 <li>
-                                    <a href="#" class="">NEW ARRIVALS</a>
+                                    <a href="/products/newArrivals" class="">NEW ARRIVALS</a>
 
                                     
                                 </li>
@@ -64,7 +60,7 @@
                     <div class="header-right">
                         <div class="header-search header-search-extended header-search-visible">
                             <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                            <form action="#" method="get">
+                            <form id="search-form" action="/products/search-form" method="GET">
                                 <div class="header-search-wrapper">
                                     <label for="q" class="sr-only">Search</label>
                                     <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
@@ -73,7 +69,7 @@
                             </form>
                         </div><!-- End .header-search -->
                         
-                        <a href="/user-account"  class="wishlist-link">
+                        <a href="/account"  class="wishlist-link">
                             <i class="icon-user"></i>
                         </a>
                         
@@ -98,13 +94,13 @@
                                                     </h4>
                                                     <span class="cart-product-info">
                                                         <span class="cart-product-qty"><%= current.quantity %></span>
-                                                        x $<%= current.product.price %>
+                                                        x Rs.<%= current.product.price %>
                                                     </span>
                                                 </div><!-- End .product-cart-details -->
                                 
                                                 <figure class="product-image-container" style="width: 40px; height: 50px;">
                                                     <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="product-image">
-                                                        <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="Product">
+                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" style="width: 52px; height: auto;" alt="Product">
                                                     </a>
                                                 </figure>
                                                 <!-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a> -->
@@ -114,12 +110,12 @@
                                 
                                     <div class="dropdown-cart-total">
                                         <span>Total</span>
-                                        <span class="cart-total-price">$<%= totalPrice %></span>
+                                        <span class="cart-total-price">Rs.<%= totalPrice %></span>
                                     </div><!-- End .dropdown-cart-total -->
                                 
                                     <div class="dropdown-cart-action">
                                         <a href="/cart" class="btn btn-primary">View Cart</a>
-                                        <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+                                        <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
                                     </div><!-- End .dropdown-cart-action -->
                                 <% } else { %>
                                     <div class="dropdown-cart-action">

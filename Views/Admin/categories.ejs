@@ -354,7 +354,7 @@
                 gender: document.getElementById('category-gender').value,
             };
 
-            fetch('/admin/categories/addCategory', {
+            fetch('/admin/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -586,7 +586,7 @@
 
     function updateCategory(data) {
             console.log(data)
-            fetch('/admin/categories/editCategory', {
+            fetch('/admin/categories', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

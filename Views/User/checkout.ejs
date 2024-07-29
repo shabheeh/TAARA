@@ -176,8 +176,8 @@ input[type="radio"]:checked + label::after {
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        
                         <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                     </ol>
                 </div><!-- End .container -->
@@ -312,7 +312,7 @@ input[type="radio"]:checked + label::after {
                                                 <div class="cart-product" id="cartItem-<%= index %>">
                                                     <div class="product-media-1">
                                                         <a href="#">
-                                                            <img class="product-image" src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="Product image">
+                                                            <img class="product-image" src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product image">
                                                         </a>
                                                     </div>
                                                     <div class="product-details">
@@ -1007,7 +1007,7 @@ input[type="radio"]:checked + label::after {
         });
     
         function editCheckoutAddress(data) {
-                fetch('/user/editAddress', {
+                fetch('/editAddress', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1193,7 +1193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     function addCheckoutAddress(data) {
-            fetch('/user/addAddress', {
+            fetch('/addAddress', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1359,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkout(data){
 
-        fetch('/user/checkout', {
+        fetch('/checkout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1369,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if(data.success){
-                window.location.href = `/user/checkout/success/${data.orderId}`
+                window.location.href = `/checkout/success/${data.orderId}`
                 console.log('Success:', data.message);
             } else {
                 Swal.fire({

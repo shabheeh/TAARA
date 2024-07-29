@@ -47,8 +47,8 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        
                         <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                     </ol>
                 </div><!-- End .container -->
@@ -75,7 +75,7 @@
                                 <div class="card mt-3 address-section d-flex flex-row justify-content-between">
                                     <div class=" align-items-start">
                                         <p class="card-text mb-0">Order: #<%= order.orderId %></p>
-                                        <a href="/user-account?openTab=orders" class="btn-link">
+                                        <a href="/account?openTab=orders" class="btn-link">
                                             <button class="btn btn-primary btn-block-custom mt-2">View or Manage Order</button>
                                         </a>
                                     </div>
@@ -93,13 +93,13 @@
                                     <div class="card-body">
                                         <% order.products.forEach(product => { %>
                                             <div class="product-card mb-1 p-3 d-flex align-items-center">
-                                                <img src="/Admin/assets/Products-Cropped/<%= product.variant.images[0] %>" alt="<%= product.product.name %>" class="img-fluid mr-3" style="width: 80px;">
+                                                <img src="/Admin/assets/Products-Images/<%= product.variant.images[0] %>" alt="<%= product.product.name %>" class="img-fluid mr-3" style="width: 80px;">
                                                 <div>
                                                     <h6 class="mb-0"><%= product.product.name %></h6>
                                                     
                                                     <p class="mb-0">Quantity: <%= product.quantity %></p>
-                                                    <p class="mb-0">Price: $<%= product.product.price %></p>
-                                                    <p class="mb-0">Subtotal: $<%= (product.product.price * product.quantity) %></p>
+                                                    <p class="mb-0">Price: Rs.<%= product.product.price %></p>
+                                                    <p class="mb-0">Subtotal: Rs.<%= (product.product.price * product.quantity) %></p>
                                                 </div>
                                             </div>
                                         <% }); %>

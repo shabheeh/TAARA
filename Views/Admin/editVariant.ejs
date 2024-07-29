@@ -154,19 +154,23 @@
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <div class="row">
-                                                    <% variant.images.forEach((image, i) => { %>
+                                                    <% variant.images.forEach((image, i)=> { %>
                                                         <div class="col-lg-3 col-md-6 mb-3 d-flex flex-column align-items-center">
                                                             <div class="rounded-image-preview mb-2" style="width: 257px; height: 361px;">
-                                                                <img id="imagePreview<%= i + 1 %>" src="<%= '/Admin/assets/Products-Images/' + image %>" class="img-fluid" style="max-width: 100%; max-height: 100%;">
+                                                                <img id="imagePreview<%= i + 1 %>" src="<%= '/Admin/assets/Products-Images/' + image %>"
+                                                                    class="img-fluid" style="max-width: 100%; max-height: 100%;">
                                                             </div>
                                                             <label for="imageInput<%= i + 1 %>" class="btn btn-sm btn-outline-primary waves-effect">
                                                                 Browse image
                                                             </label>
                                                             <input type="hidden" name="existingImage<%= i + 1 %>" value="<%= image %>">
-                                                            <input name="productImage<%= i + 1 %>" type="file" accept="image/*" id="imageInput<%= i + 1 %>" class="imageInput" onchange="previewImage(this, 'imagePreview<%= i + 1 %>')" style="display: none;">
+                                                            <input name="productImage<%= i + 1 %>" type="file" accept="image/*" id="imageInput<%= i + 1 %>"
+                                                                class="imageInput" onchange="previewImage(this, 'imagePreview<%= i + 1 %>')"
+                                                                style="display: none;">
                                                         </div>
-                                                    <% }) %>
+                                                        <% }) %>
                                                 </div>
+                                        
                                             </div>
                                         </div>
                                     </div>
@@ -177,6 +181,27 @@
                         
                     </div>
                     
+                    <div class="modal fade" id="cropModal" tabindex="-1" role="dialog" aria-labelledby="cropModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <img id="imageToCrop" src="" alt="Image to crop" style="max-width: 100%;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="cropButton">Crop</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
                 </div>
@@ -242,15 +267,7 @@
 
 
             <script>
-                function previewImage(input, previewId) {
-                        const file = input.files[0];
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const img = document.getElementById(previewId);
-                            img.src = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
+               
 
                     document.getElementById('variantColor').addEventListener('change', function () {
                         const selectedOption = this.options[this.selectedIndex];
@@ -259,66 +276,77 @@
                     });
             </script>
 
-            // <script>
-            //     function previewImage(input, imageId) {
-            //         const file = input.files[0];
-            //         const reader = new FileReader();
+            <script>
+                let currentImageInput;
+let cropper;
 
-            //         reader.onload = function (e) {
-            //             const img = document.getElementById(imageId);
-            //             img.src = e.target.result;
-            //             createCropper(img);
-            //             console.log(img);
-            //         };
+function previewImage(input, imageId) {
+    const file = input.files[0];
+    const reader = new FileReader();
 
-            //         if (file) {
-            //             reader.readAsDataURL(file);
-            //         }
-            //     }
+    reader.onload = function (e) {
+        const img = document.getElementById(imageId);
+        img.src = e.target.result;
 
-            //     function createCropper(img) {
-            //         img.cropper = new Cropper(img, {
-            //             aspectRatio: 1,
-            //             viewMode: 3,
-            //             preview: '.preview'
-            //         });
-            //     }
+        // Open the modal
+        $('#cropModal').modal('show');
 
-            //     function cropImage(button, imageId) {
-            //             var img = document.getElementById(imageId);
-            //             var cropper = img.cropper;
+        // Set the image in the modal
+        const imageToCrop = document.getElementById('imageToCrop');
+        imageToCrop.src = e.target.result;
 
-            //             cropper.getCroppedCanvas({
-            //                 width: 200,
-            //                 height: 200,
-            //             }).toBlob(function (blob) {
-            //                 var url = URL.createObjectURL(blob);
-            //                 img.src = url;
-            //                 cropper.destroy();
-            //                 button.disabled = false;
+        // Store the current input for later use
+        currentImageInput = input;
 
-            //                 // Create a new FormData object
-            //                 var formData = new FormData();
+        // Initialize cropper
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: 0.667,
+            viewMode: 1,
+        });
+    };
 
-            //                 // Create a new file object from the blob
-            //                 var file = new File([blob], `croppedImage.jpg`, {
-            //                     type: 'image/jpeg',
-            //                 });
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
 
-            //                 // Append the file to the FormData object
-            //                 formData.append('croppedImage', file);
+// Crop button click handler
+document.getElementById('cropButton').addEventListener('click', function() {
+    if (cropper) {
+        cropper.getCroppedCanvas({
+            width: 1440,
+            height: 1440,
+        }).toBlob(function (blob) {
+            const url = URL.createObjectURL(blob);
+            const img = document.getElementById(currentImageInput.id.replace('Input', 'Preview'));
+            img.src = url;
 
-            //                 // Send the FormData object to the server
-            //                 fetch('/admin/addProduct', {
-            //                     method: 'POST',
-            //                     body: formData,
-            //                 })
-            //                     .then(response => response.json())
-            //                     .then(data => console.log(data))
-            //                     .catch(error => console.error(error));
-            //             });
-            //         }
-            // </script> 
+            // Create a new file from the blob
+            const croppedFile = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
+
+            // Create a new FileList containing the cropped file
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            currentImageInput.files = dataTransfer.files;
+
+            // Close the modal
+            $('#cropModal').modal('hide');
+        });
+    }
+});
+
+$('#cropModal').on('hidden.bs.modal', function () {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+});
+
+
+            </script>
 
 // alert
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

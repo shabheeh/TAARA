@@ -38,7 +38,7 @@
                 <div class="container d-flex align-items-center">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="/products/gender/<%= product.gender %>"><%= product.gender %></a></li>
+                        <li class="breadcrumb-item"><a href="/products/<%= product.gender %>"><%= product.gender %></a></li>
                         <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
                     </ol>
 
@@ -107,7 +107,7 @@
                                   <div class="product-nav product-nav-thumbs" >
                                     <% product.variants.forEach((variant) => { %>
                                       <a active style="width: 50px; height: 73px;" href="/product/<%= product._id %>/variant/<%= variant._id %>">
-                                        <img src="/Admin/assets/Products-Cropped/<%= variant.images[0] %>" alt="product desc" 
+                                        <img src="/Admin/assets/Products-Images/<%= variant.images[0] %>" alt="product desc" 
                                              width="50" height="70"
                                              title="<%= variant.name %>">
                                       </a>
@@ -133,6 +133,15 @@
                                         <label for="qty">Qty:</label>
                                         <div class="product-details-quantity">
                                             <input type="number" id="productQty" class="form-control" value="1" min="1" max="<%= Math.min(variant.quantity, 5) %>"  step="1" data-decimals="0" required>
+                                            <% if (variant.quantity < 5) { %>
+                                                <span style="color: red;">
+                                                     Only <%= variant.quantity %> left in
+                                                    stock
+                                                </span>
+                                                
+                                            
+                                             
+                                            <% } %>
                                         </div><!-- End .product-details-quantity -->
                                     </div><!-- End .details-filter-row -->
 
@@ -141,6 +150,7 @@
                                             <a href="#" class="btn-product btn-danger btn-cart btn-disabled"><span>Out of Stock</span></a>
                                         <% } else { %>
                                             <a href="#" id="addToCart" class="btn-product btn-cart"><span>add to cart</span></a>
+                            
                                             <% } %>
                                         
 
@@ -791,7 +801,7 @@
     });
 
     function addToCart(data) {
-        fetch('/cart/add', {
+        fetch('/cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -836,6 +846,29 @@
             });
         }
     </script>
+
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  const searchForm = document.getElementById('search-form');
+  const searchInput = document.getElementById('search');
+
+  if (searchForm && searchInput) {
+    searchForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm) {
+        const params = new URLSearchParams();
+        params.set('search', searchTerm);
+
+        // Redirect to the search results page
+        window.location.href = `/products/search-form?${params.toString()}`;
+      }
+    });
+  }
+});
+</script> -->
     
 
 

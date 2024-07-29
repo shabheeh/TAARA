@@ -88,7 +88,9 @@ const logout = async (req, res) => {
             console.log(error.message + ' admin logout');
         }
 
-    }
+}
+
+
 // ------List Users------>
 
 const loadUsers = async ( req, res ) => {

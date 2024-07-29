@@ -347,7 +347,7 @@
                             status: document.getElementById('brand-status').value
                         };
 
-                        fetch('/admin/brands/addBrand', {
+                        fetch('/admin/brands', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -564,7 +564,7 @@
 
                 function updateBrand(data) {
                     console.log(data)
-                    fetch('/admin/brands/editBrand', {
+                    fetch('/admin/brands', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'

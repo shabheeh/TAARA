@@ -42,10 +42,8 @@ const loadHome = async (req, res) => {
 
         if (!cart || cart.products.length === 0) {
             // Handle case where cart is empty
-            return res.render('home', {
-                user,
                 cart: { products: [] }  
-            });
+            
         }
 
         let totalPrice = 0;
@@ -62,7 +60,7 @@ const loadHome = async (req, res) => {
     } catch (error) {
 
         console.log('Error loading home:', error.message);
-        res.status(500).send('Server error');
+        res.render('404')
     }
 };
 
@@ -80,6 +78,7 @@ const authentication = async ( req, res) => {
         });
         } catch (error) {
             console.log('Error loading authentication:', error.message);
+            res.render('404')
         }
             
 }
@@ -122,7 +121,7 @@ const insertUser = async (req, res) => {
 
     } catch (error) {
         console.log('Error inserting user:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -162,7 +161,7 @@ const sendSignupOtp = async (user, req, res) => {
 
     } catch (error) {
         console.log('Error sending OTP:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -190,7 +189,7 @@ const resendOtp = async (req, res) => {
 
     } catch (error) {
         console.log('Error resending OTP:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };  
 
@@ -206,7 +205,7 @@ const loadOtp = async (req, res) => {
         res.render('signupOtp');
     } catch (error) {
         console.log('Error loading OTP page:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -317,6 +316,7 @@ const verifySignIn = async (req, res) => {
         }
     } catch ( error ) {
         console.log(error.message + ' user verifySignIn');
+        res.render('404')
     }
 };
 
@@ -331,7 +331,7 @@ const forgotPass = async (req, res) => {
         
     } catch (error) {
         console.log('Error loading forgot password page:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -370,7 +370,7 @@ const sendResetPasswordLink = async (user, req, res) => {
         });
     } catch (error) {
         console.log('Error sending password reset email:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -400,7 +400,7 @@ const forgotPassVerify = async (req, res) => {
 
     } catch (error) {
         console.log('Error in forgot password route:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -429,7 +429,7 @@ const resetPass = async (req, res) => {
 
     } catch (error) {
         console.log('Error in reset token route:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
 };
 
@@ -476,8 +476,20 @@ const resetPassVerify = async ( req, res) => {
 
     } catch (error) {
         console.log('Error resetting password:', error.message);
-        res.status(500).send('Internal Server Error');
+        res.render('404')
     }
+}
+
+const signout = async (req, res) => {
+    try {
+        
+        req.session.user = false;
+        res.redirect('/')
+
+        } catch (error) {
+            console.log(error.message + ' user singout');
+        }
+
 }
 
 // ------User Account------>
@@ -488,7 +500,24 @@ const userAccount = async ( req, res) => {
             const userId = req.userId
             const user = await User.findById(userId)
             const addresses = await Address.find({user: req.userId})
-            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant').populate('address')
+            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant')
+
+            
+
+        
+        const cart = await Cart.findOne({ user }).populate('products.product').populate('products.variant');
+
+        if (!cart || cart.products.length === 0) {
+            // Handle case where cart is empty
+                cart: { products: [] }  
+            
+        }
+
+        let totalPrice = 0;
+
+      cart.products.forEach((product) => {
+        totalPrice += product.product.price * product.quantity;
+      });
 
             // creating deep copy for not manupulating the orders
             const ordersCopy = JSON.parse(JSON.stringify(orders));
@@ -513,6 +542,8 @@ const userAccount = async ( req, res) => {
                     addresses: addresses ? addresses : null,
                     orders: orders ? orders : null,
                     cancelledOrders: cancelledOrders ? cancelledOrders : null,
+                    cart,
+                    totalPrice
                     })
             
 
@@ -522,6 +553,7 @@ const userAccount = async ( req, res) => {
 
         }catch (error){
             console.log(error.message + ' user userAccount');
+            res.render('404')
         }
 }
 
@@ -718,7 +750,22 @@ const deleteAddress = async ( req, res ) => {
     }
 }
 
+const fourNotFour = async ( req, res ) => {
+    try {
+        let user = null;
+        if (req.userId) {
+          
+          user = await User.findById(req.userId);
+        }
+        res.render('404', {
+            user: user ? user : null
+        })
+    } catch (error) {
+        console.log('Error rendering 404:', error.message);
+        res.render('404')
 
+    }
+}
 
 module.exports = {
     loadHome,
@@ -732,6 +779,7 @@ module.exports = {
     forgotPassVerify,
     resetPass,
     resetPassVerify,
+    signout,
 
     userAccount,
     updateProfile,
@@ -739,6 +787,7 @@ module.exports = {
     addAddress,
     editAddress,
     deleteAddress,
+    fourNotFour,
 
 
 }

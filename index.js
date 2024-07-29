@@ -1,15 +1,11 @@
 
-const mongoose  = require("mongoose");
 const express = require('express');
 const session = require('express-session');
 const nocache = require('nocache');
-const bodyParser = require('body-parser')
 require('dotenv').config();
 const passport = require('./passport');
-
-
 const { v4: uuidv4 } = require('uuid');
-
+const dbConnect = require('./Middlewares/dbConnect')
 
 
 const app = express();
@@ -30,21 +26,14 @@ app.use(passport.session());
 
  
 //db connect
-mongoose.connect(process.env.DB_HOST, {
-}).then(() => {
-    console.log('Connected to the database');
-}).catch((error) => {
-    console.log('Database connection error:', error);
-});
-
- 
+dbConnect() 
 
 
 
 
 // bodyparser
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
 // Admin_Routes

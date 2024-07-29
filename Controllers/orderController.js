@@ -24,8 +24,13 @@ const loadCheckout = async (req, res) => {
 
         let subTotal = 0;
         let shippingCharge = 0;
-        let totalPrice = 0;
+        let totalPriceCart = 0;
         let filteredProducts = [];
+        let totalPrice = 0;
+
+      cart.products.forEach((product) => {
+        totalPrice += product.product.price * product.quantity;
+      });
 
         if (cart) {
             filteredProducts = cart.products.filter(product => product.quantity > 0);
@@ -37,7 +42,7 @@ const loadCheckout = async (req, res) => {
             });
 
             shippingCharge = (subTotal >= 500 && subTotal !== 0) ? 0 : 50;
-            totalPrice = subTotal + shippingCharge;
+            totalPriceCart = subTotal + shippingCharge;
         }
 
         res.render('checkout', {
@@ -46,6 +51,7 @@ const loadCheckout = async (req, res) => {
             cart: { products: filteredProducts },
             subTotal,
             shippingCharge,
+            totalPriceCart,
             totalPrice
         });
 
@@ -59,7 +65,12 @@ const loadCheckout = async (req, res) => {
 const checkout = async (req, res) => {
     try {
         const userId = req.userId;
+        
+
+
         const { addressId, paymentMethod } = req.body;
+
+        const address = await Address.findById(addressId)
 
         const cart = await Cart.findOne({ user: userId })
             .populate("products.product")
@@ -75,7 +86,9 @@ const checkout = async (req, res) => {
         let totalQuantity = 0;
         let filteredProducts = cart.products.filter(product => product.quantity > 0);
 
-        
+        if(filteredProducts < 1){
+            return res.json({ success: false, message: "No products in cart" });
+        }
 
         filteredProducts.forEach((product) => {
             subTotal += product.product.price * product.quantity;
@@ -91,6 +104,8 @@ const checkout = async (req, res) => {
             quantity: product.quantity,
             price: product.product.price * product.quantity
         }));
+
+        
 
         function generateOrderId() {
             const prefix = "TR";
@@ -118,12 +133,21 @@ const checkout = async (req, res) => {
         const order = new Order({
             orderId,
             user: userId,
-            address: addressId,
             payment: paymentMethod,
             products,
             totalQuantity,
             shippingCharge,
-            totalPrice
+            totalPrice,
+            address: {
+                name: address.name,
+                phone: address.phone,
+                address: address.address,
+                street: address.street,
+                city: address.city,
+                landmark: address.landmark,
+                state: address.state,
+                pincode: address.pincode
+            }
         });
 
         await order.save();
@@ -161,26 +185,39 @@ const checkout = async (req, res) => {
 const confirmOrder = async ( req, res ) => {
 
     try {
+
         const orderId = req.params.orderId
         const user = req.userId
         const order = await Order.findById(orderId).populate('products.product').populate('products.variant')
-        .populate('user').populate('address')
+        .populate('user')
+        
 
-        .populate('payment')
         if (!order) {
             return res.json({ success: false, message: 'Order not found'
             })
         }
+        const cart = await Cart.findOne({ user })
+                    .populate("products.product")
+                    .populate("products.variant");
+    
+    let totalPrice = 0;
+
+      cart.products.forEach((product) => {
+        totalPrice += product.product.price * product.quantity;
+      });
 
         res.render('confirmOrder', {
         order,
-        user
+        user,
+        cart,
+        totalPrice
+
         })
 
 
     } catch (error) {
         console.log('Error placing order:', error.message);
-        res.json({ success: false, message: 'Error placing order' });
+        res.json({ success: false, message: 'Error viewing success order' });
         
     }
 }
@@ -229,7 +266,7 @@ const orders = async ( req, res ) => {
     }   
 }
 
-// ----------Order Details-------->
+// ----------Order Details-------->  
 
 const viewOrder = async ( req, res ) => {
 

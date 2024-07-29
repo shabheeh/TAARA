@@ -12,8 +12,39 @@ const orderShcema = new mongoose.Schema({
     },
 
     address: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address'
+        
+        name: {
+            type: String,
+        },
+    
+        phone: {
+            type: Number
+        },
+    
+        address: {
+            type: String
+        },
+    
+        street: {
+            type: String
+        },
+    
+        city: {
+            type: String
+        },
+    
+        landmark: {
+            type: String
+        },
+    
+        state: {
+            type: String
+        },
+    
+        pincode: {
+            type: Number
+        },
+    
     },
 
     payment: {

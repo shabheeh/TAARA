@@ -35,12 +35,157 @@
 <body>
     <div class="page-wrapper">
 
-        <%- include('../Layouts/User/navbar') -%>
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left mb-4">
+                        
+                    </div><!-- End .header-left -->
+        
+                    <div class="header-right">
+                        <ul class="top-menu">
+                            <li>
+                                <a href="#">Links</a>
+                                <ul>
+                                    <li><a href="tel:#"><i class="icon-phone"></i>Call: +0123 456 789</a></li>
+                                    <li><a href="wishlist.html"><i class="icon-heart-o"></i>Wishlist <span>(3)</span></a></li>
+                                    <li><a href="about.html">About Us</a></li>
+                                    <li><a href="contact.html">Contact Us</a></li>
+                                    <li><a href="/account"><i class="icon-user"></i><%= user ? user.firstName || 'Account' : 'Sign In' %></a></li>
+        
+        
+                                </ul>
+                            </li>
+                        </ul><!-- End .top-menu -->
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-top -->
+        
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+        
+                        <a href="/" class="logo">
+                            Taara
+                        </a>
+        
+                        <nav class="main-nav">
+                            <ul class="menu sf-arrows">
+                                
+                                <li>
+                                    <a href="/products/Men" class="">MEN</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="/products/Women" class="">WOMEN</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="/products/newArrivals" class="">NEW ARRIVALS</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="blog.html" class="">SALE</a>
+        
+                                    
+                                </li>
+                                
+                            </ul><!-- End .menu -->
+                        </nav><!-- End .main-nav -->
+        
+                    </div><!-- End .header-left -->
+        
+                    <div class="header-right">
+                        <div class="header-search">
+                            <a class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
+                            <form id="search-form" >
+                                <div class="header-search-wrapper">
+                                    <label for="q" class="sr-only">Search</label>
+                                    <input type="search" class="form-control" name="search" id="search" value="<%= locals.search ? search : '' %>" placeholder="Search in..." >
+                                </div><!-- End .header-search-wrapper -->
+                            </form>
+                        </div><!-- End .header-search -->
+                        
+        
+                        <div class="dropdown cart-dropdown">
+                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                <i class="icon-shopping-cart"></i>
+                                <span class="cart-count"><%= cart.products.length %></span>
+                            </a>
+                        
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <% if (cart.products.length > 0) { %>
+                                    <div class="dropdown-cart-products">
+                                        <% cart.products.slice(0, 3).forEach(current => { %>
+                                            <div class="product">
+                                                <div class="product-cart-details">
+                                                    <h4 class="product-title">
+                                                        <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
+                                                    </h4>
+                                                    <span class="cart-product-info">
+                                                        <span class="cart-product-qty"><%= current.quantity %></span>
+                                                        x Rs.<%= current.product.price %>
+                                                    </span>
+                                                </div><!-- End .product-cart-details -->
+                                
+                                                <figure class="product-image-container" style="width: 40px; height: 50px;">
+                                                    <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="product-image">
+                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product" style="width: 52px; height: auto;">
+                                                    </a>
+                                                </figure>
+                                                <!-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a> -->
+                                            </div><!-- End .product -->
+                                        <% }); %>
+                                    </div><!-- End .dropdown-cart-products -->
+                                
+                                    <div class="dropdown-cart-total">
+                                        <span>Total</span>
+                                        <span class="cart-total-price">Rs.<%= totalPrice %></span>
+                                    </div><!-- End .dropdown-cart-total -->
+                                
+                                    <div class="dropdown-cart-action">
+                                        <a href="/cart" class="btn btn-primary">View Cart</a>
+                                        <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+                                    </div><!-- End .dropdown-cart-action -->
+                                <% } else { %>
+                                    <div class="dropdown-cart-action">
+                                        <p>Your cart is empty  </p>
+                                        <a href="/cart" class="btn btn-primary">View Cart</a>
+
+                                    </div><!-- End .dropdown-cart-action -->
+                                <% } %>
+                            </div><!-- End .dropdown-menu -->
+                            
+                        </div><!-- End .cart-dropdown -->
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-middle -->
+        </header><!-- End .header -->
 
         <main class="main">
         	<div class="page-header text-center" style="background-image: url('/User/assets/images/black-screen-6.jpg')">
         		<div class="container">
-        			<h1 class="page-title"><%= title.toUpperCase() %></h1>
+        			<h1 class="page-title">
+                        <% if (title === 'Men') { %>
+                          MEN
+                        <% } else if (title === 'Women') { %>
+                          WOMEN
+                        <% } else if (title === 'newArrivals') { %>
+                            NEW ARRIVALS
+                        <% } else if (title === 'Sale') { %>
+                          SALE
+                        <% } else { %>
+                          SEARCH RESULTS
+                        <% } %>
+                      </h1>
+                      
         		</div><!-- End .container -->
         	</div><!-- End .page-header -->
             <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
@@ -59,7 +204,8 @@
                 			<div class="toolbox">
                 				<div class="toolbox-left">
                 					<div class="toolbox-info">
-                						Showing <span>9 of 56</span> Products
+                						Showing <span><%= locals.products && products.length > 9 ? '9' : products.length %>
+                                         of <%= locals.products ? totalProducts : 'x' %></span> Products
                 					</div><!-- End .toolbox-info -->
                 				</div><!-- End .toolbox-left -->
 
@@ -97,7 +243,7 @@
                                             <% } %>
                         
                                             <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
-                                              <img src="/Admin/assets/Products-Cropped/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
+                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
                                             </a>
                                   
                                             <div class="product-action-vertical">
@@ -122,7 +268,7 @@
                                   
                                             <div class="product-nav product-nav-dots" style="text-align: left;">
                                                 <% product.variants.forEach(function(variant) { %>
-                                                    <a href="/product/<%= product._id %>/variant/<%= variant._id %>" class="<%= variant.isActive ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
+                                                    <a href="/product/<%= product._id %>/variant/<%= variant._id %>" class="<%= variant.isActive? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
                                                         <span class="sr-only">Color name</span>
                                                     </a>
                                                 <% }); %>
@@ -144,24 +290,30 @@
                               </div><!-- End .products -->
 
 
-                			<nav aria-label="Page navigation">
-							    <ul class="pagination justify-content-center">
-							        <li class="page-item disabled">
-							            <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
-							                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
-							            </a>
-							        </li>
-							        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-							        <li class="page-item"><a class="page-link" href="#">2</a></li>
-							        <li class="page-item"><a class="page-link" href="#">3</a></li>
-							        <li class="page-item-total">of 6</li>
-							        <li class="page-item">
-							            <a class="page-link page-link-next" href="#" aria-label="Next">
-							                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
-							            </a>
-							        </li>
-							    </ul>
-							</nav>
+                              <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                  <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link page-link-prev" href="<%= page > 1 ? `?page=${page - 1}` : '' %>" aria-label="Previous" tabindex="<%= page === 1 ? '-1' : '' %>" aria-disabled="<%= page === 1 ? 'true' : '' %>">
+                                      <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                    </a>
+                                  </li>
+                              
+                                  <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= page === i ? 'active' : '' %>" aria-current="<%= page === i ? 'page' : '' %>">
+                                      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                    </li>
+                                  <% } %>
+                              
+                                  <li class="page-item-total">of <%= totalPages %></li>
+                              
+                                  <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link page-link-next" href="<%= page < totalPages ? `?page=${page + 1}` : '' %>" aria-label="Next">
+                                      Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                    </a>
+                                  </li>
+                                </ul>
+                              </nav>
+                              
 
                                       
 
@@ -174,6 +326,32 @@
                 					<a href="#" class="sidebar-filter-clear">Clean All</a>
                 				</div><!-- End .widget widget-clean -->
 
+                                <% if (title !== "Men" && title !== "Women") { %>
+                                    <div class="widget widget-collapsible">
+                                        <h3 class="widget-title">
+                                            <a data-toggle="collapse" href="#widget-0" role="button" aria-expanded="true" aria-controls="widget-1">
+                                                Gender
+                                            </a>
+                                        </h3><!-- End .widget-title -->
+                                    
+                                        <div class="collapse show" id="widget-0">
+                                            <div class="widget-body">
+                                                <div class="filter-items filter-items-count">
+                                                    <% genders.forEach((gender, index) => { %>
+                                                        <div class="filter-item">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" name="gender" id="gender-<%= gender.toLowerCase() %>" 
+                                                                value="<%= gender %>" <%= filteredGender.includes(gender) ? 'checked' : '' %>>
+                                                                <label class="custom-control-label" for="gender-<%= gender.toLowerCase() %>"><%= gender %></label>
+                                                            </div><!-- End .custom-checkbox -->
+                                                            <span class="item-count"><%= gender === 'Men' ? menCount : womenCount %></span>
+                                                        </div><!-- End .filter-item -->
+                                                    <% }); %>
+                                                </div><!-- End .filter-items -->
+                                            </div><!-- End .widget-body -->
+                                        </div><!-- End .collapse -->
+                                    </div><!-- End .widget -->
+                                <% } %>
                 				<div class="widget widget-collapsible">
                                     <h3 class="widget-title">
                                         <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
@@ -680,7 +858,7 @@
 
 function addToCart(data) {
 
-        fetch('/cart/add', {
+        fetch('/cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -729,8 +907,10 @@ function addToCart(data) {
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('filter-form').addEventListener('change', function() {
+
             const sortForm = document.getElementById('sort-form');
             const sortItem = document.getElementById('sortProducts').value;
+            const searchTerm = document.getElementById('search').value;
 
             const params = new URLSearchParams(new FormData(this));
 
@@ -738,13 +918,21 @@ function addToCart(data) {
                 params.set('sortProducts', sortItem);
             }
 
+            
+            if (searchTerm) {
+                params.set('search', searchTerm);
+            }
+
             const title = "<%= title %>";
             window.location.href = `/products/${title}?${params.toString()}`;
+
         });
 
         document.getElementById('sort-form').addEventListener('change', function() {
+
             const filterForm = document.getElementById('filter-form');
             const sortItem = document.getElementById('sortProducts').value;
+            const searchTerm = document.getElementById('search').value;
 
             const params = new URLSearchParams(new FormData(filterForm));
 
@@ -752,8 +940,36 @@ function addToCart(data) {
                 params.set('sortProducts', sortItem);
             }
 
+            
+            if (searchTerm) {
+                params.set('search', searchTerm);
+            }
+
             const title = "<%= title %>";
             window.location.href = `/products/${title}?${params.toString()}`;
+
+        });
+
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const filterForm = document.getElementById('filter-form');
+            const sortItem = document.getElementById('sortProducts').value;
+            const searchTerm = document.getElementById('search').value;
+
+            const params = new URLSearchParams(new FormData(filterForm));
+
+            if (searchTerm) {
+                params.set('search', searchTerm);
+            }
+
+            if (sortItem) {
+                params.set('sortProducts', sortItem);
+            }
+
+            const title = "<%= title %>";
+            window.location.href = `/products/${title}?${params.toString()}`;
+
         });
 });
 

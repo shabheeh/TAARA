@@ -6,6 +6,8 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="/User/assets/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <style>
         .address-container {
     width: 100%;
@@ -178,7 +180,22 @@
 .product-actions .btn {
     margin-bottom: 0.5rem;
 }
+.password-input-wrapper {
+    position: relative;
+}
 
+.password-input-wrapper .form-control {
+    padding-right: 35px; /* Make room for the icon */
+}
+
+.password-input-wrapper .fas {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999; /* Adjust color as needed */
+}
 
     </style>
 
@@ -202,7 +219,6 @@
                 <div class="container">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
                         <li class="breadcrumb-item active" aria-current="page">My Account</li>
                     </ol>
                 </div><!-- End .container -->
@@ -221,7 +237,7 @@
 								        <a class="nav-link" id="tab-security-link" data-toggle="tab" href="#tab-security" role="tab" aria-controls="tab-security" aria-selected="false">Sign-in & Security</a>
 								    </li>
                                     <li class="nav-item">
-								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
+								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Addresses</a>
 								    </li>
 								    <li class="nav-item">
 								        <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
@@ -233,10 +249,38 @@
 								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
 								    </li>
 								    <li class="nav-item">
-								        <a class="nav-link" href="#">Sign Out</a>
-								    </li>
+                                        <a class="nav-link" data-toggle="modal"  data-bs-toggle="modal" href="#signOutModal" data-bs-target="##signOutModal">Sign Out</a>
+                                        
+                                      </li>
+                                      
 								</ul>
 	                		</aside><!-- End .col-lg-3 -->
+
+                            <!-- Sign Out Confirmation Modal -->
+                            <div class="modal fade" id="signOutModal" tabindex="-1" role="dialog" aria-labelledby="signOutModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog " role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editAddressModalLabel">Confirm Sign Out</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body m-5">
+                                            <!-- Form Content -->
+                                            <form action="/signout" method="POST" >
+                                                
+                                                
+                                                <button type="submit" class="btn btn-primary">
+                                                    CONFIRM
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">DISCARD</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
 	                		<div class="col-md-8 col-lg-9">
 	                			<div class="tab-content">
@@ -279,33 +323,41 @@
 								    </div><!-- .End .tab-pane -->
 
                                     <div class="tab-pane fade" id="tab-security" role="tabpanel" aria-labelledby="tab-security-link">
-								    	<div class="row">
+                                        <div class="row">
                                             <div class="col">
-                                                <h4 class="profile-title text-center">Sign-in & Security</h4><!-- End .profile-title -->
+                                                <h4 class="profile-title text-center">Sign-in & Security</h4>
                                                 <div class="card card-dashboard">
                                                     <div class="card-body col-md-8 col-lg-9">
                                                         <form id="password-form">
                                                             <h5>Change Password</h5>
                                                             <div class="form-group">
                                                                 <label for="current-pass" id="currentPassLabel">Enter current password</label>
-                                                                <input type="password" id="current-pass" class="form-control"  placeholder="Enter current password" >
+                                                                <div class="password-input-wrapper">
+                                                                    <input type="password" id="current-pass" class="form-control" placeholder="Enter current password">
+                                                                    <i class="fas fa-eye togglePassword" id="toggleCurrentPass"></i>
+                                                                </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="phone" id="newPassLabel">Enter new password</label>
-                                                                <input type="password" id="newPass" class="form-control" placeholder="Enter new password" >
+                                                                <label for="newPass" id="newPassLabel">Enter new password</label>
+                                                                <div class="password-input-wrapper">
+                                                                    <input type="password" id="newPass" class="form-control" placeholder="Enter new password">
+                                                                    <i class="fas fa-eye togglePassword" id="toggleNewPass"></i>
+                                                                </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="phone" id="newPassLabel2">Confirm new password</label>
-                                                                <input type="password" id="newPass2" class="form-control"  placeholder="Re-Enter new password" >
+                                                                <label for="newPass2" id="newPassLabel2">Confirm new password</label>
+                                                                <div class="password-input-wrapper">
+                                                                    <input type="password" id="newPass2" class="form-control" placeholder="Re-Enter new password">
+                                                                    <i class="fas fa-eye togglePassword" id="toggleNewPass2"></i>
+                                                                </div>
                                                             </div>
                                                             <button type="submit" class="btn btn-primary" id="confirm-button">Confirm</button>
-                                                            
                                                         </form>
                                                     </div><!-- End .card-body -->
                                                 </div><!-- End .card-dashboard -->
                                             </div><!-- End .col -->
                                         </div><!-- End .row -->
-								    </div><!-- .End .tab-pane -->
+                                    </div><!-- .End .tab-pane -->
 
 								    <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
                                         <div class="orders-container">
@@ -357,7 +409,7 @@
                                                                 <div class="order-content collapse" id="order-details-<%= index %>">
                                                                     <% order.products.forEach(current => { %>
                                                                         <div class="product-item d-flex align-items-start mb-2">
-                                                                            <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="<%= current.product.name %>" class="product-image mr-3" >
+                                                                            <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="<%= current.product.name %>" class="product-image mr-3" >
                                                                             <div class="product-details mb-0">
                                                                                 <div class="d-flex justify-content-between">
                                                                                     <h5 class="product-heading mb-0">
@@ -369,12 +421,19 @@
                                                                                 <p class="product-price-1 mb-0">Rs.<%= current.product.price %></p>
                                                                                 <p class="product-total mb-0">Total Quantity: <%= current.quantity %></p>
                                                                                 <p class="product-total mb-0">Total: Rs.<%= current.product.price * current.quantity %></p>
-                                                                                <p class="mb-0">Return or replace items: Eligible through <%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
+                                                                                <% if (current.status === 'Cancelled') { %>
+                                                                                    <p class="mb-0">Cancelled Date: <%= new Date(current.cancelDate).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
+                                                                                    
+                                                                                        <% } else { %>
+                                                                                         
+                                                                                            <p class="mb-0">Return or replace items: Eligible through <%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
+                                                                                <% } %>
+                                                                                
                                                                                 <div class=" mt-1">
                                                                                     <a href="#" id="addToCart-<%= current.variant._id %>" class="btn btn-sm btn-outline-primary-2 mr-2">Buy again</a>
                                                                                     <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="btn btn-sm btn-outline-secondary mr-2">View item</a>
                                                                                     <% if (current.status === 'Delivered') { %>
-                                                                                        <a data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Return</a>
+                                                                                        <a data-toggle="modal" href="#returnOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= current.variant._id %>">Return</a>
                                                                                         <% } else if (current.status === 'Cancelled') { %>
                                                                                             <% } else { %>
                                                                                              
@@ -416,8 +475,12 @@
 
                                                                     <% }); %>
                                                                     <div class="address-card my-2" >
+                                                                        <div>
+                                                                            <p><strong>Payment Method: </strong><%= order.payment %></p>
+                                                                        </div>
                                                                         <div class="address-details">
                                                                             <p class="address-content">
+                                                                                <strong>Shipping Address: </strong><br>
                                                                                 <span class="address-name"><%= order.address.name %></span>
                                                                                 <span class="address-phone"><%= order.address.phone %></span><br>
                                                                                 <span class="address-line"><%= order.address.address %>, <%= order.address.street %>, <%= order.address.city %>, <%= order.address.landmark %>, <%= order.address.state %> - <span class="address-zip"><%= order.address.pincode %></span></span>
@@ -1183,7 +1246,7 @@
         
         async function updateProfile(data) {
             try {
-                const response = await fetch('/user/updateProfile', {
+                const response = await fetch('/profile', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1281,7 +1344,7 @@
 
             function updatePassword(data){
 
-                fetch('/user/changePassword', {
+                fetch('/password', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1448,7 +1511,7 @@
             })
 
             function addAddress(data) {
-    fetch('/user/addAddress', {
+    fetch('/address', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1747,7 +1810,7 @@
     });
 
     function editAddress(data) {
-            fetch('/user/editAddress', {
+            fetch('/address', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1802,7 +1865,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const addressId = this.querySelector('input[name="addressId"]').value;
             console.log(addressId)
 
-            fetch(`/user/deleteAddress`, {
+            fetch(`/deleteAddress`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1886,7 +1949,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function cancelOrder(data) {
-            fetch('/user/order/cancel', {
+            fetch('/order/cancel', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1896,9 +1959,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-
                     
-                    $('#cancelOrderModal' + data.orderId + data.variantId).modal('hide');
+                    
+                    $(`#cancelOrderModal${data.orderId}-${data.variantId}`).modal('hide');
+                
+
                     // Show success alert
                 Swal.fire({
                     title: 'Success',
@@ -1954,6 +2019,47 @@ document.addEventListener('DOMContentLoaded', function() {
             tabContent.show();
         }
     });
+    </script>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    function togglePasswordVisibility(passwordField, toggleIcon) {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        toggleIcon.classList.toggle('fa-eye-slash');
+    }
+
+    // Current password toggle
+    const toggleCurrentPass = document.querySelector('#toggleCurrentPass');
+    const currentPass = document.querySelector('#current-pass');
+
+    if (toggleCurrentPass && currentPass) {
+        toggleCurrentPass.addEventListener('click', function() {
+            togglePasswordVisibility(currentPass, this);
+        });
+    }
+
+    // New password toggle
+    const toggleNewPass = document.querySelector('#toggleNewPass');
+    const newPass = document.querySelector('#newPass');
+
+    if (toggleNewPass && newPass) {
+        toggleNewPass.addEventListener('click', function() {
+            togglePasswordVisibility(newPass, this);
+        });
+    }
+
+    // Confirm new password toggle
+    const toggleNewPass2 = document.querySelector('#toggleNewPass2');
+    const newPass2 = document.querySelector('#newPass2');
+
+    if (toggleNewPass2 && newPass2) {
+        toggleNewPass2.addEventListener('click', function() {
+            togglePasswordVisibility(newPass2, this);
+        });
+    }
+});
     </script>
 
 

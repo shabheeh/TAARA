@@ -134,7 +134,7 @@
                         <% if (current.status === "Cancelled") { %>
                           <div class="mt-3"><strong>Reason for cancel:</strong> <%= current.cancelReason %></div>
                         <% } %>
-                        
+                         
                       </td>
                     <td><span>Rs.<%= current.product.price %></span></td>
                     <td><span><%= current.quantity %></span></td>
@@ -350,7 +350,7 @@
 
 
     function updateStautus(data){
-        fetch('/admin/order/update-status', {
+        fetch('/admin/order', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'

@@ -25,8 +25,8 @@
                 <div class="container">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="">Shop</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+                        
+                        <li class="breadcrumb-item active" aria-current="page">Cart</li>
                     </ol>
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
@@ -56,7 +56,7 @@
                                                         <div class="product">
                                                             <figure class="product-media">
                                                                 <a href="#">
-                                                                    <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="Product image">
+                                                                    <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product image">
                                                                 </a>
                                                             </figure>
                                                             <h3 class="product-title">
@@ -71,10 +71,23 @@
                                                                 <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
                                                             <% } else { %>
                                                                 <input type="number" id="updateCart-<%= index %>" data-index="<%= index %>" data-cart-id="<%= cart._id %>" class="form-control" value="<%= current.quantity %>" min="1" max="<%= Math.min(current.variant.quantity, 5) %>" step="1" data-decimals="0">
+                                                                <% if (current.variant.quantity < 5) { %>
+                                                                    <span style="color: red;">
+                                                                        Only <%= current.variant.quantity %> left in
+                                                                       stock
+                                                                   </span>
+                                                                
+                                                                 
+                                                                <% } %>
                                                             <% } %>
                                                         </div><!-- End .cart-product-quantity -->
                                                     </td>
-                                                    <td class="total-col text-center">Rs.<%= current.product.price * current.quantity %></td>
+                                                    <% if (current.quantity > 0 ) { %>
+                                                        <td class="total-col text-center">Rs.<%= current.product.price *  current.quantity  %></td>
+                                                        <% } else { %>
+                                                            <td class="total-col text-center">Rs.<%= current.product.price *  1  %></td>
+                                                    <% } %>
+                                                    
                                                     <td class="remove-col">
                                                         <button class="btn-remove removeItem" data-index="<%= index %>" data-cart-id="<%= cart._id %>"><i class="icon-close"></i></button>
                                                     </td>
@@ -114,12 +127,12 @@
                                                 </tr><!-- End .summary-shipping-row -->
                                                 <tr class="summary-total">
                                                     <td>Total:</td>
-                                                    <td id="total-price">Rs.<%= filteredProducts.length > 0 ?  totalPrice : "0" %></td>
+                                                    <td id="total-price">Rs.<%= filteredProducts.length > 0 ?  totalPriceCart : "0" %></td>
                                                 </tr><!-- End .summary-total -->
                                             </tbody>
                                         </table><!-- End .table table-summary -->
                                         <% if (filteredProducts.length > 0) { %>
-                                            <a href="/user/checkout" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+                                            <a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
                                         <% } %>
                                         
                                     </div><!-- End .summary -->
@@ -510,7 +523,7 @@
 });
 
 function removeFromCart(index, cartId) {
-    fetch(`/cart/remove/${index}/${cartId}`, {
+    fetch(`/cart/${index}/${cartId}`, {
         method: 'DELETE',
     })
     .then(response => response.json())
@@ -557,7 +570,7 @@ document.querySelectorAll('input[id^="updateCart-"]').forEach(input => {
 });
 
 function updateCart(data) {
-    fetch(`/cart/update/${data.index}/${data.cartId}`, {
+    fetch(`/cart/${data.index}/${data.cartId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'

@@ -137,7 +137,7 @@
                         <td>
                           <div class="avatar-wrapper" style="width: 50px; height: 70px;">
                             <% if (product.variants.length> 0 && product.variants[0].images.length > 0) { %>
-                              <img src="/Admin/assets/Products-Cropped/<%= product.variants[0].images[0] %>"
+                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[0] %>"
                                 alt="Product image" class="img-fluid" style="max-width: 100%; max-height: 100%;">
                               <% } else { %>
                                 <img src="default-image.jpg" alt="No Image" class="product-image">
@@ -235,9 +235,7 @@
                                         name="category">
                                         <option value="">Select category</option>
                                         <% categories.forEach(category=> { %>
-                                          <option value="<%= category._id %>" <% if (product.category &&
-                                            product.category.toString()===category._id.toString()) { %>selected<% } %>><%= category.name %>
-                                          </option>
+                                          <option value="<%= category._id %>" <%= category._id.equals(product.category._id) ? 'selected' : '' %>><%= category.name %></option>
                                           <% }); %>
                                       </select>
                                       <label for="product-category-<%= product._id %>"
@@ -251,9 +249,7 @@
                                       <select id="product-brand-<%= product._id %>" class="form-select" aria-label="Brand" name="brand">
                                         <option value="">Select brand</option>
                                         <% brands.forEach(brand=> { %>
-                                          <option value="<%= brand._id %>" <% if (product.brand &&
-                                            product.brand.toString()===brand._id.toString()) { %>selected<% } %>><%= brand.name %>
-                                          </option>
+                                          <option value="<%= brand._id %>" <%= brand._id.equals(product.brand._id) ? 'selected' : '' %>><%= brand.name %></option>
                                           <% }); %>
                                       </select>
                                       <label for="product-brand-<%= product._id %>" id="productBrandError-<%= product._id %>">Brand</label>

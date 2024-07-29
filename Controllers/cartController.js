@@ -31,14 +31,18 @@ const cart = async (req, res) => {
 
       filteredProducts = cart.products.filter(product => product.quantity > 0);
 
-      
+      let totalPrice = 0;
+
+      cart.products.forEach((product) => {
+        totalPrice += product.product.price * product.quantity;
+      });
 
       cart.products.forEach((product) => {
         subTotal += product.product.price * product.quantity;
       });
 
       let shippingCharge = (subTotal >= 500 && subTotal !== 0) ? 0 : 50;
-      let totalPrice = subTotal + shippingCharge;
+      let totalPriceCart = subTotal + shippingCharge;
 
       res.render("cart", {
         cart,
@@ -46,6 +50,7 @@ const cart = async (req, res) => {
         subTotal,
         shippingCharge,
         totalPrice,
+        totalPriceCart,
         filteredProducts
       });
     }

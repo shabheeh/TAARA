@@ -614,7 +614,7 @@
                         console.error('Error:', error);
                         Swal.fire({
                             title: 'Error',
-                            text: 'An error occurred while updating the product.',
+                            text: error.message,
                             icon: 'error',
                             confirmButtonColor: '#d33',
                             confirmButtonText: 'OK'

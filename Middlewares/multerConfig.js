@@ -26,6 +26,7 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
+      req.fileValidationError = 'Error: Images Only!';
       cb("Error: Images Only!");
     }
   },
