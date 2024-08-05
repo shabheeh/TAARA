@@ -60,10 +60,10 @@
                     <div class="header-right">
                         <div class="header-search header-search-extended header-search-visible">
                             <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                            <form id="search-form" action="/products/search-form" method="GET">
+                            <form id="search-form" action="/products/search" method="GET">
                                 <div class="header-search-wrapper">
                                     <label for="q" class="sr-only">Search</label>
-                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
+                                    <input type="search" class="form-control" name="search" id="q" placeholder="Search product ..." required>
                                     <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
                                 </div><!-- End .header-search-wrapper -->
                             </form>
@@ -87,13 +87,18 @@
                                 <% if (cart.products.length > 0) { %>
                                     <div class="dropdown-cart-products">
                                         <% cart.products.slice(0, 3).forEach(current => { %>
-                                            <div class="product">
+                                            <div class="product pb-3">
                                                 <div class="product-cart-details">
                                                     <h4 class="product-title">
                                                         <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
                                                     </h4>
                                                     <span class="cart-product-info">
-                                                        <span class="cart-product-qty"><%= current.quantity %></span>
+                                                        <% if (current.quantity > 0 ) { %>
+                                                            <span class="cart-product-qty"><%= current.quantity %></span>
+                                                            <% } else { %>
+                                                                <span class="cart-product-qty"> 1 </span>
+                                                        <% } %>
+                                                        
                                                         x Rs.<%= current.product.price %>
                                                     </span>
                                                 </div><!-- End .product-cart-details -->
@@ -136,10 +141,10 @@
         <main class="main">
             <div class="intro-slider-container">
                 <div class="intro-slider owl-carousel owl-simple owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{"nav":false, "dots": false, "loop": false}'>
-                    <div class="intro-slide" style="background-image: url(/User/assets/images/demos/demo-15/slider/slide-1.jpg);">
+                    <div class="intro-slide" style="background-image: url(/User/assets/images/demos/demo-15/bg-1.jpg);">
                         <div class="container intro-content text-center">
                             <h3 class="intro-subtitle">Want to know what's hot?</h3><!-- End .h3 intro-subtitle -->
-                            <h1 class="intro-title text-white">Spring Lookbook 2019</h1><!-- End .intro-title -->
+                            <h1 class="intro-title text-white">Spring Lookbook 2024</h1><!-- End .intro-title -->
 
                             <a href="#scroll-to-content" class="btn btn-outline-primary-2 scroll-to">
                                 <span>Start scrolling</span>

@@ -6,10 +6,12 @@ require('dotenv').config();
 const passport = require('./passport');
 const { v4: uuidv4 } = require('uuid');
 const dbConnect = require('./Middlewares/dbConnect')
+const adminRoute = require("./Routes/adminRoute");
+const userRoute = require("./Routes/userRoute");
+const path = require('path');
 
 
 const app = express();
-
 
 
 //session 
@@ -35,18 +37,18 @@ dbConnect()
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// set View engine
+app.set("view engine", "ejs");
 
 // Admin_Routes
-const adminRoute = require("./Routes/adminRoute");
 app.use('/admin', adminRoute);
 
-
-
 // User_Routes 
-const userRoute = require("./Routes/userRoute");
 app.use('/', userRoute);
 
-
+app.use('*' , ( req, res ) => {
+    res.render(path.join(__dirname, './Views/User/404.ejs'))
+})
 
 const port = process.env.PORT; 
 

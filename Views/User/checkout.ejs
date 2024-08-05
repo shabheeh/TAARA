@@ -91,6 +91,10 @@
     color: red !important;
 }
 
+.success-message {
+    color: green !important;
+}
+
 /* Hide default radio button */
 input[type="radio"] {
     position: absolute;
@@ -145,17 +149,16 @@ input[type="radio"]:checked + label::after {
 
 
 
-/* .product-title {
-    margin: 0;
-}
+.hidden-coupon {
+        display: none;
+    }
+    #toggleCoupons {
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
 
-.product-price, .product-total {
-    margin-top: 5px;
-}
-
-.cart-product-quantity {
-    margin-top: 5px;
-} */
 
 
 
@@ -165,7 +168,146 @@ input[type="radio"]:checked + label::after {
 <body>
     <div class="page-wrapper">
         
-        <%- include('../Layouts/User/navbar') -%>
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left mb-4">
+                        
+                    </div><!-- End .header-left -->
+        
+                    <div class="header-right">
+                        <ul class="top-menu">
+                            <li>
+                                <a href="#">Links</a>
+                                <ul>
+                                    <li><a href="tel:#"><i class="icon-phone"></i>Call: +0123 456 789</a></li>
+                                    <li><a href="wishlist.html"><i class="icon-heart-o"></i>Wishlist <span>(3)</span></a></li>
+                                    <li><a href="about.html">About Us</a></li>
+                                    <li><a href="contact.html">Contact Us</a></li>
+                                    <li><a href="/account"><i class="icon-user"></i><%= user ? user.firstName || 'Account' : 'Sign In' %></a></li>
+        
+        
+                                </ul>
+                            </li>
+                        </ul><!-- End .top-menu -->
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-top -->
+        
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+        
+                        <a href="/" class="logo">
+                            Taara
+                        </a>
+        
+                        <nav class="main-nav">
+                            <ul class="menu sf-arrows">
+                                
+                                <li>
+                                    <a href="/products/Men" class="">MEN</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="/products/Women" class="">WOMEN</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="/products/newArrivals" class="">NEW ARRIVALS</a>
+        
+                                    
+                                </li>
+                                <li>
+                                    <a href="blog.html" class="">SALE</a>
+        
+                                    
+                                </li>
+                                
+                            </ul><!-- End .menu -->
+                        </nav><!-- End .main-nav -->
+        
+                    </div><!-- End .header-left -->
+        
+                    <div class="header-right">
+                        <div class="header-search">
+                            <a class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
+                            <form id="search-form" action="/products/search" method="GET">
+                                <div class="header-search-wrapper">
+                                    <label for="q" class="sr-only">Search</label>
+                                    <input type="search" class="form-control" name="search" id="search" value="<%= locals.search ? search : '' %>" placeholder="Search in..." >
+                                </div><!-- End .header-search-wrapper -->
+                            </form>
+                        </div><!-- End .header-search -->
+                        
+        
+                        <div class="dropdown cart-dropdown">
+                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                <i class="icon-shopping-cart"></i>
+                                <span class="cart-count"><%= cart.products.length %></span>
+                            </a>
+                        
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <% if (cart.products.length > 0) { %>
+                                    <div class="dropdown-cart-products">
+                                        <% cart.products.slice(0, 3).forEach(current => { %>
+                                            <div class="product pb-3">
+                                                <div class="product-cart-details">
+                                                    <h4 class="product-title">
+                                                        <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
+                                                    </h4>
+                                                    <span class="cart-product-info">
+                                                        <% if (current.quantity > 0 ) { %>
+                                                            <span class="cart-product-qty"><%= current.quantity %></span>
+                                                            <% } else { %>
+                                                                <span class="cart-product-qty"> 1 </span>
+                                                        <% } %>
+                                                        
+                                                        x Rs.<%= current.discountedPrice %>
+                                                    </span>
+                                                </div><!-- End .product-cart-details -->
+                                
+                                                <figure class="product-image-container" style="width: 40px; height: 50px;">
+                                                    <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="product-image">
+                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" style="width: 52px; height: auto;" alt="Product">
+                                                    </a>
+                                                </figure>
+                                                <!-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a> -->
+                                            </div><!-- End .product -->
+                                        <% }); %>
+                                    </div><!-- End .dropdown-cart-products -->
+                                
+                                    <div class="dropdown-cart-total">
+                                        <span>Total</span>
+                                        <span class="cart-total-price">Rs.<%= locals.totalPriceCart %></span>
+                                    </div><!-- End .dropdown-cart-total -->
+                                
+                                    <div class="dropdown-cart-action">
+                                        <a href="/cart" class="btn btn-primary">View Cart</a>
+                                        <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+                                    </div><!-- End .dropdown-cart-action -->
+                                <% } else { %>
+                                    <div class="dropdown-cart-action">
+                                        <p>Your cart is empty  </p>
+                                        <a href="/cart" class="btn btn-primary">View Cart</a>
+        
+                                    </div><!-- End .dropdown-cart-action -->
+                                <% } %>
+                            </div><!-- End .dropdown-menu -->
+                            
+                        </div><!-- End .cart-dropdown -->
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-middle -->
+        </header><!-- End .header -->
+        
+        
 
         <main class="main">
         	<div class="page-header text-center" style="background-image: url('/User/assets/images/black-screen-6.jpg')">
@@ -186,13 +328,26 @@ input[type="radio"]:checked + label::after {
             <div class="page-content">
             	<div class="checkout">
 	                <div class="container">
-            			<div class="checkout-discount">
-            				<form action="#">
-        						<input type="text" class="form-control" required id="checkout-discount-input">
-            					<label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
-            				</form>
-            			</div><!-- End .checkout-discount -->
-            			<form action="#">
+            			
+                        <div class="cart-bottom my-2 d-flex">
+                            <div class="cart-discount">
+                              <form id="coupon-form">
+                                <div class="input-group">
+                                  <input type="text" class="form-control" id="couponCode" placeholder="Coupon code">
+                                  <div class="input-group-append">
+                                    <button style="height: 40px;" class="btn btn-outline-primary-2" type="submit">
+                                      <i class="icon-long-arrow-right"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div id="coupon-label-wrapper">
+                                  <label for="couponCode" id="coupon-label"></label>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                          
+            			<form >
 		                	<div class="row">
 		                		<div class="col-lg-9">
                                     <div class="checkout-container mb-3">
@@ -319,12 +474,12 @@ input[type="radio"]:checked + label::after {
                                                         <h5 class="product-heading mb-1" >
                                                             <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
                                                         </h5>
-                                                        <p class="product-amount">Rs.<%= current.product.price %></p>
+                                                        <p class="product-amount">Rs.<%= current.discountedPrice %></p>
                                                         <div class="cart-product-quantity">
                                                             
                                                         </div>
                                                         <p class="product-total">Total Quantity: <%= current.quantity %></p>
-                                                        <p class="product-total">Total: Rs.<%= current.product.price * current.quantity %></p>
+                                                        <p class="product-total">Total: Rs.<%= current.discountedPrice * current.quantity %></p>
                                                     </div>
                                                 </div>
                                                 <% }); %>
@@ -424,15 +579,19 @@ input[type="radio"]:checked + label::after {
 		                						
 		                						<tr class="summary-subtotal">
 		                							<td>Subtotal:</td>
-		                							<td>Rs.<%= subTotal %></td>
+		                							<td>Rs.<%= originalSubTotal.toFixed(2) %></td>
 		                						</tr><!-- End .summary-subtotal -->
+                                                <tr>
+		                							<td>Discount:</td>
+		                							<td>- Rs.<%= Math.round(originalSubTotal - discountedSubTotal).toFixed(2) %></td>
+		                						</tr>
 		                						<tr>
 		                							<td>Shipping:</td>
-		                							<td><%= shippingCharge %></td>
+		                							<td>+ Rs.<%= shippingCharge.toFixed(2) %></td>
 		                						</tr>
 		                						<tr class="summary-total">
 		                							<td>Total:</td>
-		                							<td>Rs.<%= totalPrice %></td>
+		                							<td>Rs.<%= totalPriceCart.toFixed(2) %></td>
 		                						</tr><!-- End .summary-total -->
 		                					</tbody>
 		                				</table><!-- End .table table-summary -->
@@ -450,7 +609,7 @@ input[type="radio"]:checked + label::after {
                                                 <div class="card-header" id="heading-2">
                                                     <h2 class="card-title">
                                                         <!-- Radio Button with Label -->
-                                                        <input type="radio" name="paymentMethod" id="payment-method-2" value="Check payments">
+                                                        <input type="radio" name="paymentMethod" id="payment-method-2" value="Razorpay">
                                                         <label for="payment-method-2" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
                                                             Razor Pay
                                                         </label>
@@ -458,7 +617,7 @@ input[type="radio"]:checked + label::after {
                                                 </div><!-- End .card-header -->
                                                 <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
                                                     <div class="card-body">
-                                                        Ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis.
+                                                        Razorpay is a secure payment gateway that allows you to make online payments using cards, net banking, UPI, and digital wallets.
                                                     </div><!-- End .card-body -->
                                                 </div><!-- End .collapse -->
                                             </div><!-- End .card -->
@@ -467,7 +626,7 @@ input[type="radio"]:checked + label::after {
                                                 <div class="card-header" id="heading-3">
                                                     <h2 class="card-title">
                                                         <!-- Radio Button with Label -->
-                                                        <input type="radio" name="paymentMethod" id="payment-method-3" value="Cash on Delivery">
+                                                        <input type="radio" name="paymentMethod" id="payment-method-3" value="COD">
                                                         <label for="payment-method-3" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
                                                             Cash on Delivery
                                                         </label>
@@ -482,11 +641,50 @@ input[type="radio"]:checked + label::after {
                                         </div><!-- End .accordion-summary -->
                                         
 
-		                				<button type="submit" id="checkout" class="btn btn-outline-primary-2 btn-order btn-block">
+		                				<button id="checkout" class="btn btn-outline-primary-2 btn-order btn-block">
 		                					<span class="btn-text">Place Order</span>
 		                					<span class="btn-hover-text">Proceed to Checkout</span>
 		                				</button>
 		                			</div><!-- End .summary -->
+
+                                    <div class="summary">
+                                        <h3 class="summary-title mb-0">Coupons Available</h3>
+                                        <table class="table table-summary">
+                                            <tbody id="couponList">
+                                                <% if (coupons && coupons.length > 0) { %>
+                                                    <% coupons.forEach((coupon, index) => { %>
+                                                        <tr class="coupon-row <%= index >= 3 ? 'hidden-coupon' : '' %>">
+                                                            <td>
+                                                                <a href="#couponModal-<%= coupon._id %>" data-toggle="modal" data-bs-target="#couponModal-<%= coupon._id %>"><%= coupon.code %></a>
+                                                            </td>
+                                                            <td>></td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                        <% if (coupons && coupons.length > 3) { %>
+                                            <a href="#" id="toggleCoupons" class="btn btn-outline-primary-2 btn-order btn-block">View All Coupons</a>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <!-- Coupon Modals -->
+                                    <% if (coupons && coupons.length > 0) { %>
+                                        <% coupons.forEach((coupon) => { %>
+                                            <div class="modal fade" id="couponModal-<%= coupon._id %>" tabindex="-1" aria-labelledby="couponModalLabel<%= coupon._id %>" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" style="width: 400px;">
+                                                        <div class="modal-body m-5">
+                                                            <h5 class="modal-title"><%= coupon.name %></h5>
+                                                            <p><%= coupon.description %></p>
+                                                            <p>Rs. <%= coupon.discount %> OFF on orders above Rs. <%= coupon.amount %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    <% } %><!-- End .summary -->
+
 		                		</aside><!-- End .col-lg-3 -->
 		                	</div><!-- End .row -->
             			</form>
@@ -1303,105 +1501,195 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('checkout').addEventListener('click', (event) => {
-        event.preventDefault();
-        
+  const couponForm = document.getElementById('coupon-form');
+  const couponInput = document.getElementById('couponCode');
+  const couponLabel = document.getElementById('coupon-label');
+  const checkoutButton = document.getElementById('checkout');
 
-        // Get the selected address
-        const selectedAddressRadio = document.querySelector('input[name="delivery-address"]:checked');
-        const addressId = selectedAddressRadio ? selectedAddressRadio.value : null;
+  // Function to validate coupon
+  async function validateCoupon(couponCode) {
+    try {
+      const response = await fetch('/coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ couponCode }),
+      });
 
-        // Get the selected payment method
-        const selectedPaymentRadio = document.querySelector('input[name="paymentMethod"]:checked');
-        const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : null;
+      const result = await response.json();
 
-        const paymentLabel = document.getElementById('paymentLabel')
-        const addressLabel = document.getElementById('addressLabel')
+      if (result.valid) {
+        couponLabel.classList.remove('error-message');
+        couponLabel.classList.add('success-message');
+        couponLabel.innerHTML = `Coupon applied Rs.${result.discount} OFF`;
+      } else {
+        couponLabel.classList.add('error-message');
+        couponLabel.classList.remove('success-message');
+        couponLabel.innerHTML = result.message;
+      }
 
-        let isValid = true
+      return result.valid;
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      couponLabel.classList.add('error-message');
+      couponLabel.innerHTML = 'Error validating coupon';
+      return false;
+    }
+  }
 
-        if(!addressId){
-            addressLabel.classList.add('error-message')
-            addressLabel.innerHTML = 'Select Delevery Address'
-            isValid = false
-        } else {
-            addressLabel.classList.remove('error-message')
-            addressLabel.innerHTML = 'Delevery Address'
-        }
+  // Coupon form submission
+  couponForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const couponCode = couponInput.value.trim();
+    if (couponCode) {
+      await validateCoupon(couponCode);
+    }
+  });
 
-        if(!paymentMethod){
-            paymentLabel.classList.add('error-message')
-            paymentLabel.innerHTML = 'Select Payment Method'
-            isValid = false
-        } else {
-            paymentLabel.classList.remove('error-message')
-            paymentLabel.innerHTML = 'Payment Methods'
-        }
+  // Checkout button click
+  checkoutButton.addEventListener('click', async (event) => {
+    event.preventDefault();
 
+    const selectedAddressRadio = document.querySelector('input[name="delivery-address"]:checked');
+    const addressId = selectedAddressRadio ? selectedAddressRadio.value : null;
+    const couponCode = couponInput.value.trim();
 
-        if(isValid){
+    const selectedPaymentRadio = document.querySelector('input[name="paymentMethod"]:checked');
+    const paymentMethod = selectedPaymentRadio ? selectedPaymentRadio.value : null;
 
-        const data = {
-            addressId: addressId,
-            paymentMethod: paymentMethod
-        };
+    const paymentLabel = document.getElementById('paymentLabel');
+    const addressLabel = document.getElementById('addressLabel');
 
-        checkout(data)
+    let isValid = true;
 
-        }
-    });
-});
-
-
-
-    function checkout(data){
-
-        fetch('/checkout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success){
-                window.location.href = `/checkout/success/${data.orderId}`
-                console.log('Success:', data.message);
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                    })
-                    
-                console.log('failed', data.message)
-            }
-            
-  
-        })
-        .catch(error => {
-            console.error('Error:', error);
-
-        });
-
+    if (!addressId) {
+      addressLabel.classList.add('error-message');
+      addressLabel.innerHTML = 'Select Delivery Address';
+      isValid = false;
+    } else {
+      addressLabel.classList.remove('error-message');
+      addressLabel.innerHTML = 'Delivery Address';
     }
 
+    if (!paymentMethod) {
+      paymentLabel.classList.add('error-message');
+      paymentLabel.innerHTML = 'Select Payment Method';
+      isValid = false;
+    } else {
+      paymentLabel.classList.remove('error-message');
+      paymentLabel.innerHTML = 'Payment Methods';
+    }
 
+    // Validate coupon if entered
+    if (couponCode) {
+      const isCouponValid = await validateCoupon(couponCode);
+      if (!isCouponValid) {
+        isValid = false;
+      }
+    }
 
-        
+    if (isValid) {
+      const data = {
+        addressId: addressId,
+        paymentMethod: paymentMethod,
+        couponCode: couponCode || null
+      };
 
-    
+      checkout(data);
+    }
+  });
 
-        
+  function checkout(data) {
+  fetch('/checkout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      if (data.order.razorpayOrderId) { 
+        // Razorpay payment flow
+        const options = {
+          key: data.order.razorpayKeyId,
+          amount: data.order.amount * 100,  
+          currency: "INR",
+          name: 'TAARA',
+          description: 'Purchase Description',
+          order_id: data.order.razorpayOrderId,
+          handler: function (response) {
+            window.location.href = `/checkout/success/${data.orderId}`;
+          },
+          prefill: {
+            email: data.user.email,
+          },
+          theme: {
+            color: '#cd9967'
+          }
+        };
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+      } else {
+        // COD flow
+        window.location.href = `/checkout/success/${data.orderId}`;
+      }
+      console.log('Success:', data.message);
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: data.message,
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      console.log('failed', data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'An error occurred during checkout.',
+      icon: 'error',
+      confirmButtonText: 'Ok'
+    });
+  });
+}
+});
 
 </script>
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleLink = document.getElementById('toggleCoupons');
+        const couponRows = document.querySelectorAll('.coupon-row');
+        let isExpanded = false;
+    
+        if (toggleLink) {
+            toggleLink.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default anchor behavior
+                
+                isExpanded = !isExpanded;
+                
+                couponRows.forEach((row, index) => {
+                    if (index >= 3) {
+                        row.classList.toggle('hidden-coupon');
+                    }
+                });
+    
+                this.textContent = isExpanded ? 'View Less' : 'View All Coupons';
+            });
+        }
+    });
+    </script>
 
     <!-- Plugins JS File -->
     <script src="/User/assets/js/jquery.min.js"></script>

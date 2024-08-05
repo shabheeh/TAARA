@@ -58,17 +58,48 @@ const orderShcema = new mongoose.Schema({
                 ref: 'Product'
             },
 
+            name: {
+                type: String
+            },
+
             variant: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Variant'
             },
 
-            price: {
+            originalPrice: {
                 type: Number, 
+            },
+
+            discountedPrice: {
+                type: Number,
+            },
+
+            totalPrice: {
+                type: Number
             },
 
             quantity: {
                 type: Number,
+            },
+
+            appliedOffer: {
+                offerId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Offer'
+                },
+
+                title: {
+                    type: String
+                },
+
+                type:{
+                    type:String
+                },
+
+                discount: {
+                    type: Number
+                }
             },
 
             status: {
@@ -103,9 +134,33 @@ const orderShcema = new mongoose.Schema({
         type: Number,
     },
 
+    originalSubTotal: {
+        type: Number
+    },
+
+    discountedSubTotal: {
+        type: Number
+    },
+
     totalPrice: {
         type: Number,
     },
+
+    appliedCoupon: {
+        
+        couponId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Coupon'
+        },
+        code: {
+            type: String
+        },
+        discount: {
+            type: Number
+        },
+        
+    },
+
 },
 { timestamps: true }
 );

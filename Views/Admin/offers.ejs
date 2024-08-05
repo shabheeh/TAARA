@@ -1,0 +1,1157 @@
+<%- include('../Layouts/Admin/header') -%>
+
+
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/typography.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/katex.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/editor.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/dropzone/dropzone.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/flatpickr/flatpickr.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/tagify/tagify.css" />
+
+    <!-- Page CSS -->
+
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+    
+    <script src="/Admin/assets/js/config.js"></script>
+
+    <style>
+        
+
+        .error-message {
+            color: red !important;
+        }
+    </style>
+
+    </head>
+
+    <body>
+
+        <%- include('../Layouts/Admin/navbar') -%>
+
+
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+
+                <!-- Content -->
+
+                <div class="container-xxl flex-grow-1 container-p-y">
+
+
+
+
+                    <!-- Order Details Table -->
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">Products Based</h5>
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#addProductOffer">Add</button>
+
+                                </div>
+
+
+
+
+                            </div>
+
+                            <div class="row">
+                                <% if (productOffer && productOffer.length > 0) { %>
+                                    <% productOffer.forEach(offer => { %>
+                                        <div id="offer-<%= offer._id %>" class="col-4">
+                                            <div class="card mb-6">
+                                                <div class="card-body">
+                                                    <h5 class="card-title mb-4">Title: <strong><%= offer.title %></strong></h5>
+                                                    
+                                                    <div class="d-flex justify-content-start align-items-center mb-3">
+                                                        <h6 class="text-nowrap me-2 mb-0">Status:</h6>
+                                                        <span class="badge rounded-pill bg-<%= offer.status === 'Active' ? 'success' : 'danger' %>">
+                                                            <%= offer.status === 'Active' ? 'Active' : 'Inactive' %>
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <h6 class="me-2 mb-0">Discount: </h6>
+                                                        <span><%= offer.discount %>%</span>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <% if (offer.products && offer.products.length > 0) { %>
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#applied-products-<%= offer._id %>">View applied products</a>
+                                                        <% } else { %>
+                                                            <a>No applied products</a>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="d-flex justify-content-start align-items-center mb-3">
+                                                        <div class="d-flex flex-column" style="height: 100px;">
+                                                            <h6 class="mb-0"> Description </h6>
+                                                            <p><%= offer.description %></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end">
+                                                        <button class="btn btn-primary mx-1" data-bs-toggle="modal" data-bs-target="#editProductOffer-<%= offer._id %>">Edit</button>
+                                                        <button class="btn btn-danger mx-1" onclick="deleteOffer('<%= offer._id %>')">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                            
+                                        <!-- Applied products modal -->
+                                        <div class="modal fade centered" id="applied-products-<%= offer._id %>" tabindex="-1" aria-labelledby="applied-productsModalLabel<%= offer._id %>" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Applied Products</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <!-- Modal Body -->
+                                                    <div class="modal-body">
+                                                        <% offer.products.forEach(product => { %>
+                                                            <p><%= product.name %></p>
+                                                        <% }) %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                            
+                                        <!-- Edit product offer modal -->
+                                        <div class="modal fade" id="editProductOffer-<%= offer._id %>" tabindex="-1" aria-labelledby="addProductOfferModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h5 id="ecommerceBrandModalLabel" class="modal-title">Edit Product Offer</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <!-- Modal Body -->
+                                                    <div class="modal-body">
+                                                        <p id="modal-message" class="text-danger text-center"></p>
+                                                        <form id="edit-product-offer-<%= offer._id %>">
+                                                            <!-- Title -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <input type="text" value="<%= offer.title %>" class="form-control" id="product-offer-title-<%= offer._id %>" placeholder="Enter offer title" name="title" aria-label="title">
+                                                                <label for="product-title" id="productTitleError-<%= offer._id %>">Title</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Description -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <textarea id="product-offer-description-<%= offer._id %>" class="form-control" placeholder="Enter description" aria-label="description" name="description" rows="4"><%= offer.description %></textarea>
+                                                                <label for="product-offer-description" id="productDesError-<%= offer._id %>">Description</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Discount -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <input type="text" value="<%= offer.discount %>" class="form-control" id="product-offer-discount-<%= offer._id %>" placeholder="Discount in percentage" name="discount" aria-label="discount">
+                                                                <label for="product-offer-discount" id="productDiscountError-<%= offer._id %>">Discount</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Applied products -->
+                                                            <div class="form-floating form-floating-outline mb-5">
+                                                                <select id="applied-products-<%= offer._id %>" class="select2 form-select" data-placeholder="Applied Products" data-allow-clear="true" name="applied-products[]" multiple="multiple">
+                                                                    <option value="">Select products</option>
+                                                                    <% products.forEach(product => { %>
+                                                                        <option value="<%= product._id %>" <%= offer.products.some(appliedProduct => appliedProduct.equals(product._id)) ? 'selected' : '' %>><%= product.name %></option>
+                                                                    <% }); %>
+                                                                </select>
+                                                                <label for="applied-products" id="appliedProductsError-<%= offer._id %>">Products</label>
+                                                            </div>
+                                                            <!-- Status -->
+                                                            <div class="form-floating form-floating-outline mb-5">
+                                                                <select id="product-offer-status-<%= offer._id %>" class="select2 form-select" aria-label="Status" name="status">
+                                                                    <option value="">Select status</option>
+                                                                    <option value="Active" <% if (offer.status === 'Active') { %>selected<% } %>>Active</option>
+                                                                    <option value="Inactive" <% if (offer.status === 'Inactive') { %>selected<% } %>>Inactive</option>
+                                                                </select>
+                                                                <label for="product-offer-status" id="productStatusError-<%= offer._id %>">Status</label>
+                                                            </div>
+                                                            <!-- Submit and reset -->
+                                                            <div class="mb-4">
+                                                                <button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Confirm</button>
+                                                                <button type="reset" class="btn btn-outline-danger waves-effect" data-bs-dismiss="modal">Discard</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div class="col-12 text-center text-danger">No Offers Found</div>
+                                <% } %>
+                            </div>
+                            
+
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-12 my-6">
+                            <div class="card my-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">Category Based</h5>
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#addCategoryOffer">Add</button>
+                                    <!-- <a class="btn btn-primary">Add</a> -->
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <% if (categoryOffer && categoryOffer.length > 0) { %>
+                                    <% categoryOffer.forEach(offer => { %>
+                                        <div id="offer-<%= offer._id %>" class=" col-4">
+                                            <div class="card mb-6">
+                                                <div class="card-body">
+                                                    <h5 class="card-title mb-4">Title: <strong><%= offer.title %></strong></h5>
+                                                    <div class="d-flex justify-content-start align-items-center mb-3">
+                                                        <h6 class="text-nowrap me-2 mb-0">Status:</h6>
+                                                        <span class="badge rounded-pill bg-<%= offer.status === 'Active' ? 'success' : 'danger' %>">
+                                                          <%= offer.status === 'Active' ? 'Active' : 'Inactive' %>
+                                                        </span>
+                                                      </div>
+                                                    <div class="d-flex  align-items-center mb-3">
+                                                        <h6 class="me-2 mb-0">Discount: </h6>
+                                                        <span>  <%= offer.discount %>%</span>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <% if (offer.categories && offer.categories.length > 0 ) { %>
+                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#applied-categories-<%= offer._id %>">View applied categories</a>
+                                                            <% } else { %>
+                                                             <a>No applied categories</a>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="d-flex justify-content-start align-items-center mb-3">
+        
+                                                        <div class="d-flex flex-column" style="height: 100px;">
+        
+                                                            <h6 class="mb-0"> Description </h6>
+                                                            <p><%= offer.description %></p>
+        
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end">
+                                                        <button class="btn btn-primary mx-1" data-bs-toggle="modal" data-bs-target="#editCategoryOffer-<%= offer._id %>">Edit</button>
+                                                        <button class="btn btn-danger mx-1" onclick="deleteOffer('<%= offer._id %>')">Delete</button>
+        
+                                                    </div>
+        
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade centered" id="applied-categories-<%= offer._id %>" tabindex="-1" 
+                                            aria-labelledby="editModalLabel<%= offer._id %>" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Applied Products</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <!-- Modal Body -->
+                                                    <div class="modal-body">
+                                                      <% offer.categories.forEach(category => { %>
+                                                       <p><%= category.name %></p>
+                                                      <% }) %>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- Edit product offer modal -->
+                                        <div class="modal fade" id="editCategoryOffer-<%= offer._id %>" tabindex="-1" aria-labelledby="addCategoryOfferModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h5 id="ecommerceBrandModalLabel" class="modal-title">Edit Category Offer</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <!-- Modal Body -->
+                                                    <div class="modal-body">
+                                                        <p id="modal-message" class="text-danger text-center"></p>
+                                                        <form id="edit-category-offer-<%= offer._id %>">
+                                                            <!-- Title -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <input type="text" value="<%= offer.title %>" class="form-control" id="category-offer-title-<%= offer._id %>" placeholder="Enter offer title" name="title" aria-label="title">
+                                                                <label for="category-title" id="categoryTitleError-<%= offer._id %>">Title</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Description -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <textarea id="category-offer-description-<%= offer._id %>" class="form-control" placeholder="Enter description" aria-label="description" name="description" rows="4"><%= offer.description %></textarea>
+                                                                <label for="category-offer-description" id="categoryDesError-<%= offer._id %>">Description</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Discount -->
+                                                            <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                                                <input type="text" value="<%= offer.discount %>" class="form-control" id="category-offer-discount-<%= offer._id %>" placeholder="Discount in percentage" name="discount" aria-label="discount">
+                                                                <label for="category-offer-discount" id="categoryDiscountError-<%= offer._id %>">Discount</label>
+                                                                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                            </div>
+                                                            <!-- Applied products -->
+                                                            <div class="form-floating form-floating-outline mb-5">
+                                                                <select id="applied-products-<%= offer._id %>" class="select2 form-select" data-placeholder="Applied Categories" data-allow-clear="true" name="applied-categories[]" multiple="multiple">
+                                                                    <option value="">Select products</option>
+                                                                    <% categories.forEach(category => { %>
+                                                                        <option value="<%= category._id %>" <%= offer.categories.some(appliedCategories => appliedCategories.equals(category._id)) ? 'selected' : '' %>><%= category.name %></option>
+                                                                    <% }); %>
+                                                                </select>
+                                                                <label for="applied-categories" id="appliedCategoriesError-<%= offer._id %>">Categories</label>
+                                                            </div>
+                                                            <!-- Status -->
+                                                            <div class="form-floating form-floating-outline mb-5">
+                                                                <select id="category-offer-status-<%= offer._id %>" class="select2 form-select" aria-label="Status" name="status">
+                                                                    <option value="">Select status</option>
+                                                                    <option value="Active" <% if (offer.status === 'Active') { %>selected<% } %>>Active</option>
+                                                                    <option value="Inactive" <% if (offer.status === 'Inactive') { %>selected<% } %>>Inactive</option>
+                                                                </select>
+                                                                <label for="category-offer-status" id="categoryStatusError-<%= offer._id %>">Status</label>
+                                                            </div>
+                                                            <!-- Submit and reset -->
+                                                            <div class="mb-4">
+                                                                <button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Confirm</button>
+                                                                <button type="reset" class="btn btn-outline-danger waves-effect" data-bs-dismiss="modal">Discard</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    <% }) %>
+                                    <% } else { %>
+                                        <div class="col-12 text-center text-danger">No Offers Found</div>
+                                <% } %>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- add product offer modal -->
+                    <div class="modal fade" id="addProductOffer" tabindex="-1"
+                        aria-labelledby="addProductOfferModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm ">
+                            <div class="modal-content">
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h5 id="ecommerceBrandModalLabel" class="modal-title">Add Product Offer</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+                                    <p id="modal-message" class="text-danger text-center"></p>
+                                    <form id="add-product-offer">
+                                        <!-- Title -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <input type="text" class="form-control" id="product-offer-title"
+                                                placeholder="Enter offer title" name="title" aria-label=" title">
+                                            <label for="product-title" id="productTitleError">Title</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <!-- Description -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <textarea id="product-offer-description" class="form-control"
+                                                placeholder="Enter description" aria-label="description"
+                                                name="description" rows="4"></textarea>
+                                            <label for="product-offer-description" id="productDesError">Description</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <input type="text" class="form-control" id="product-offer-discount"
+                                                placeholder="Discount in percentage" name="productDiscount" aria-label="brand title">
+                                            <label for="product-offer-discount" id="productDiscountError">Dicount</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+
+                                         <!-- applied products -->
+                                         <div class="form-floating form-floating-outline mb-5">
+                                            <select id="applied-products" class="select2 form-select"
+                                                placeholder="Applied Products" data-allow-clear="true"
+                                                name="applied-products[]" multiple="multiple">
+                                                <option value="">Select products</option>
+                                                <% products.forEach(product => { %>
+                                                    <option value="<%= product._id %>"><%= product.name %></option>
+                                                  <% }); %>
+                                            </select>
+                                            <label for="applied-products" id="appliedProductsError">Products</label>
+                                        </div>
+
+                                        <!-- Status -->
+                                        <div class="form-floating form-floating-outline mb-5">
+                                            <select id="product-offer-status" class="select2 form-select" aria-label="Status"
+                                                name="isListed">
+                                                <option value="">Select status</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                            <label for="product-offer-status" id="productStatusError">Status</label>
+                                        </div>
+                                        <!-- Submit and reset -->
+                                        <div class="mb-4">
+                                            <button type="submit"
+                                                class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Add</button>
+                                            <button type="reset" class="btn btn-outline-danger waves-effect"
+                                                data-bs-dismiss="modal">Discard</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- add category offer modal -->
+                    <div class="modal fade" id="addCategoryOffer" tabindex="-1"
+                        aria-labelledby="ecommerceBrandModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm ">
+                            <div class="modal-content">
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h5 id="ecommerceBrandModalLabel" class="modal-title">Add Category Offer</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+                                    <p id="modal-message" class="text-danger text-center"></p>
+                                    <form id="add-category-offer">
+                                        <!-- Title -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <input type="text" class="form-control" id="category-offer-title"
+                                                placeholder="Enter offer title" name="title" aria-label="brand title">
+                                            <label for="category-title" id="categoryTitleError">Title</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <!-- Description -->
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <textarea id="category-offer-description" class="form-control"
+                                                placeholder="Enter description" aria-label="description"
+                                                name="description" rows="4"></textarea>
+                                            <label for="category-description" id="categoryDesError">Description</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-5 fv-plugins-icon-container">
+                                            <input type="number" class="form-control" id="category-offer-discount"
+                                                placeholder="Discount in percentage" name="categoryDiscount" aria-label="brand title">
+                                            <label for="cateory-discount" id="categoryDiscountError">Dicount</label>
+                                            <div
+                                                class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                            </div>
+                                        </div>
+
+                                         <!-- applied categories -->
+                                         <div class="form-floating form-floating-outline mb-5">
+                                            <select id="applied-categories" class="select2 form-select"
+                                                data-placeholder="Applied Categories" data-allow-clear="true"
+                                                name="applied-categories[]" multiple="multiple">
+                                                <option value="">Select categories</option>
+                                                <% categories.forEach(category => { %>
+                                                    <option value="<%= category._id %>"><%= category.name %></option>
+                                                  <% }); %>
+                                            </select>
+                                            <label for="applied-categories" id="appliedCategoriesError">Categories</label>
+                                        </div>
+
+                                        <!-- Status -->
+                                        <div class="form-floating form-floating-outline mb-5">
+                                            <select id="category-offer-status" class="select2 form-select aria-label="Status"
+                                                name="isListed">
+                                                <option value="">Select status</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                            <label for="brand-status" id="categoryStatusError">Status</label>
+                                        </div>
+                                        <!-- Submit and reset -->
+                                        <div class="mb-4">
+                                            <button type="submit"
+                                                class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">Add</button>
+                                            <button type="reset" class="btn btn-outline-danger waves-effect"
+                                                data-bs-dismiss="modal">Discard</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <!-- / Content -->
+
+
+
+
+
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
+            </div>
+
+
+
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+
+
+            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+            <div class="drag-target"></div>
+
+            </div>
+            <!-- / Layout wrapper -->
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+            <script>
+
+
+                document.getElementById('add-product-offer').addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const isValid = validateAddProductOffer();
+
+                    if (isValid) {
+
+                        const selectedOptions = document.querySelectorAll('#applied-products option:checked');
+                        const appliedProducts = Array.from(selectedOptions).map(option => option.value);
+
+                        const formData = {
+                            title: document.getElementById('product-offer-title').value.trim(),
+                            description: document.getElementById('product-offer-description').value.trim(),
+                            discount: document.getElementById('product-offer-discount').value.trim(),
+                            appliedProducts: appliedProducts.length > 0 ? JSON.stringify(appliedProducts) : '[]',
+                            status: document.getElementById('product-offer-status').value,
+                            type: 'products'
+
+                        };
+
+                        addOffer(formData)
+                    }
+
+                });
+
+                function validateAddProductOffer() {
+                    const title = document.getElementById('product-offer-title').value.trim();
+                    const description = document.getElementById('product-offer-description').value.trim();
+                    const discount = document.getElementById('product-offer-discount').value.trim();
+                    const status = document.getElementById('product-offer-status').value;
+
+                    const titleLabel = document.getElementById('productTitleError');
+                    const descriptionLabel = document.getElementById('productDesError');
+                    const discountLabel = document.getElementById('productDiscountError');
+                    const statusLabel = document.getElementById('productStatusError');
+
+                    const titleRegex = /^(\S+(?:\s\S+)?)$/;
+                    const percentageRegex = /^(100|[1-7][0-9]|80)$/
+
+
+                    let isValid = true;
+
+                    // Validate Name
+                    if (title === '') {
+                        titleLabel.innerText = 'Title cannot be empty';
+                        titleLabel.classList.add('error-message');
+                        isValid = false;
+                    } else if (!titleRegex.test(title)) {
+                        titleLabel.innerText = 'Title should be  without spaces';
+                        titleLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        titleLabel.innerText = 'Title';
+                        titleLabel.classList.remove('error-message');
+                    }
+
+                    if (!description) {
+                        descriptionLabel.innerText = 'Description cannot be empty';
+                        descriptionLabel.classList.add('error-message');
+                        isValid = false;
+                    } else if (description.length > 150) {
+                        descriptionLabel.innerText = "description shouldn't exceed 150 char";
+                        descriptionLabel.classList.add('error-message');
+
+                        isValid = false;
+                    } else {
+                        descriptionLabel.innerText = 'Description';
+                        descriptionLabel.classList.remove('error-message');
+                    }
+
+
+                    if (!discount) {
+                    discountLabel.innerText = 'Discount cannot be empty';
+                    discountLabel.classList.add('error-message');
+                    isValid = false;
+                    } else if (!percentageRegex.test(discount)) {
+                            discountLabel.innerText = "Invalid discount percentage";
+                            discountLabel.classList.add('error-message');
+                            isValid = false;
+                    } else {
+                        discountLabel.innerText = 'Discount';
+                        discountLabel.classList.remove('error-message');
+                    }
+
+                    if (status === '') {
+                        statusLabel.innerText = 'Please select a status';
+                        statusLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        statusLabel.innerText = 'Status';
+                        statusLabel.classList.remove('error-message');
+                    }
+
+                    return isValid;
+                }
+
+
+                document.getElementById('add-category-offer').addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const isValid = validateAddCategoryOffer();
+
+                    if (isValid) {
+
+                        const selectedOptions = document.querySelectorAll('#applied-categories option:checked');
+                        const appliedCategories = Array.from(selectedOptions).map(option => option.value);
+
+                        const formData = {
+                            title: document.getElementById('category-offer-title').value.trim(),
+                            description: document.getElementById('category-offer-description').value.trim(),
+                            discount: document.getElementById('category-offer-discount').value.trim(),
+                            appliedCategories: appliedCategories.length > 0 ? JSON.stringify(appliedCategories) : '[]',
+                            status: document.getElementById('category-offer-status').value,
+                            type: 'categories'
+
+                        };
+
+
+                        addOffer(formData)
+                    }
+
+                });
+
+                function validateAddCategoryOffer() {
+                    const title = document.getElementById('category-offer-title').value.trim();
+                    const description = document.getElementById('category-offer-description').value.trim();
+                    const discount = document.getElementById('category-offer-discount').value.trim();
+                    const status = document.getElementById('category-offer-status').value;
+
+                    const titleLabel = document.getElementById('categoryTitleError');
+                    const descriptionLabel = document.getElementById('categoryDesError');
+                    const discountLabel = document.getElementById('categoryDiscountError');
+                    const statusLabel = document.getElementById('categoryStatusError');
+
+                    const titleRegex = /^(\S+(?:\s\S+)?)$/;
+                    const percentageRegex = /^(100|[1-7][0-9]|80)$/
+
+
+                    let isValid = true;
+
+                    // Validate Name
+                    if (title === '') {
+                        titleLabel.innerText = 'Title cannot be empty';
+                        titleLabel.classList.add('error-message');
+                        isValid = false;
+                    } else if (!titleRegex.test(title)) {
+                        titleLabel.innerText = 'Title should be  without spaces';
+                        titleLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        titleLabel.innerText = 'Title';
+                        titleLabel.classList.remove('error-message');
+                    }
+
+                    if (!description) {
+                        descriptionLabel.innerText = 'Description cannot be empty';
+                        descriptionLabel.classList.add('error-message');
+                        isValid = false;
+                    } else if (description.length > 150) {
+                        descriptionLabel.innerText = "description shouldn't exceed 150 char";
+                        descriptionLabel.classList.add('error-message');
+
+                        isValid = false;
+                    } else {
+                        descriptionLabel.innerText = 'Description';
+                        descriptionLabel.classList.remove('error-message');
+                    }
+
+
+                    if (!discount) {
+                    discountLabel.innerText = 'Discount cannot be empty';
+                    discountLabel.classList.add('error-message');
+                    isValid = false;
+                    } else if (!percentageRegex.test(discount)) {
+                            discountLabel.innerText = "Invalid discount percentage";
+                            discountLabel.classList.add('error-message');
+                            isValid = false;
+                    } else {
+                        discountLabel.innerText = 'Discount';
+                        discountLabel.classList.remove('error-message');
+                    }
+
+
+                    if (status === '') {
+                        statusLabel.innerText = 'Please select a status';
+                        statusLabel.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        statusLabel.innerText = 'Status';
+                        statusLabel.classList.remove('error-message');
+                    }
+
+                    return isValid;
+                }
+
+                function addOffer(data) {
+                    fetch('/admin/offers', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (data.type == 'products') {
+                                    $('#addProductOffer').modal('hide');
+                                } else {
+                                    $('#addCategoryOffer').modal('hide');
+                                }
+                                // Show success alert
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: data.message,
+                                    icon: 'success',
+
+                                })
+
+                                window.location.reload();
+                            } else {
+                                if (data.type === 'products') {
+                                    $('#addProductOffer').modal('hide');
+                                } else {
+                                    $('#addCategoryOffer').modal('hide');
+                                }
+                                // Show error alert
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonColor: '#d33',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+
+                                $('#addProductOffer').modal('hide');
+
+                                $('#addCategoryOffer').modal('hide');
+
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                }
+
+            </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('form[id^="edit-product-offer-"]');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const offerId = this.id.split(`edit-product-offer-`)[1];
+
+                const title = document.getElementById(`product-offer-title-${offerId}`).value.trim();
+                const description = document.getElementById(`product-offer-description-${offerId}`).value.trim();
+                const discount = document.getElementById(`product-offer-discount-${offerId}`).value.trim();
+                const status = document.getElementById(`product-offer-status-${offerId}`).value;
+
+                const titleLabel = document.getElementById(`productTitleError-${offerId}`);
+                const descriptionLabel = document.getElementById(`productDesError-${offerId}`);
+                const discountLabel = document.getElementById(`productDiscountError-${offerId}`);
+                const statusLabel = document.getElementById(`productStatusError-${offerId}`);
+
+                const titleRegex = /^(\S+(?:\s\S+)?)$/;
+                const percentageRegex = /^(100|[1-7][0-9]|80)$/
+
+                let isValid = true;
+
+                // Validate Name
+                if (title === '') {
+                    titleLabel.innerText = 'Title cannot be empty';
+                    titleLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (!titleRegex.test(title)) {
+                    titleLabel.innerText = 'Title should be without spaces';
+                    titleLabel.classList.add('error-message');
+                    isValid = false;
+                } else {
+                    titleLabel.innerText = 'Title';
+                    titleLabel.classList.remove('error-message');
+                }
+
+                if (!description) {
+                    descriptionLabel.innerText = 'Description cannot be empty';
+                    descriptionLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (description.length > 150) {
+                    descriptionLabel.innerText = "description shouldn't exceed 150 char";
+                    descriptionLabel.classList.add('error-message');
+
+                    isValid = false;
+                } else {
+                    descriptionLabel.innerText = 'Description';
+                    descriptionLabel.classList.remove('error-message');
+                }
+
+
+                if (!discount) {
+                    discountLabel.innerText = 'Discount cannot be empty';
+                    discountLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (!percentageRegex.test(discount)) {
+                        discountLabel.innerText = "Invalid discount percentage";
+                        discountLabel.classList.add('error-message');
+                        isValid = false;
+                } else {
+                    discountLabel.innerText = 'Discount';
+                    discountLabel.classList.remove('error-message');
+                }
+
+
+                if (status === '') {
+                    statusLabel.innerText = 'Please select a status';
+                    statusLabel.classList.add('error-message');
+                    isValid = false;
+                } else {
+                    statusLabel.innerText = 'Status';
+                    statusLabel.classList.remove('error-message');
+                }
+
+               
+
+                if (isValid) {
+
+                    const selectedOptions = document.querySelectorAll(`#applied-products-${offerId} option:checked`);
+                    const appliedProducts = Array.from(selectedOptions).map(option => option.value);
+
+                    const formData = {
+                        id: offerId,
+                        title: document.getElementById(`product-offer-title-${offerId}`).value.trim(),
+                        description: document.getElementById(`product-offer-description-${offerId}`).value.trim(),
+                        discount: document.getElementById(`product-offer-discount-${offerId}`).value.trim(),
+                        appliedProducts: appliedProducts.length > 0 ? JSON.stringify(appliedProducts) : '[]',
+                        status: document.getElementById(`product-offer-status-${offerId}`).value,
+                        type: 'products'
+
+                    };
+                    
+                    updateOffer(formData);
+                }
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('form[id^="edit-category-offer-"]');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const offerId = this.id.split(`edit-category-offer-`)[1];
+
+                const title = document.getElementById(`category-offer-title-${offerId}`).value.trim();
+                const description = document.getElementById(`category-offer-description-${offerId}`).value.trim();
+                const discount = document.getElementById(`category-offer-discount-${offerId}`).value.trim();
+                const status = document.getElementById(`category-offer-status-${offerId}`).value;
+
+                const titleLabel = document.getElementById(`categoryTitleError-${offerId}`);
+                const descriptionLabel = document.getElementById(`categoryDesError-${offerId}`);
+                const discountLabel = document.getElementById(`categoryDiscountError-${offerId}`);
+                const statusLabel = document.getElementById(`categoryStatusError-${offerId}`);
+
+                const titleRegex = /^(\S+(?:\s\S+)?)$/;
+                const percentageRegex = /^(100|[1-7][0-9]|80)$/
+
+
+                let isValid = true;
+
+                // Validate Name
+                if (title === '') {
+                    titleLabel.innerText = 'Title cannot be empty';
+                    titleLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (!titleRegex.test(title)) {
+                    titleLabel.innerText = 'Title should be  without spaces';
+                    titleLabel.classList.add('error-message');
+                    isValid = false;
+                } else {
+                    titleLabel.innerText = 'Title';
+                    titleLabel.classList.remove('error-message');
+                }
+
+                if (!description) {
+                    descriptionLabel.innerText = 'Description cannot be empty';
+                    descriptionLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (description.length > 150) {
+                    descriptionLabel.innerText = "description shouldn't exceed 150 char";
+                    descriptionLabel.classList.add('error-message');
+
+                    isValid = false;
+                } else {
+                    descriptionLabel.innerText = 'Description';
+                    descriptionLabel.classList.remove('error-message');
+                }
+
+
+                if (!discount) {
+                    discountLabel.innerText = 'Discount cannot be empty';
+                    discountLabel.classList.add('error-message');
+                    isValid = false;
+                } else if (!percentageRegex.test(discount)) {
+                        discountLabel.innerText = "Invalid discount percentage";
+                        discountLabel.classList.add('error-message');
+                        isValid = false;
+                } else {
+                    discountLabel.innerText = 'Discount';
+                    discountLabel.classList.remove('error-message');
+                }
+                
+
+
+                if (status === '') {
+                    statusLabel.innerText = 'Please select a status';
+                    statusLabel.classList.add('error-message');
+                    isValid = false;
+                } else {
+                    statusLabel.innerText = 'Status';
+                    statusLabel.classList.remove('error-message');
+                }
+
+               
+
+                if (isValid) {
+
+                    const selectedOptions = document.querySelectorAll(`#applied-categories-${offerId} option:checked`);
+                    const appliedCategories = Array.from(selectedOptions).map(option => option.value);
+
+                    const formData = {
+                        id: offerId,
+                        title: document.getElementById(`category-offer-title-${offerId}`).value.trim(),
+                        description: document.getElementById(`category-offer-description-${offerId}`).value.trim(),
+                        discount: document.getElementById(`category-offer-discount-${offerId}`).value.trim(),
+                        appliedCategories: appliedCategories.length > 0 ? JSON.stringify(appliedCategories) : '[]',
+                        status: document.getElementById(`category-offer-status-${offerId}`).value,
+                        type: 'categories'
+
+                    };
+                    
+                    updateOffer(formData);
+                }
+            });
+        });
+    });
+
+
+
+
+    function updateOffer(data) {
+
+        fetch('/admin/offers', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                            if (data.success) {
+                                if (data.type === 'products') {
+                                    $(`#editProductOffer-${data.id}`).modal('hide');
+                                } else {
+                                    $(`#editCategoryOffer-${data.id}`).modal('hide');
+                                }
+                                // Show success alert
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: data.message,
+                                    icon: 'success',
+
+                                })
+
+                                window.location.reload();
+                            } else {
+                                if (data.type == 'products') {
+                                    $(`#editProductOffer-${data.id}`).modal('hide');
+                                } else {
+                                    $(`#editCategoryOffer-${data.id}`).modal('hide');
+                                }
+                                // Show error alert
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonColor: '#d33',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                         
+                                    $(`#editProductOffer-${error.id}`).modal('hide');
+   
+                                    $(`#editCategoryOffer-${error.id}`).modal('hide');
+ 
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                }
+</script>
+
+<script>
+    // Delete offer function
+    function deleteOffer(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this offer.',
+            icon: 'warning',
+            showCancelButton: true,
+            
+            confirmButtonColor: '#8c57ff',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+            if (result.value) {
+                fetch('/admin/offers', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            $(`#offer-${id}`).remove();
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: 'Your coupon has been deleted.',
+                                icon: 'success',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                        Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                    });
+            }
+        });
+    }
+</script>
+
+            <!-- Core JS -->
+            <!-- build:js /Admin/assets/vendor/js/core.js -->
+            <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+            <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+            <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+            <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+            <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+            <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+            <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+            <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+            <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+            <!-- endbuild -->
+
+            <!-- Vendors JS -->
+            <script src="/Admin/assets/vendor/libs/quill/katex.js"></script>
+            <script src="/Admin/assets/vendor/libs/quill/quill.js"></script>
+            <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+            <script src="/Admin/assets/vendor/libs/dropzone/dropzone.js"></script>
+            <script src="/Admin/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
+            <script src="/Admin/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+            <script src="/Admin/assets/vendor/libs/tagify/tagify.js"></script>
+
+            <!-- Main JS -->
+            <script src="/Admin/assets/js/main.js"></script>
+
+
+            <!-- Page JS -->
+            <script src="/Admin/assets/js/app-ecommerce-product-add.js"></script>
+
+
+            <!-- Page JS -->
+
+
+
+    </body>
+
+
+    <!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-order-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:34 GMT -->
+
+    </html>
+
+    <!-- beautify ignore:end -->

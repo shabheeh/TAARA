@@ -262,7 +262,7 @@
                                 </div>
                                 <!-- Parent category -->
                                 <div class="form-floating form-floating-outline mb-5">
-                                    <select id="category-gender" class="form-select" aria-label="Gender" name="gender">
+                                    <select id="category-gender" class="select2 form-select" aria-label="Gender" name="gender">
                                         <option value="">Select gender</option>
                                         <option value="Men">Men</option>
                                         <option value="Women">Women</option>
@@ -364,18 +364,31 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        $('#ecommerceCategoryModal').modal('hide');
                         
                         window.location.reload();
                         
                     } else {
                         
-                        document.getElementById('modal-message').innerText = data.message;
+                        // Show error alert
+                        Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('modal-message').innerText = 'An error occurred.';
-                    document.getElementById('modal-message').classList.add('text-danger');
+                    // Show error alert
+                    Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                 });
             }
 
@@ -500,10 +513,26 @@
                                 .addClass('bg-label-success')
                                 .text('List');
                         } else {
-                            console.error('Error unlisting category:', data.message);
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                         }
                     })
-                    .catch(error => console.error('Error unlisting category:', error));
+                    .catch(error => {
+                        // Show error alert
+                        Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                    });
             }
 
         // Event listener for list/unlist buttons
@@ -606,13 +635,8 @@
                     title: 'Success',
                     text: data.message,
                     icon: 'success',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = `/admin/categories`;
-                    }
-                });
+                    });
+                    window.location.reload();
             } else {
                 // Show error alert
                 Swal.fire({

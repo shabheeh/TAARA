@@ -4,6 +4,7 @@ const Brand = require("../Models/brandModel");
 const Variant = require("../Models/variantModel")
 const User = require('../Models/userModel')
 const Cart = require('../Models/cartModel')
+const Offer = require('../Models/offerModel')
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -118,22 +119,7 @@ const addProduct = async (req, res) => {
 
     await product.save();
 
-    // const images = [];
-
-    // Object.keys(req.files).forEach((fieldName) => {
-    //   const files = req.files[fieldName];
-    //   files.forEach((file) => {
-    //     const imagePath = path.join(__dirname, "../Public/Admin/assets/Products-Images", file.filename);
-    //     const resizedImagePath = path.join(__dirname, "../Public/Admin/assets/Products-Cropped", file.filename);
-
-    //     // Resize image using Sharp
-    //     sharp(imagePath)
-    //       .resize({ width: 303, height: 454 })
-    //       .toFile(resizedImagePath);
-
-    //     images.push(file.filename);
-    //   });
-    // });
+    
 
     // Handle uploaded files
     const imageFiles = req.files;
@@ -455,9 +441,7 @@ for (let i = 1; i <= 4; i++) {
 // ------Products Grid---->
 
 const productsGrid = async (req, res) => {
-
   try {
-
     const page = parseInt(req.query.page) || 1;
     const limit = 9;
     const skip = (page - 1) * limit;
@@ -507,87 +491,59 @@ const productsGrid = async (req, res) => {
       matchStage.brand = { $in: filteredBrands.map(b => b._id) };
     }
 
-    
-
-    // aggregation pipeline
     let pipeline = [
       { $match: matchStage },
       {
         $lookup: {
           from: 'variants',
-          localField: 'variants',
-          foreignField: '_id',
-          as: 'variantsData'
+          localField: '_id',
+          foreignField: 'product',
+          as: 'variants'
         }
       },
-      { $unwind: '$variantsData' }
+      {
+        $match: {
+          'variants.isListed': true
+        }
+      }
     ];
 
-    // Add variant filtering conditions
-    if (sizes || color) {
-      let variantMatch = {};
-      if (sizes) {
-        variantMatch['variantsData.sizes'] = { $in: Array.isArray(sizes) ? sizes : [sizes] };
-      }
-      if (color) {
-        variantMatch['variantsData.color'] = { $in: Array.isArray(color) ? color : [color] };
-      }
-      pipeline.push({ $match: variantMatch });
+    // Add color filter
+    if (color && color.length > 0) {
+      pipeline.push({
+        $match: {
+          'variants.color': { $in: Array.isArray(color) ? color : [color] }
+        }
+      });
     }
 
-    // Group back to actual products
+    // Add size filter
+    if (sizes && sizes.length > 0) {
+      pipeline.push({
+        $match: {
+          'variants.sizes': { $in: Array.isArray(sizes) ? sizes : [sizes] }
+        }
+      });
+    }
+
+    // Add sorting stage
     pipeline.push({
-      $group: {
-        _id: '$_id',
-        name: { $first: '$name' },
-        description: { $first: '$description' },
-        gender: { $first: '$gender' },
-        category: { $first: '$category' },
-        brand: { $first: '$brand' },
-        price: { $first: '$price' },
-        variants: { $push: '$variantsData' },
-        isListed: { $first: '$isListed' },
-        createdAt: { $first: '$createdAt' } 
-      }
+      $sort: sortProducts ? getSortStage(sortProducts) : { createdAt: -1 }
     });
-
-// add sorting
-let sortStage = {};
-
-switch (sortProducts) {
-  case 'lowPrice':
-    sortStage = { price: 1 };
-    break;
-  case 'highPrice':
-    sortStage = { price: -1 };
-    break;
-  case 'a-to-z':
-    sortStage = { name: 1 };
-    break;
-  case 'z-to-a':
-    sortStage = { name: -1 };
-    break;
-  default:
-    sortStage = { createdAt: 1 }; 
-}
-
-// sort when in newArrivals page
-if (title === 'newArrivals' && sortProducts === undefined) {
-  sortStage = { createdAt: -1 };
-}
-
-pipeline.push({ $sort: sortStage });
 
     // Add pagination
     pipeline.push({ $skip: skip });
     pipeline.push({ $limit: limit });
 
-    
+    // Add population stages
+    pipeline.push(
+      { $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'category' } },
+      { $unwind: '$category' },
+      { $lookup: { from: 'brands', localField: 'brand', foreignField: '_id', as: 'brand' } },
+      { $unwind: '$brand' }
+    );
 
-    // Execute the aggregation
     const products = await Product.aggregate(pipeline);
-
-    
 
     // count total products
     const countPipeline = pipeline.slice(0, -2); // Remove skip and limit stages
@@ -661,7 +617,42 @@ pipeline.push({ $sort: sortStage });
 
     const listedBrandsWithCount = await Product.aggregate(brandCountPipeline);
 
+    // Get all offer IDs from the products
+    const offerIds = products.reduce((ids, product) => {
+      if (product.offers && Array.isArray(product.offers)) {
+        return ids.concat(product.offers);
+      }
+      return ids;
+    }, []);
 
+    // Fetch all relevant offers
+    const offers = await Offer.find({ 
+      _id: { $in: offerIds },
+      status: 'Active'
+    }).lean();
+
+    // Process offers for each product
+    const newProduct = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    products.forEach(product => {
+      product.isNew = product.createdAt > newProduct;
+      if (product.offers && Array.isArray(product.offers) && product.offers.length > 0) {
+        const productOffers = offers.filter(offer => 
+          product.offers.some(offerId => offerId.toString() === offer._id.toString())
+        );
+        if (productOffers.length > 0) {
+          const bestOffer = productOffers.reduce((best, current) => 
+            (current.discount > best.discount) ? current : best
+          );
+          product.bestOffer = bestOffer;
+          product.discountedPrice = Number((product.price * (1 - bestOffer.discount / 100)).toFixed(2));
+        } else {
+          product.discountedPrice = Number(product.price.toFixed(2));
+        }
+      } else {
+        product.discountedPrice = Number(product.price.toFixed(2));
+      }
+    });
 
     // Prepare data for rendering
     const filteredBrands = brands ? (Array.isArray(brands) ? brands : [brands]) : [];
@@ -693,7 +684,6 @@ pipeline.push({ $sort: sortStage });
     let user = null;
     let cart = null;
     let totalPrice = 0;
-    
 
     if (req.userId) {
       // Fetch the user
@@ -708,17 +698,12 @@ pipeline.push({ $sort: sortStage });
         if (cart && cart.products.length > 0) {
           // Calculate the total price
           cart.products.forEach((product) => {
-            totalPrice += product.product.price * product.quantity;
+            const quantity = product.quantity > 0 ? product.quantity : 1;
+            totalPrice += product.product.price * quantity;
           });
-          
         }
       }
     }
-    
-
-  
-    
-
 
     res.render('productsGrid', {
       user,
@@ -744,7 +729,6 @@ pipeline.push({ $sort: sortStage });
       womenCount,
       search,
     });
-    
 
   } catch (error) {
     console.error('Error in productsGrid :', error);
@@ -752,24 +736,41 @@ pipeline.push({ $sort: sortStage });
   }
 };
 
+// Helper function to get sort stage
+function getSortStage(sortProducts) {
+  switch (sortProducts) {
+    case 'lowPrice':
+      return { price: 1 };
+    case 'highPrice':
+      return { price: -1 };
+    case 'a-to-z':
+      return { name: 1 };
+    case 'z-to-a':
+      return { name: -1 };
+    default:
+      return { createdAt: 1 };
+  }
+}
+
 
 // ------Product View------>
 
-const product = async (req, res) => {
-
+const productView = async (req, res) => {
   try {
     const productId = req.params.id;
     const variantId = req.params.variantId;
-  
 
-    const product = await Product.findById(productId).populate('variants').populate('category');
+    const product = await Product.findById(productId)
+      .populate('variants')
+      .populate('category')
+      .populate('offers')
+      .lean();  // Use lean() for better performance
 
     if (!product) {
       return res.status(404).send('Product not found');
     }
 
-    let variant = product.variants.find((variant) => variant._id == variantId)
-
+    let variant = product.variants.find((variant) => variant._id == variantId);
 
     if (!variant) {
       return res.status(404).send('Variant not found');
@@ -777,13 +778,54 @@ const product = async (req, res) => {
 
     const category = product.category._id;
 
-    const similarProducts = await Product.find({ category }).populate('variants').populate('category').populate('brand');
+    const similarProducts = await Product.find({ category })
+      .populate('variants')
+      .populate('category')
+      .populate('brand')
+      .populate('offers')
+      .lean();
 
-    
+    // Process offers for the main product
+    const newProductDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    product.isNew = product.createdAt > newProductDate;
+
+    if (product.offers && Array.isArray(product.offers) && product.offers.length > 0) {
+      const activeOffers = product.offers.filter(offer => offer.status === 'Active');
+      if (activeOffers.length > 0) {
+        const bestOffer = activeOffers.reduce((best, current) => 
+          (current.discount > best.discount) ? current : best
+        );
+        product.bestOffer = bestOffer;
+        product.discountedPrice = Number((product.price * (1 - bestOffer.discount / 100)).toFixed(2));
+      } else {
+        product.discountedPrice = Number(product.price.toFixed(2));
+      }
+    } else {
+      product.discountedPrice = Number(product.price.toFixed(2));
+    }
+
+    // Process offers for similar products
+    similarProducts.forEach(similarProduct => {
+      similarProduct.isNew = similarProduct.createdAt > newProductDate;
+      if (similarProduct.offers && Array.isArray(similarProduct.offers) && similarProduct.offers.length > 0) {
+        const activeOffers = similarProduct.offers.filter(offer => offer.status === 'Active');
+        if (activeOffers.length > 0) {
+          const bestOffer = activeOffers.reduce((best, current) => 
+            (current.discount > best.discount) ? current : best
+          );
+          similarProduct.bestOffer = bestOffer;
+          similarProduct.discountedPrice = Number((similarProduct.price * (1 - bestOffer.discount / 100)).toFixed(2));
+        } else {
+          similarProduct.discountedPrice = Number(similarProduct.price.toFixed(2));
+        }
+      } else {
+        similarProduct.discountedPrice = Number(similarProduct.price.toFixed(2));
+      }
+    });
+
     let user = null;
     let cart = null;
     let totalPrice = 0;
-    
 
     if (req.userId) {
       // Fetch the user
@@ -797,14 +839,13 @@ const product = async (req, res) => {
         
         if (cart && cart.products.length > 0) {
           // Calculate the total price
-          cart.products.forEach((product) => {
-            totalPrice += product.product.price * product.quantity;
+          cart.products.forEach((cartProduct) => {
+            const quantity = cartProduct.quantity > 0 ? cartProduct.quantity : 1;
+            totalPrice += cartProduct.product.price * quantity;
           });
-          
         }
       }
     }
-
 
     res.render('productSingle', {
       user,
@@ -834,7 +875,7 @@ module.exports = {
     addVariant,
     loadEditVariant,
     editVariant,
-    product,
+    productView,
     productsGrid,
 
 }

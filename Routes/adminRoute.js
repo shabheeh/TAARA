@@ -1,13 +1,13 @@
 const express = require("express");
-const app = express();
+const router = express();
 const path = require("path");
-
 const upload = require("../Middlewares/multerConfig");
 
-//     Set view engine and static
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "..", "Views", "Admin"));
-app.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
+
+//        Set view and  static
+
+router.set("views", path.join(__dirname, "..", "Views", "Admin"));
+router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
 
 //          middlewares
 const authAdmin = require("../Middlewares/authAdmin");
@@ -16,53 +16,54 @@ const authAdmin = require("../Middlewares/authAdmin");
 const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController");
 const orderController = require("../Controllers/orderController");
+const offerController = require("../Controllers/offerController")
 
 //           admin login and dashboard
-app.get("/", authAdmin.isLogin, adminController.login);
-app.get("/login", authAdmin.isLogout, adminController.loadSignin);
-app.post("/login", adminController.verifySignIn);
-app.get("/dashboard", authAdmin.isLogin, adminController.loadHome);
-app.post("/logout", adminController.logout);
+router.get("/", authAdmin.isLogin, adminController.login);
+router.get("/login", authAdmin.isLogout, adminController.loadSignin);
+router.post("/login", adminController.verifySignIn);
+router.get("/dashboard", authAdmin.isLogin, adminController.loadHome);
+router.post("/logout", adminController.logout);
 
 //               user management
-app.get("/users", authAdmin.isLogin, adminController.loadUsers);
-app.patch("/blockUser", authAdmin.isLogin, adminController.blockUser);
-app.patch("/unblockUser", authAdmin.isLogin, adminController.unBlockUser);
+router.get("/users", authAdmin.isLogin, adminController.loadUsers);
+router.patch("/blockUser", authAdmin.isLogin, adminController.blockUser);
+router.patch("/unblockUser", authAdmin.isLogin, adminController.unBlockUser);
 
 //                category management
-app.get("/categories", authAdmin.isLogin, adminController.category);
-app.post("/categories", authAdmin.isLogin, adminController.addCategory);
-app.put("/categories", authAdmin.isLogin, adminController.editCategory);
-app.patch(
+router.get("/categories", authAdmin.isLogin, adminController.category);
+router.post("/categories", authAdmin.isLogin, adminController.addCategory);
+router.put("/categories", authAdmin.isLogin, adminController.editCategory);
+router.patch(
   "/categories/listCategory",
   authAdmin.isLogin,
   adminController.listCategory
 );
-app.patch(
+router.patch(
   "/categories/unlistCategory",
   authAdmin.isLogin,
   adminController.unlistCategory
 );
 
 //               brand management
-app.get("/brands", authAdmin.isLogin, adminController.brand);
-app.put("/brands", authAdmin.isLogin, adminController.editBrand);
-app.post("/brands", authAdmin.isLogin, adminController.addBrand);
-app.patch("/brands/listBrand", authAdmin.isLogin, adminController.listBrand);
-app.patch(
+router.get("/brands", authAdmin.isLogin, adminController.brand);
+router.put("/brands", authAdmin.isLogin, adminController.editBrand);
+router.post("/brands", authAdmin.isLogin, adminController.addBrand);
+router.patch("/brands/listBrand", authAdmin.isLogin, adminController.listBrand);
+router.patch(
   "/brands/unlistBrand",
   authAdmin.isLogin,
   adminController.unlistBrand
 );
 
 //            product management
-app.get("/products", authAdmin.isLogin, productController.products);
-app.get(
+router.get("/products", authAdmin.isLogin, productController.products);
+router.get(
   "/products/addProduct",
   authAdmin.isLogin,
   productController.loadAddProduct
 );
-app.post(
+router.post(
   "/products/addProduct",
   authAdmin.isLogin,
   upload.fields([
@@ -73,22 +74,22 @@ app.post(
   ]),
   productController.addProduct
 );
-app.put("/products/editProduct", productController.editProduct);
-app.patch("/products/listProduct", productController.listProduct);
-app.patch("/products/unlistProduct", productController.unlistProduct);
+router.put("/products/editProduct", productController.editProduct);
+router.patch("/products/listProduct", productController.listProduct);
+router.patch("/products/unlistProduct", productController.unlistProduct);
 
 //             variant management
-app.get(
+router.get(
   "/products/variants/single/:id",
   authAdmin.isLogin,
   productController.variants
 );
-app.get(
+router.get(
   "/products/variants/addVariant/:id",
   authAdmin.isLogin,
   productController.loadAddVariant
 );
-app.post(
+router.post(
   "/products/variants/addVariant",
   authAdmin.isLogin,
   upload.fields([
@@ -99,12 +100,12 @@ app.post(
   ]),
   productController.addVariant
 );
-app.get(
+router.get(
   "/products/variants/editVariant/:id",
   authAdmin.isLogin,
   productController.loadEditVariant
 );
-app.put(
+router.put(
   "/products/variants/editVariant",
   upload.fields([
     { name: "productImage1", maxCount: 1 },
@@ -116,16 +117,25 @@ app.put(
 );
 
 //              order management
-app.get("/orders", authAdmin.isLogin, orderController.orders);
-app.get("/order/:orderId", authAdmin.isLogin, orderController.viewOrder);
-app.patch(
-  "/order",
-  authAdmin.isLogin,
-  orderController.updateStatus
-);
+router.get("/orders", authAdmin.isLogin, orderController.orders);
+router.get("/order/:orderId", authAdmin.isLogin, orderController.viewOrder);
+router.patch("/order", authAdmin.isLogin, orderController.updateStatus);
 
-app.get("/trail", (req, res) => {
-  res.render("trail");
-});
+//             offer and coupon Mangagement
+router.get("/offers", authAdmin.isLogin, offerController.offers);
+router.post('/offers', authAdmin.isLogin, offerController.addOffer)
+router.put('/offers', authAdmin.isLogin, offerController.updateOffer)
+router.delete('/offers', authAdmin.isLogin, offerController.deleteOffer)
 
-module.exports = app;
+router.get('/coupons', authAdmin.isLogin, offerController.coupons)
+router.post('/coupons', authAdmin.isLogin, offerController.addCoupon)
+router.put('/coupons', authAdmin.isLogin, offerController.updateCoupon)
+router.delete('/coupons', authAdmin.isLogin, offerController.deleteCoupon)
+
+
+
+
+
+
+
+module.exports = router;

@@ -64,13 +64,14 @@ const verifySignIn = async ( req, res) => {
             res.redirect('/admin/dashboard')
 
         } else {
-            console.log('error verify');
+            
             res.render('login', {
                 errorMessage: "Invalid email or password" 
             });
         }
         
     } catch (error) {
+        console.log(error.message + ' admin verify signin');
         
     }
 }
@@ -84,9 +85,9 @@ const logout = async (req, res) => {
         success: true
     })
 
-        } catch (error) {
-            console.log(error.message + ' admin logout');
-        }
+    } catch (error) {
+        console.log(error.message + ' admin logout');
+    }
 
 }
 
@@ -506,7 +507,11 @@ const editBrand = async (req, res) => {
             });
         }
 
-        res.json({ success: "Brand edited", brand: updatedBrand });
+        res.json({ 
+            success: "Brand edited", 
+            brand: updatedBrand ,
+            id: id,
+        });
     } catch (error) {
         console.error(error.message);
         res.json({

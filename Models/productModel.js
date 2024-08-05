@@ -27,10 +27,17 @@ const productSchema = new mongoose.Schema({
 
     variants: [
         {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Variant',
+           type: mongoose.Schema.Types.ObjectId,
+           ref: 'Variant',
         },
-      ],
+    ],
+    
+    offers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Offer',
+        },
+    ],
 
     isListed: {
         type: Boolean,

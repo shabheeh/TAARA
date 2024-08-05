@@ -98,8 +98,8 @@
                                                     <h6 class="mb-0"><%= product.product.name %></h6>
                                                     
                                                     <p class="mb-0">Quantity: <%= product.quantity %></p>
-                                                    <p class="mb-0">Price: Rs.<%= product.product.price %></p>
-                                                    <p class="mb-0">Subtotal: Rs.<%= (product.product.price * product.quantity) %></p>
+                                                    <p class="mb-0">Price: Rs.<%= product.discountedPrice %></p>
+                                                    <p class="mb-0">Subtotal: Rs.<%= (product.discountedPrice * product.quantity) %></p>
                                                 </div>
                                             </div>
                                         <% }); %>
@@ -108,11 +108,13 @@
                                     <div class="d-flex mb-2 align-items-end text-right">
                                         <div class="col-6  text-right ">
                                             <p class="card-text">Sub-total</p>
+                                            <p class="card-text">Discount</p>
                                             <p class="card-text">Shipping</p>
                                             <h5 class="card-title">Total</h5>
                                         </div>
                                         <div class="col-5 me-5 text-right">
-                                            <p class="card-text">Rs.<%= order.totalPrice - order.shippingCharge %></p>
+                                            <p class="card-text">Rs.<%= order.originalSubTotal %></p>
+                                            <p class="card-text">Rs.<%= order.originalSubTotal - order.discountedSubTotal %></p>
                                             <p class="card-text">Rs.<%= order.shippingCharge %></p>
                                             <h5 class="card-title">Rs.<%= order.totalPrice %></h5>
                                         </div>

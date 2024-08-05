@@ -6,6 +6,7 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="/User/assets/css/style.css">
     <link rel="stylesheet" href="/User/assets/css/plugins/nouislider/nouislider.css">
+    <link rel="stylesheet" href="/User/assets/css/plugins/magnific-popup/magnific-popup.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
 
     <style>
@@ -28,7 +29,12 @@
         transform: scale(1.1); /* Scale up the selected color preview */
         box-shadow: 0 0 0 1px #fff, 0 0 0 2px #333; /* Add a box shadow to the selected color preview */
         }
+        
+        .actual-price {
+            color: #ff0707 !important;
+            text-decoration: line-through;
 
+        }
     </style>
 </head>
 
@@ -124,13 +130,18 @@
                                 <% if (cart.products.length > 0) { %>
                                     <div class="dropdown-cart-products">
                                         <% cart.products.slice(0, 3).forEach(current => { %>
-                                            <div class="product">
+                                            <div class="product pb-3">
                                                 <div class="product-cart-details">
                                                     <h4 class="product-title">
                                                         <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
                                                     </h4>
                                                     <span class="cart-product-info">
-                                                        <span class="cart-product-qty"><%= current.quantity %></span>
+                                                        <% if (current.quantity > 0 ) { %>
+                                                            <span class="cart-product-qty"><%= current.quantity %></span>
+                                                            <% } else { %>
+                                                                <span class="cart-product-qty"> 1 </span>
+                                                        <% } %>
+                                                        
                                                         x Rs.<%= current.product.price %>
                                                     </span>
                                                 </div><!-- End .product-cart-details -->
@@ -238,17 +249,22 @@
                                           <figure class="product-media">
                                             <% if (product.variants[0].quantity == 0) { %>
                                                 <span class="product-label label-sale">Out of Stock</span>
+                                                <% } else if (product.bestOffer) { %>
+                                                    <span class="product-label label-sale"><%= product.bestOffer.discount %>% OFF</span>
+                                                    <% } else if (product.isNew) { %>
+                                                        <span class="product-label label-new">New</span>
                                             <% } else { %>
-                                                <span class="product-label label-new">New</span>
+                                               
                                             <% } %>
                         
                                             <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
                                               <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
+                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[1] %>" alt="Product image" class="product-image-hover">
                                             </a>
                                   
                                             <div class="product-action-vertical">
                                               <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                              <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                              <a href="quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
                                               <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
                                             </div><!-- End .product-action-vertical -->
                                   
@@ -263,16 +279,24 @@
                                             </div><!-- End .product-cat -->
                                             <h3 class="product-title"><a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>"><%= product.name %></a></h3><!-- End .product-title -->
                                             <div class="product-price">
-                                              Rs.<%= product.price %>
+                                                <% if (product.bestOffer) { %>
+                                                    <% if (product.discountedPrice) { %>
+                                                       <span class="actual-price">Rs.<%= product.price.toFixed(2) %></span>
+                                                       <span class="new-price px-3">Rs.<%= Math.round(product.discountedPrice).toFixed(2) %></span>
+                                                    <% } %>
+                                                    <% } else { %>
+                                                       <span class="new-price">Rs.<%= product.price %></span>
+                                                   <% } %>
                                             </div><!-- End .product-price -->
                                   
-                                            <div class="product-nav product-nav-dots" style="text-align: left;">
-                                                <% product.variants.forEach(function(variant) { %>
-                                                    <a href="/product/<%= product._id %>/variant/<%= variant._id %>" class="<%= variant.isActive? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
+                                            <div class="product-nav product-nav-dots text-start">
+                                                <% product.variants.forEach(function(variant, index) { %>
+                                                    <a href="/product/<%= product._id %>/variant/<%= variant._id %>" class="<%= index === 0 ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
                                                         <span class="sr-only">Color name</span>
                                                     </a>
                                                 <% }); %>
                                             </div><!-- End .product-nav -->
+                                            
                                           </div><!-- End .product-body -->
                                         </div><!-- End .product -->
                                       </div><!-- End .col-sm-6 -->

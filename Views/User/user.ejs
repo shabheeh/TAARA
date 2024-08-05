@@ -304,8 +304,8 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="email" id="emailLabel">Email:</label>
-                                                                <input type="email" id="email" class="form-control" value="<%= user.email %>" placeholder="Enter your email" disabled>
-                                                            </div>
+                                                                <input class="form-control" value="<%= user.email %>" disabled readonly>
+                                                              </div>
                                                             <div class="form-group">
                                                                 <label for="phone" id="phoneLabel">Phone:</label>
                                                                 <input type="text" id="phone" class="form-control" value="<%= user.phone %>" placeholder="Enter your phone number" disabled>
@@ -363,11 +363,11 @@
                                         <div class="orders-container">
                                             <div class="orders-header d-flex justify-content-between align-items-center mb-3">
                                                 <h4 class="profile-title">Your Orders <span class="order-count"><%= orders ? orders.length : "" %></span></h4>
-                                                <select class="form-control" style="width: auto;">
+                                                <!-- <select class="form-control" style="width: auto;">
                                                     <option>Past 3 Month</option>
                                                     <option>Past 6 Month</option>
                                                     <option>Past Year</option>
-                                                </select>
+                                                </select> -->
                                             </div>
                                     
                                             <ul class="nav nav-pills mb-3" id="orders-tab" role="tablist">
@@ -415,7 +415,7 @@
                                                                                     <h5 class="product-heading mb-0">
                                                                                         <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
                                                                                     </h5>
-                                                                                    <div class="align-items-end"><strong><%= current.status %></strong></div>
+                                                                                    <div class="align-items-end"><strong id="orderStatus<%= order._id %>-<%= current.variant._id %>"><%= current.status %></strong></div>
                                                                                 </div>
                                                                                 
                                                                                 <p class="product-price-1 mb-0">Rs.<%= current.product.price %></p>
@@ -433,11 +433,11 @@
                                                                                     <a href="#" id="addToCart-<%= current.variant._id %>" class="btn btn-sm btn-outline-primary-2 mr-2">Buy again</a>
                                                                                     <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="btn btn-sm btn-outline-secondary mr-2">View item</a>
                                                                                     <% if (current.status === 'Delivered') { %>
-                                                                                        <a data-toggle="modal" href="#returnOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= current.variant._id %>">Return</a>
-                                                                                        <% } else if (current.status === 'Cancelled') { %>
+                                                                                        <a id="returnBtn<%= order._id %>-<%= current.variant._id %>" data-toggle="modal" href="#returnOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= current.variant._id %>">Return</a>
+                                                                                        <% } else if (current.status === 'Cancelled' || current.status === 'Return Requested' || current.status === 'Returned') { %>
                                                                                             <% } else { %>
                                                                                              
-                                                                                            <a data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Cancel</a>
+                                                                                            <a id="cancelBtn<%= order._id %>-<%= current.variant._id %>" data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Cancel</a>
                                                                                     <% } %>
                                                                                     
                                                                                 </div>
@@ -446,7 +446,7 @@
 
                                                                         <!-- Cancel Modal -->
                                                                         <div class="modal fade" id="cancelOrderModal<%= order._id %>-<%= current.variant._id %>" tabindex="-1" role="dialog"
-                                                                            aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                                                                            aria-labelledby="cancelOrderModalLabel" >
                                                                             <div class="modal-dialog " role="document">
                                                                                 <div class="modal-content">
                                                                                     <div class="modal-header">
@@ -471,6 +471,32 @@
                                                                             </div>
                                                                         </div>
 
+                                                                        <!-- Return  Modal -->
+                                                                        <div class="modal fade" id="returnOrderModal<%= order._id %>-<%= current.variant._id %>" tabindex="-1" role="dialog"
+                                                                            aria-labelledby="returnOrderModalLabel">
+                                                                            <div class="modal-dialog " role="document">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class="modal-title" id="returnOrderModalLabel">Request for return</h5>
+                                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                            <span aria-hidden="true">&times;</span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <div class="modal-body m-5">
+                                                                                        <!-- Form Content -->
+                                                                                        <form id="return-order-<%= order._id %>-<%= current.product._id %>-<%= current.variant._id %>">
+                                                                                            <label id="returnOrderLabel-<%= order._id %>-<%= current.variant._id %>">Reason for Returning</label>
+                                                                                            <textarea name="resonForReturn" id="returnOrder-<%= order._id %>-<%= current.variant._id %>" class="form-control"></textarea>
+                                                                                            
+                                                                                            <button type="submit" class="btn btn-primary">
+                                                                                                REQUEST
+                                                                                            </button>
+                                                                                            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">DISCARD</button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
 
 
                                                                     <% }); %>
@@ -1178,14 +1204,14 @@
         
             const firstName = document.getElementById('first-name').value.trim();
             const lastName = document.getElementById('last-name').value.trim();
-            const email = document.getElementById('email').value.trim();
+            
             const phone = document.getElementById('phone').value.trim();
         
             console.log(firstName, lastName, email, phone);
         
             const firstNameLabel = document.getElementById('firstNameLabel');
             const lastNameLabel = document.getElementById('lastNameLabel');
-            const emailLabel = document.getElementById('emailLabel');
+            
             const phoneLabel = document.getElementById('phoneLabel');
         
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1208,16 +1234,6 @@
                 lastNameLabel.innerHTML = "Last Name:";
                 lastNameLabel.classList.remove('error-message');
             }
-
-        
-            if (!emailPattern.test(email)) {
-                emailLabel.innerHTML = "Email is not valid";
-                emailLabel.classList.add('error-message');
-                isValid = false;
-            } else {
-                emailLabel.innerHTML = "Email:";
-                emailLabel.classList.remove('error-message');
-            }
         
             if (!phone) {
                 phoneLabel.innerHTML = "Phone is required";
@@ -1236,7 +1252,6 @@
                 const data = {
                     firstName,
                     lastName,
-                    email,
                     phone
                 };
         
@@ -1949,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function cancelOrder(data) {
-            fetch('/order/cancel', {
+            fetch('/order', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1962,7 +1977,111 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     
                     $(`#cancelOrderModal${data.orderId}-${data.variantId}`).modal('hide');
+                    $(`#orderStatus${data.orderId}-${data.variantId}`).text('Cancelled');
+                    $(`#cancelBtn${data.orderId}-${data.variantId}`).hide();
+                    // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    
+                })
+
                 
+                    
+
+                } else {
+                    $(`#cancelOrderModal${data.orderId}-${data.variantId}`).modal('hide');
+                    
+                    // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+                }
+            })
+            .catch(err => {
+                $(`#cancelOrderModal${err.orderId}-${err.variantId}`).modal('hide');
+
+                // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: err.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    
+
+    
+</script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('form[id^="return-order-"]');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formId = this.id.split('return-order-')[1];
+                const [orderId, productId, variantId] = formId.split('-');
+            
+                const reason = document.getElementById(`returnOrder-${orderId}-${variantId}`).value.trim()
+
+                const reasonLabel = document.getElementById(`returnOrderLabel-${orderId}-${variantId}`)
+              
+
+                let isValid = true
+
+                if(!reason){
+                    reasonLabel.classList.add('error-message')
+                    reasonLabel.innerHTML = 'Reason is required'
+                    isValid = false
+                } else {
+                    reasonLabel.classList.remove('error-message')
+                    reasonLabel.innerHTML = 'Reason for Returning'
+                }
+
+                
+
+                if(isValid){
+
+                    const data = {
+                        orderId,
+                        productId,
+                        variantId,
+                        reason
+                    }
+
+                    returnOrder(data)
+                }
+            });
+        });
+    });
+
+    function returnOrder(data) {
+            fetch('/order', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    
+                    
+                    $(`#returnOrderModal${data.orderId}-${data.variantId}`).modal('hide');
+                    $(`#orderStatus${data.orderId}-${data.variantId}`).text('Cancelled');
+                    $(`#returnBtn${data.orderId}-${data.variantId}`).hide();
 
                     // Show success alert
                 Swal.fire({
@@ -1976,6 +2095,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
 
                 } else {
+
+                    $(`#returnOrderModal${data.orderId}-${data.variantId}`).modal('hide');
                     // Show error alert
                 Swal.fire({
                     title: 'Error',
@@ -1987,10 +2108,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(err => {
+                $(`#returnOrderModal${err.orderId}-${err.variantId}`).modal('hide');
                 // Show error alert
                 Swal.fire({
                     title: 'Error',
-                    text: data.message,
+                    text: err.message,
                     icon: 'error',
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'OK'

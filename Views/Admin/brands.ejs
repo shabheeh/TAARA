@@ -88,8 +88,8 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 10px;">SI</th>
-                                            <th class="name-column" style="width: 500px;">Name</th>
-                                            <th class="gender-column">Gender</th>
+                                            <th class="name-column" style="width: 800px;">Name</th>
+                                            
                                             <th class="text-center action-column">Action</th>
                                         </tr>
                                     </thead>
@@ -114,9 +114,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        <%= brand.name %>
-                                                    </td>
+                                                    
                                                     <td class="text-center">
                                                         <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= brand._id %>"
                                                             data-bs-toggle="modal" data-bs-target="#editModal<%= brand._id %>">Edit</a>
@@ -131,7 +129,7 @@
                                                 </tr>
 
 
-                                                <!-- Modal -->
+                                                <!--edit Modal -->
                                                 <div class="modal fade" id="editModal<%= brand._id %>" tabindex="-1"
                                                     aria-labelledby="editModalLabel<%= brand._id %>" aria-hidden="true">
                                                     <div class="modal-dialog modal-sm">
@@ -255,7 +253,7 @@
 
                                         <!-- Status -->
                                         <div class="form-floating form-floating-outline mb-5">
-                                            <select id="brand-status" class="form-select" aria-label="Status"
+                                            <select id="brand-status" class="select2 form-select" data-allow-clear="true" aria-label="Status"
                                                 name="isListed">
                                                 <option value="">Select status</option>
                                                 <option value="true">List</option>
@@ -270,7 +268,7 @@
                                             <button type="reset" class="btn btn-outline-danger waves-effect"
                                                 data-bs-dismiss="modal">Discard</button>
                                         </div>
-                                        <input type="hidden">
+
                                     </form>
                                 </div>
                             </div>
@@ -330,6 +328,7 @@
 
             <!-- Main JS -->
             <script src="/Admin/assets/js/main.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 
             <script>
 
@@ -357,18 +356,30 @@
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-
+                                    $('#ecommerceBrandModal').modal('hide');
                                     window.location.reload();
 
                                 } else {
 
-                                    document.getElementById('modal-message').innerText = data.message;
+                                    // Show error alert
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: data.message,
+                                        icon: 'error',
+                                        confirmButtonColor: '#d33',
+                                        confirmButtonText: 'OK'
+                                    });
                                 }
                             })
                             .catch(error => {
-                                console.error('Error:', error);
-                                document.getElementById('modal-message').innerText = 'An error occurred.';
-                                document.getElementById('modal-message').classList.add('text-danger');
+                                // Show error alert
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonColor: '#d33',
+                                    confirmButtonText: 'OK'
+                                });
                             });
                     }
 
@@ -464,10 +475,26 @@
                                     .addClass('bg-label-danger')
                                     .text('Unlist');
                             } else {
-                                console.error('Error listing brand:', data.message);
+                                // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                             }
                         })
-                        .catch(error => console.error('Error listing brand:', error));
+                        .catch(error => {
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        });
                 }
 
                 //  unlist brand request
@@ -487,10 +514,26 @@
                                     .addClass('bg-label-success')
                                     .text('List');
                             } else {
-                                console.error('Error unlisting brand:', data.message);
+                                // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                             }
                         })
-                        .catch(error => console.error('Error unlisting brand:', error));
+                        .catch(error => {
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        });
                 }
 
                 // Event listener for list/unlist buttons
@@ -574,15 +617,40 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                window.location.reload();
+                                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
+               
+                modal.hide();
+
+                // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    
+                })
+                window.location.reload();
                             } else {
-                                document.getElementById(`modal-message-${data.id}`).innerText = data.message;
+                                 // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                                
                             }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
-                            document.getElementById(`modal-message-${data.id}`).innerText = 'An error occurred.';
+                             // Show error alert
+                             Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                         });
                 }
             </script>

@@ -5,6 +5,7 @@
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
+    
     <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
 <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
 <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
@@ -96,7 +97,7 @@
                         <div class="d-flex justify-content-start align-items-center user-name">
                           <div class="product-image-wrapper">
                             <div class=" me-4">
-                              <img src="/Admin/assets/Products-Cropped/<%= current.variant.images[0] %>" alt="product" class="product-image">
+                              <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="product" class="product-image">
                             </div>
                           </div>
                           <div class="d-flex flex-column">
@@ -117,24 +118,26 @@
                             <small class="mb-4">
                               <strong>Color: </strong><%= current.variant.color %>
                             </small>
-                            <% if (current.status !== "Delivered") { %>
-                              <a href="#" class="badge rounded-pill mt-5 mx-2 bg-label-primary " 
-                                  data-bs-toggle="modal" 
-                                  data-bs-target="#editModal<%= current.variant._id %>" 
-                                  data-category-id="<%= current.variant._id %>">
-                                  Update
-                              </a>
-                          <% } else { %>
-                              <a href="#" class="badge rounded-pill mt-5 mx-2 bg-label-primary " disabled>
-                                  Update
-                              </a>
+                            <% if (current.status === "Return Requested") { %>
+                              <button id="updateBtn<%= current.variant._id %>" class="badge rounded-pill mt-5 mx-2 bg-label-primary border-none" onclick="returnOrder('<%= current.product._id %>' , '<%= current.variant._id %>')">Accept</button>
+                              
+                              <% } else if (current.status !== "Delivered" && current.status !== "Cancelled" && current.status !== "Returned") { %>
+                                <a href="#"  class="badge rounded-pill mt-5 mx-2 bg-label-primary " 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editModal<%= current.variant._id %>" 
+                                data-category-id="<%= current.variant._id %>">
+                                Update
+                            </a>
+                          
                           <% } %>
                           </div>
                         </div>
                         <% if (current.status === "Cancelled") { %>
                           <div class="mt-3"><strong>Reason for cancel:</strong> <%= current.cancelReason %></div>
                         <% } %>
-                         
+                        <% if (current.status === "Return Requested" || current.status === "Returned") { %>
+                          <div class="mt-3"><strong>Reason for return:</strong> <%= current.returnReason %></div>
+                        <% } %>
                       </td>
                     <td><span>Rs.<%= current.product.price %></span></td>
                     <td><span><%= current.quantity %></span></td>
@@ -145,6 +148,9 @@
                           <% } else if (current.status === 'Dispatched') { %>bg-label-warning
                           <% } else if (current.status === 'Out for Delivery' || current.status === 'Delivered') { %>bg-label-success
                           <% } else if (current.status === 'Cancelled') { %>bg-label-danger
+                          <% } else if (current.status === 'Return Requested') { %>bg-label-info
+                          <% } else if (current.status === 'Returned') { %>bg-label-danger
+                           
                           <% } %>">
                           <%= current.status %>
                       </span>
@@ -169,12 +175,12 @@
                                         <p id="modal-message-<%= current.variant._id %>" class="text-danger text-center"></p>
                                         <!-- Order Status -->
                                         <div class="form-floating form-floating-outline mb-5">
-                                            <select id="order-status-<%= current.variant._id %>" class="form-select" aria-label="Order Status" name="orderStatus">
+                                            <select id="order-status-<%= current.variant._id %>" class="select2 form-select" aria-label="Order Status" name="orderStatus">
                                                 <option value="">Select Status</option>
                                                 <option value="Dispatched" <% if (current.status === 'Dispatched') { %>selected<% } %>>Dispatch</option>
                                                 <option value="Out for Delivery" <% if (current.status === 'Out for Delivery') { %>selected<% } %>>Out for Delivery</option>
                                                 <option value="Delivered" <% if (current.status === 'Delivered') { %>selected<% } %>>Delivered</option>
-                      
+                                                <option value="Cancelled" <% if (current.status === 'Cancelled') { %>selected<% } %>>Cancel</option>
                                             </select>
                                             <label for="order-status-<%= current.variant._id %>" id="orderStatusLabel<%= current.variant._id %>">Order Status</label>
                                             <div class="invalid-feedback">Please select a valid status.</div>
@@ -360,10 +366,8 @@
                 .then(response => response.json())
                 .then(data => {
             if (data.success) {
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
-            
-                modal.hide();
+                
+                $(`#editModal${data.id}`).modal('hide');
 
                 // Show success alert
                 Swal.fire({
@@ -386,9 +390,21 @@
                             newBadgeClass = 'bg-label-warning';
                             break;
                         case 'Out for Delivery':
-                        case 'Delivered':
                             newBadgeClass = 'bg-label-success';
                             break;
+                        case 'Delivered':  
+                            newBadgeClass = 'bg-label-success';
+                            document.getElementById(`updateBtn${data.id}`).style.display = 'none';
+                            break;
+                        case 'Cancelled':
+                            newBadgeClass = 'bg-label-danger';
+                            document.getElementById(`updateBtn${data.id}`).style.display = 'none';
+                            break;
+                        case 'Returned':
+                            newBadgeClass = 'bg-label-warning';
+                            document.getElementById(`acceptBtn${data.id}`).style.display = 'none';
+
+                            break;    
                         default:
                             newBadgeClass = '';
                     }
@@ -399,10 +415,9 @@
 
 
             } else {
-              // Close the modal
-              const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
+              $(`#editModal${data.id}`).modal('hide');
             
-            modal.hide();
+           
                 // Show error alert
                 Swal.fire({
                     title: 'Error',
@@ -427,6 +442,36 @@
 
   </script>
 
+
+<script>
+  // Delete offer function
+  function returnOrder(productId, variantId) {
+    const orderId = document.getElementById('orderId').value.trim()
+    const data = {
+            productId: productId,
+            variantId: variantId,
+            status: 'Returned',
+            orderId: orderId
+        }
+
+      Swal.fire({
+          title: 'Accept Return',
+          text: 'Accept purchase return from customer.',
+          icon: 'warning',
+          showCancelButton: true,
+          
+          confirmButtonColor: '#00ff00',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Accept',
+          cancelButtonText: 'No'
+      }).then((result) => {
+          if (result.value) {
+            updateStautus(data)
+                      
+          }
+      });
+  }
+</script>
   
 
   <!-- Core JS -->

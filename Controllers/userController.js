@@ -500,7 +500,7 @@ const userAccount = async ( req, res) => {
             const userId = req.userId
             const user = await User.findById(userId)
             const addresses = await Address.find({user: req.userId})
-            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant')
+            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant').sort({ createdAt: -1 })
 
             
 
@@ -515,9 +515,10 @@ const userAccount = async ( req, res) => {
 
         let totalPrice = 0;
 
-      cart.products.forEach((product) => {
-        totalPrice += product.product.price * product.quantity;
-      });
+        cart.products.forEach((product) => {
+            const quantity = product.quantity > 0 ? product.quantity : 1;
+            totalPrice += product.product.price * quantity;
+          });
 
             // creating deep copy for not manupulating the orders
             const ordersCopy = JSON.parse(JSON.stringify(orders));
@@ -562,7 +563,7 @@ const userAccount = async ( req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { firstName, lastName, email, phone } = req.body
+        const { firstName, lastName, phone } = req.body
 
         const userId = req.userId;
 
@@ -576,8 +577,7 @@ const updateProfile = async (req, res) => {
         }
 
         user.firstName = firstName;
-        user.lastName = lastName;
-        user.email = email;
+        user.lastName = lastName;;
         user.phone = Number(phone)
         await user.save();
         res.json({
