@@ -119,10 +119,10 @@
                               <strong>Color: </strong><%= current.variant.color %>
                             </small>
                             <% if (current.status === "Return Requested") { %>
-                              <button id="updateBtn<%= current.variant._id %>" class="badge rounded-pill mt-5 mx-2 bg-label-primary border-none" onclick="returnOrder('<%= current.product._id %>' , '<%= current.variant._id %>')">Accept</button>
+                              <button id="acceptBtn<%= current.variant._id %>" class="badge rounded-pill mt-5 mx-2 bg-label-primary border-none" onclick="returnOrder('<%= current.product._id %>' , '<%= current.variant._id %>')">Accept</button>
                               
                               <% } else if (current.status !== "Delivered" && current.status !== "Cancelled" && current.status !== "Returned") { %>
-                                <a href="#"  class="badge rounded-pill mt-5 mx-2 bg-label-primary " 
+                                <a id="updateBtn<%= current.variant._id %>" href="#"  class="badge rounded-pill mt-5 mx-2 bg-label-primary " 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#editModal<%= current.variant._id %>" 
                                 data-category-id="<%= current.variant._id %>">
@@ -149,6 +149,7 @@
                           <% } else if (current.status === 'Out for Delivery' || current.status === 'Delivered') { %>bg-label-success
                           <% } else if (current.status === 'Cancelled') { %>bg-label-danger
                           <% } else if (current.status === 'Return Requested') { %>bg-label-info
+                          <% } else if (current.status === 'Return Rejected') { %>bg-label-danger
                           <% } else if (current.status === 'Returned') { %>bg-label-danger
                            
                           <% } %>">
@@ -161,7 +162,7 @@
                     
                     <!-- Modal -->
                     <div class="modal fade centered" id="editModal<%= current.variant._id %>" tabindex="-1" 
-                        aria-labelledby="editModalLabel<%= current.variant._id %>" aria-hidden="true">
+                        aria-labelledby="editModalLabel<%= current.variant._id %>" >
                         <div class="modal-dialog modal-sm">
                             <div class="modal-content">
                                 <!-- Modal Header -->
@@ -347,7 +348,7 @@
                         orderId: orderId
                     }
 
-                    updateStautus(data)
+                    updateStatus(data)
                 }
 
             })
@@ -355,7 +356,7 @@
     })
 
 
-    function updateStautus(data){
+    function updateStatus(data){
         fetch('/admin/order', {
             method: 'PATCH',
             headers: {
@@ -400,10 +401,13 @@
                             newBadgeClass = 'bg-label-danger';
                             document.getElementById(`updateBtn${data.id}`).style.display = 'none';
                             break;
+                        case 'Return Rejected':
+                            newBadgeClass = 'bg-label-warning';
+                            document.getElementById(`acceptBtn${data.id}`).style.display = 'none';
+                            break;
                         case 'Returned':
                             newBadgeClass = 'bg-label-warning';
                             document.getElementById(`acceptBtn${data.id}`).style.display = 'none';
-
                             break;    
                         default:
                             newBadgeClass = '';
@@ -446,31 +450,40 @@
 <script>
   // Delete offer function
   function returnOrder(productId, variantId) {
-    const orderId = document.getElementById('orderId').value.trim()
-    const data = {
-            productId: productId,
-            variantId: variantId,
-            status: 'Returned',
-            orderId: orderId
-        }
+  Swal.fire({
+    title: 'Accept Return',
+    text: 'Accept purchase return from customer.',
+    icon: 'warning',
+    showDenyButton: true,
+    showCancelButton: true,
+    confirmButtonColor: '#00ff00',
+    denyButtonColor: '#ff0000',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Accept',
+    denyButtonText: 'Reject',
+    cancelButtonText: 'Back',
+  }).then((result) => {
+    const orderId = document.getElementById('orderId').value.trim();
+    let status = '';
 
-      Swal.fire({
-          title: 'Accept Return',
-          text: 'Accept purchase return from customer.',
-          icon: 'warning',
-          showCancelButton: true,
-          
-          confirmButtonColor: '#00ff00',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Accept',
-          cancelButtonText: 'No'
-      }).then((result) => {
-          if (result.value) {
-            updateStautus(data)
-                      
-          }
-      });
-  }
+    if (result.isConfirmed) {
+      status = 'Returned';
+    } else if (result.isDenied) {
+      status = 'Return Rejected';
+    }
+
+    if (status) {
+      const data = {
+        productId: productId,
+        variantId: variantId,
+        status: status,
+        orderId: orderId
+      };
+      updateStatus(data);
+    }
+  });
+}
+
 </script>
   
 

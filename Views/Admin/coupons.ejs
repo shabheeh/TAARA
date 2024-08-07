@@ -81,7 +81,11 @@
                                                     </div>
                                                     <div class="d-flex align-items-center mb-3">
                                                         <h6 class="me-2 mb-0">Discount: </h6>
-                                                        <span>Rs. <%= coupon.discount %></span>
+                                                        <span><%= coupon.discount %>%</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <h6 class="me-2 mb-0">Maxumum Discount: </h6>
+                                                        <span>Rs. <%= coupon.maxDiscount %></span>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-3">
                                                         <h6 class="me-2 mb-0">Minimum Order Amount: </h6>
@@ -147,21 +151,12 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="row">
-                                                                <div class="col mb-3 mt-2">
+                                                            <div class="row g-4">
+                                                                <div class="col mb-3">
                                                                     <div class="form-floating form-floating-outline">
                                                                         <input type="number" value="<%= coupon.amount %>" id="amount-<%= coupon._id %>" class="form-control"
                                                                             placeholder="Minimum order amount">
                                                                         <label for="amount" id="amountLabel-<%= coupon._id %>">Minimum Order Amount</label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row g-4">
-                                                                <div class="col mb-3">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <input type="number" value="<%= coupon.discount %>" id="discount-<%= coupon._id %>" class="form-control"
-                                                                            placeholder="Enter discount amount">
-                                                                        <label for="discount" id="discountLabel-<%= coupon._id %>">Discount amount</label>
                                                                     </div>
                                                                 </div>
                                         
@@ -171,6 +166,26 @@
                                                                             <input type="number" value="<%= coupon.maxUses %>" id="maxUses-<%= coupon._id %>" class="form-control"
                                                                                 placeholder="Max Usage count">
                                                                             <label for="maxUses" id="maxUsesLabel-<%= coupon._id %>">Max Usages</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        
+                                                            <div class="row g-4">
+                                                                <div class="col mb-3">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <input type="number" value="<%= coupon.discount %>" id="discount-<%= coupon._id %>" class="form-control"
+                                                                            placeholder="Enter discount in percentage">
+                                                                        <label for="discount" id="discountLabel-<%= coupon._id %>">Discount percentage</label>
+                                                                    </div>
+                                                                </div>
+                                        
+                                                                <div class="col mb-3">
+                                                                    <div class="col mb-2">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <input type="number" value="<%= coupon.maxDiscount %>" id="maxDiscount-<%= coupon._id %>" class="form-control"
+                                                                                placeholder="Max Discount amount">
+                                                                            <label for="maxDiscont" id="maxDiscountLabel-<%= coupon._id %>">Maximum Discount</label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -218,7 +233,7 @@
                         </div>
                     </div>
 
-
+                    
 
                     <!--add coupon Modal -->
                     <div class="modal fade" id="addCoupon" tabindex="-1" aria-hidden="true">
@@ -259,12 +274,24 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col mb-3 mt-2">
+                                        <div class="row g-4">
+                                            <div class="col mb-3">
                                                 <div class="form-floating form-floating-outline">
-                                                    <input type="number" id="amount" class="form-control"
+                                                    <input type="number"  id="amount" class="form-control"
                                                         placeholder="Minimum order amount">
                                                     <label for="amount" id="amountLabel">Minimum Order Amount</label>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col mb-3">
+                                                <div class="col mb-2">
+                                                    <div class="col mb-2">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="number" id="maxUses" class="form-control"
+                                                                placeholder="Max Usage count">
+                                                            <label for="maxUses" id="maxUsesLabel">Max Usages</label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -272,18 +299,16 @@
                                             <div class="col mb-3">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" id="discount" class="form-control"
-                                                        placeholder="Enter discount amount">
-                                                    <label for="discount" id="discountLabel">Discount amount</label>
+                                                        placeholder="Enter discount in percentage">
+                                                    <label for="discount" id="discountLabel">Discount percentage</label>
                                                 </div>
                                             </div>
                     
                                             <div class="col mb-3">
-                                                <div class="col mb-2">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <input type="number" id="maxUses" class="form-control"
-                                                            placeholder="Max Usage count">
-                                                        <label for="maxUses" id="maxUsesLabel">Max Usages</label>
-                                                    </div>
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="number" id="maxDiscount" class="form-control"
+                                                        placeholder="Max Discount amount">
+                                                    <label for="maxDiscont" id="maxDiscountLabel">Maximum Discount</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -325,7 +350,7 @@
                 </div>
                 <!-- / Content -->
 
-
+                
 
 
 
@@ -366,6 +391,7 @@
                             description: document.getElementById('description').value.trim(),
                             amount: document.getElementById('amount').value.trim(),
                             discount: document.getElementById('discount').value.trim(),
+                            maxDiscount: document.getElementById('maxDiscount').value.trim(),
                             maxUses: document.getElementById('maxUses').value.trim(),
                             status: document.getElementById('status').value,
                             expires: document.getElementById('expires').value
@@ -385,6 +411,7 @@
                     const amount = document.getElementById('amount').value.trim();
                     const maxUses = document.getElementById('maxUses').value.trim()
                     const discount = document.getElementById('discount').value.trim();
+                    const maxDiscount = document.getElementById('maxDiscount').value.trim();
                     const status = document.getElementById('status').value;
                     const expires = document.getElementById('expires').value;
 
@@ -394,12 +421,14 @@
                     const amountError = document.getElementById('amountLabel');
                     const maxUsesError = document.getElementById('maxUsesLabel');
                     const discountError = document.getElementById('discountLabel');
+                    const maxDiscountError = document.getElementById('maxDiscountLabel');
                     const statusError = document.getElementById('statusLabel');
                     const expiresError = document.getElementById('expiresLabel');
 
                     const titleRegex = /^(\S+(?:\s\S+)?)$/;
                     const codeRegex = /^[A-Z0-9]+$/
                     const currentDate = new Date().toISOString().split('T')[0]; 
+                    const percentageRegex = /^(100|[1-7][0-9]|80)$/
 
                     let isValid = true;
 
@@ -461,13 +490,26 @@
                         discountError.innerText = 'Discount cannot be empty';
                         discountError.classList.add('error-message');
                         isValid = false;
-                    } else if (isNaN(discount)) {
+                    } else if (!percentageRegex.test(discount)) {
                         discountError.innerText = "Invalid discount percentage";
                         discountError.classList.add('error-message');
                         isValid = false;
                     } else {
                         discountError.innerText = 'Discount';
                         discountError.classList.remove('error-message');
+                    }
+
+                    if (!maxDiscount) {
+                        maxDiscountError.innerText = 'Max Discount cannot be empty';
+                        maxDiscountError.classList.add('error-message');
+                        isValid = false;
+                    } else if (isNaN(maxDiscount)) {
+                        maxDiscountError.innerText = "Invalid discount amount";
+                        maxDiscountError.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        maxDiscountError.innerText = 'Maximum Discount';
+                        maxDiscountError.classList.remove('error-message');
                     }
 
                     if (!maxUses) {
@@ -576,6 +618,7 @@
                 const amount = document.getElementById(`amount-${couponId}`).value.trim();
                 const maxUses = document.getElementById(`maxUses-${couponId}`).value.trim();
                 const discount = document.getElementById(`discount-${couponId}`).value.trim();
+                const maxDiscount = document.getElementById(`maxDiscount-${couponId}`).value.trim();
                 const status = document.getElementById(`status-${couponId}`).value;
                 const expires = document.getElementById(`expires-${couponId}`).value;
 
@@ -585,12 +628,14 @@
                 const amountError = document.getElementById(`amountLabel-${couponId}`);
                 const maxUsesError = document.getElementById(`maxUsesLabel-${couponId}`);
                 const discountError = document.getElementById(`discountLabel-${couponId}`);
+                const maxDiscountError = document.getElementById(`maxDiscountLabel-${couponId}`);
                 const statusError = document.getElementById(`statusLabel-${couponId}`);
                 const expiresError = document.getElementById(`expiresLabel-${couponId}`);
 
                 const titleRegex = /^(\S+(?:\s\S+)?)$/;
                 const codeRegex = /^[A-Z0-9]+$/
                 const currentDate = new Date().toISOString().split('T')[0]; 
+                const percentageRegex = /^(100|[1-7][0-9]|80)$/
 
                 let isValid = true;
 
@@ -652,7 +697,7 @@
                     discountError.innerText = 'Discount cannot be empty';
                     discountError.classList.add('error-message');
                     isValid = false;
-                } else if (isNaN(discount)) {
+                } else if (!percentageRegex.test(discount)) {
                     discountError.innerText = "Invalid discount percentage";
                     discountError.classList.add('error-message');
                     isValid = false;
@@ -660,6 +705,19 @@
                     discountError.innerText = 'Discount';
                     discountError.classList.remove('error-message');
                 }
+
+                if (!maxDiscount) {
+                        maxDiscountError.innerText = 'Max Discount cannot be empty';
+                        maxDiscountError.classList.add('error-message');
+                        isValid = false;
+                    } else if (isNaN(maxDiscount)) {
+                        maxDiscountError.innerText = "Invalid discount amount";
+                        maxDiscountError.classList.add('error-message');
+                        isValid = false;
+                    } else {
+                        maxDiscountError.innerText = 'Maximum Discount';
+                        maxDiscountError.classList.remove('error-message');
+                    }
 
                 if (!maxUses) {
                     maxUsesError.innerText = 'Enter Max Usage count';
@@ -704,6 +762,7 @@
                         description: document.getElementById(`description-${couponId}`).value.trim(),
                         amount: document.getElementById(`amount-${couponId}`).value.trim(),
                         discount: document.getElementById(`discount-${couponId}`).value.trim(),
+                        maxDiscount: document.getElementById(`maxDiscount-${couponId}`).value.trim(),
                         maxUses: document.getElementById(`maxUses-${couponId}`).value.trim(),
                         status: document.getElementById(`status-${couponId}`).value,
                         expires: document.getElementById(`expires-${couponId}`).value
@@ -777,12 +836,6 @@
             text: 'You will not be able to recover this coupon.',
             icon: 'warning',
             showCancelButton: true,
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            },
             confirmButtonColor: '#8c57ff',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',

@@ -160,7 +160,13 @@ const orderShcema = new mongoose.Schema({
         },
         
     },
+    razorpayOrderId:{
+        type: String,
+    },
 
+    paymentStatus: {
+        type: String,
+    }
 },
 { timestamps: true }
 );

@@ -270,7 +270,7 @@
                                         </div>
 
 
-                                        <!-- Edit product offer modal -->
+                                        <!-- Edit category offer modal -->
                                         <div class="modal fade" id="editCategoryOffer-<%= offer._id %>" tabindex="-1" aria-labelledby="addCategoryOfferModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-sm">
                                                 <div class="modal-content">
@@ -303,8 +303,8 @@
                                                             </div>
                                                             <!-- Applied products -->
                                                             <div class="form-floating form-floating-outline mb-5">
-                                                                <select id="applied-products-<%= offer._id %>" class="select2 form-select" data-placeholder="Applied Categories" data-allow-clear="true" name="applied-categories[]" multiple="multiple">
-                                                                    <option value="">Select products</option>
+                                                                <select id="applied-categories-<%= offer._id %>" class="select2 form-select" data-placeholder="Applied Categories" data-allow-clear="true" name="applied-categories[]" multiple="multiple">
+                                                                    <option value="">Select categories</option>
                                                                     <% categories.forEach(category => { %>
                                                                         <option value="<%= category._id %>" <%= offer.categories.some(appliedCategories => appliedCategories.equals(category._id)) ? 'selected' : '' %>><%= category.name %></option>
                                                                     <% }); %>
@@ -973,7 +973,7 @@
 
                     const selectedOptions = document.querySelectorAll(`#applied-categories-${offerId} option:checked`);
                     const appliedCategories = Array.from(selectedOptions).map(option => option.value);
-
+                    console.log(appliedCategories)
                     const formData = {
                         id: offerId,
                         title: document.getElementById(`category-offer-title-${offerId}`).value.trim(),

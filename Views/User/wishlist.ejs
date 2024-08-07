@@ -1,0 +1,229 @@
+
+    <!-- Plugins CSS File -->
+    <link rel="stylesheet" href="/User/assets/css/bootstrap.min.css">
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="/User/assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
+
+
+    <style>
+        .dropdown-menu {
+            min-width: 200px; /* Adjust as needed */
+        }
+        .size-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: 1px solid #c96;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .size-circle.available:hover {
+            background-color: #e0e0e0;
+            border: 1px solid #c96;
+        }
+        .size-circle.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f0f0f0;
+        }
+        .size-circle.selected {
+            background-color: #f0f0f0;
+            border: 1px solid #c96;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('../Layouts/User/navbar') -%>
+
+        <main class="main">
+            <div class="page-header text-center" style="background-color: black;">
+
+        		<div class="container">
+        			<h1 class="page-title">WISHLIST</h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="container">
+					<table class="table table-wishlist table-mobile">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Price</th>
+								<th>Stock Status</th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+
+						<tbody>
+                            <% if (wishlist && wishlist.products.length > 0 ) { %>
+                                <% wishlist.products.forEach(current => { %>
+                                    <tr>
+                                        <td class="product-col">
+                                            <div class="product">
+                                                <figure class="product-media">
+                                                    <a href="#">
+                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product image">
+                                                    </a>
+                                                </figure>
+        
+                                                <h3 class="product-title">
+                                                    <a href="#"><%= current.product.name %> </a>
+                                                </h3><!-- End .product-title -->
+                                            </div><!-- End .product -->
+                                        </td>
+                                        <td class="price-col">Rs. <%= current.product.price %></td>
+                                        <td class="stock-col"><span class="in-stock">In stock</span></td>
+                                        <td class="action-col">
+                                            <div class="dropdown">
+                                                <button class="btn btn-block btn-outline-primary-2" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                    <i class="icon-cart-plus"></i>Add to cart
+                                                </button>
+                                        
+                                                <div class="dropdown-menu">
+                                                    <div class="bg-primary text-white text-center mb-1">Select size</div>
+                                                    <div class="d-flex justify-content-around align-items-center">
+                                                        <% ['XS', 'S', 'M', 'L', 'XL'].forEach(size => { %>
+                                                            <div class="size-circle <%= current.variant.sizes.includes(size) ? 'available' : 'disabled' %>" 
+                                                                 data-size="<%= size %>" 
+                                                                 data-variant-id="<%= current.variant._id %>">
+                                                                <%= size %>
+                                                            </div>
+                                                        <% }) %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+                                    </tr>
+                                <% }) %>
+                             
+                            <% } %>
+							
+							
+						</tbody>
+					</table><!-- End .table table-wishlist -->
+	            	<div class="wishlist-share">
+	            		<div class="social-icons social-icons-sm mb-2">
+	            			<label class="social-label">Share on:</label>
+	    					<a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+	    					<a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+	    					<a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+	    					<a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
+	    					<a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+	    				</div><!-- End .soial-icons -->
+	            	</div><!-- End .wishlist-share -->
+            	</div><!-- End .container -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <%- include('../Layouts/User/footer') -%>
+        
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+        <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
+
+
+        <script>
+            document.querySelectorAll('.size-circle.available').forEach(circle => {
+                circle.addEventListener('click', function () {
+
+                    // Get the size, product ID, and variant ID
+                    const size = this.getAttribute('data-size');
+                    const variantId = this.getAttribute('data-variant-id');
+
+                    const data = {
+                        variantId: variantId,
+                        size: size,
+                        quantity: 1
+                    };
+                    addToCart(data);
+                });
+            });
+
+
+            function addToCart(data) {
+
+                fetch('/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            var notyf = new Notyf({
+                                position: {
+                                    x: 'center',
+                                    y: 'center'
+                                }
+                            });
+                            notyf.success(data.message)
+                        }
+                        else if (!data.user) {
+
+                            window.location.href = '/authentication';
+                        } else {
+                            // Show error alert
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while adding the product to the cart.',
+                            icon: 'error',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            }
+
+        </script>
+            
+
+
+
+
+    <!-- Plugins JS File -->
+    <script src="/User/assets/js/jquery.min.js"></script>
+    <script src="/User/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/User/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="/User/assets/js/jquery.waypoints.min.js"></script>
+    <script src="/User/assets/js/superfish.min.js"></script>
+    <script src="/User/assets/js/owl.carousel.min.js"></script>
+    <!-- Main JS File -->
+    <script src="/User/assets/js/main.js"></script>
+</body>
+
+
+<!-- molla/wishlist.html  22 Nov 2019 09:55:06 GMT -->
+</html>

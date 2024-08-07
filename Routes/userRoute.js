@@ -55,6 +55,10 @@ router.post('/cart', authUser.authorization, cartController.addToCart)
 router.delete('/cart/:index/:cartId', authUser.authorization, cartController.removeFromCart)
 router.put('/cart/:index/:cartId', authUser.authorization, cartController.updateCart)
 
+//                       wishlist
+router.get('/wishlist', authUser.isLogin, cartController.wishlist)
+router.post('/wishlist', authUser.authorization, cartController.addToWishlist)
+
 //                              checkout
 router.get('/checkout', authUser.isLogin, authUser.isBlocked, orderController.loadCheckout)
 router.post('/coupon', authUser.authorization, orderController.validateCoupon)
@@ -62,8 +66,9 @@ router.post('/checkout', authUser.authorization, orderController.checkout)
 router.get('/checkout/success/:orderId', authUser.isLogin, authUser.isBlocked, orderController.confirmOrder)
 
 //                             order
-router.put('/order', authUser.authorization , orderController.cancelOrder)
-router.patch('/order', authUser.authorization, orderController.returnOrder)
+router.post('/order', authUser.authorization , orderController.updateOrderStatus)
+router.put('/order', authUser.authorization, orderController.updatePaymentStatus)
+router.patch('/order', authUser.authorization, orderController.retryPayment)
 
 //            404
 // router.get('/404', userController.fourNotFour)

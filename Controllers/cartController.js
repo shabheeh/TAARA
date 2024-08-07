@@ -3,6 +3,7 @@ const Cart = require("../Models/cartModel");
 const Product = require("../Models/productModel");
 const Variant = require("../Models/variantModel");
 const Offer = require('../Models/offerModel')
+const Wishlist = require('../Models/wishlistModel')
 
 // -------View Cart--------->
 
@@ -82,6 +83,7 @@ const cart = async (req, res) => {
 
 
 // ------Add to Cart------>
+
 const addToCart = async (req, res) => {
   try {
     const { variantId, quantity } = req.body;
@@ -271,10 +273,115 @@ const updateCart = async (req, res) => {
   }
 };
 
+// -----wishlist------>
+
+const wishlist = async ( req, res ) => {
+  try {
+    const userId = req.userId
+
+    const [user, wishlist, cart] = await Promise.all([
+      User.findById(userId),
+      Wishlist.findOne({user: userId}).populate('products.product').populate('products.variant'),
+      Cart.findOne({ user: userId}).populate('products.product').populate('products.variant'),
+    ])
+    
+
+    let totalPrice = 0;
+        if (cart && cart.products.length > 0) {
+            totalPrice = cart.products.reduce((total, product) => {
+                const quantity = Math.max(product.quantity, 1);
+                return total + (product.product.price * quantity);
+            }, 0);
+        }
+    res.render('wishlist', {
+      wishlist: wishlist || { products: [] },
+      user,
+      cart: cart || { products: [] },
+      totalPrice,
+    })
+  } catch (error) {
+    console.log('error loading wishlist', error.message)
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+
+// ------Add to Cart------>
+
+const addToWishlist = async (req, res) => {
+  try {
+    const { variantId } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.json({
+        success: false,
+        user: false,
+        message: "User not authenticated.",
+      });
+    }
+
+    const user = await User.findById(userId);
+    const variant = await Variant.findById(variantId);
+    const productId = variant.product;
+    const product = await Product.findById(productId);
+
+    const existingWishlist = await Wishlist.findOne({ user: userId });
+
+    if (existingWishlist) {
+      const existingProduct = existingWishlist.products.find(
+        (product) =>
+          product.product.toString() === productId.toString() &&
+          product.variant.toString() === variantId.toString()
+      );
+
+      if (existingProduct) {
+        return res.json({
+          success: false,
+          user: true,
+          message: 'Product already in the wishlist'
+        });
+      } else {
+        existingWishlist.products.push({
+          product: product._id, 
+          variant: variant._id,
+        });
+        await existingWishlist.save();
+      }
+    } else {
+      const wishlist = new Wishlist({
+        user: user._id,
+        products: [
+          {
+            product: product._id,
+            variant: variant._id,
+          },
+        ],
+      });
+      await wishlist.save();
+    }
+
+    return res.json({
+      success: true,
+      user: true,
+      message: "Added to wishlist",
+    });
+  } catch (error) {
+    console.log("Error adding product to Wishlist", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while adding the product to the wishlist.",
+    });
+  }
+};
+
 
 module.exports = {
   cart,
   addToCart,
   removeFromCart,
-  updateCart
+  updateCart,
+
+  wishlist,
+  addToWishlist,
 };

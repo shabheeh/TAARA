@@ -75,6 +75,7 @@ const addOffer = async (req, res) => {
 const updateOffer = async (req, res) => {
     try {
         const { id, title, description, discount, status, type } = req.body;
+
         let offerData = {
             title,
             description,
@@ -197,7 +198,7 @@ const coupons = async ( req, res ) => {
 
 const addCoupon = async (req, res) => {
     try {
-        const { name, code, description, amount, discount, maxUses, status, expires } = req.body;
+        const { name, code, description, amount, discount, maxDiscount, maxUses, status, expires } = req.body;
 
         // Check if a coupon with the same code already exists
         const existingCoupon = await Coupon.findOne({ code: code });
@@ -214,6 +215,7 @@ const addCoupon = async (req, res) => {
             description,
             amount,
             discount,
+            maxDiscount,
             maxUses,
             status,
             expires
@@ -246,7 +248,7 @@ const addCoupon = async (req, res) => {
 
 const updateCoupon = async (req, res) => {
     try {
-        const { id, name, code, description, amount, discount, maxUses, status, expires } = req.body;
+        const { id, name, code, description, amount, discount, maxDiscount, maxUses, status, expires } = req.body;
 
         // Check if another coupon with the same code already exists
         const existingCoupon = await Coupon.findOne({ code: code, _id: { $ne: id } });
@@ -264,6 +266,7 @@ const updateCoupon = async (req, res) => {
             description,
             amount,
             discount,
+            maxDiscount,
             maxUses,
             status,
             expires

@@ -111,7 +111,7 @@ router.put(
     { name: "productImage1", maxCount: 1 },
     { name: "productImage2", maxCount: 1 },
     { name: "productImage3", maxCount: 1 },
-    { name: "productImage4", maxCount: 1 },
+    { name: "productImage4", maxCount: 1 }, 
   ]),
   productController.editVariant
 );
@@ -132,7 +132,8 @@ router.post('/coupons', authAdmin.isLogin, offerController.addCoupon)
 router.put('/coupons', authAdmin.isLogin, offerController.updateCoupon)
 router.delete('/coupons', authAdmin.isLogin, offerController.deleteCoupon)
 
-
+//                 sales mangement
+// router.get("/sales", authAdmin.isLogin, orderController.sales)
 
 
 

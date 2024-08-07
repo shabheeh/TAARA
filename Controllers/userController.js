@@ -4,6 +4,7 @@ const Token = require("../Models/resetToken");
 const Cart = require('../Models/cartModel')
 const Address = require('../Models/addressModel')
 const Order = require('../Models/orderModel')
+const Wallet = require('../Models/walletModel')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -35,10 +36,11 @@ const loadHome = async (req, res) => {
             });
         }
 
-        const user = await User.findById(req.userId);
-
+        const [user, cart ] = await Promise.all([
+            User.findById(req.userId),
+            Cart.findOne({ user: req.userId }).populate('products.product').populate('products.variant'),
+        ])
         
-        const cart = await Cart.findOne({ user: req.userId }).populate('products.product').populate('products.variant');
 
         if (!cart || cart.products.length === 0) {
             // Handle case where cart is empty
@@ -494,69 +496,58 @@ const signout = async (req, res) => {
 
 // ------User Account------>
 
-const userAccount = async ( req, res) => {
+const userAccount = async (req, res) => {
     try {
-        if (req.userId) {
-            const userId = req.userId
-            const user = await User.findById(userId)
-            const addresses = await Address.find({user: req.userId})
-            const orders = await Order.find({user: userId}).populate('products.product').populate('products.variant').sort({ createdAt: -1 })
-
-            
-
-        
-        const cart = await Cart.findOne({ user }).populate('products.product').populate('products.variant');
-
-        if (!cart || cart.products.length === 0) {
-            // Handle case where cart is empty
-                cart: { products: [] }  
-            
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).render('404', { message: 'User not found' });
         }
+
+        const [addresses, orders, wallet, cart] = await Promise.all([
+            Address.find({ user: userId }),
+            Order.find({ user: userId }).populate('products.product').populate('products.variant').sort({ createdAt: -1 }),
+            Wallet.findOne({ user: userId }),
+            Cart.findOne({ user: userId }).populate('products.product').populate('products.variant')
+        ]);
 
         let totalPrice = 0;
-
-        cart.products.forEach((product) => {
-            const quantity = product.quantity > 0 ? product.quantity : 1;
-            totalPrice += product.product.price * quantity;
-          });
-
-            // creating deep copy for not manupulating the orders
-            const ordersCopy = JSON.parse(JSON.stringify(orders));
-
-            // cancelled orders
-            const cancelledOrders = ordersCopy.filter(order => {
-                let isCancelled = false;
-                order.products = order.products.filter(product => {
-                    if (product.status === 'Cancelled') {
-                        isCancelled = true;
-                        return true;
-                    }
-                    return false;
-                });
-                return isCancelled;
-            });
-
-            
-
-               return res.render('user', {
-                    user,
-                    addresses: addresses ? addresses : null,
-                    orders: orders ? orders : null,
-                    cancelledOrders: cancelledOrders ? cancelledOrders : null,
-                    cart,
-                    totalPrice
-                    })
-            
-
-        } else {
-            return res.redirect('/authentication');
+        if (cart && cart.products.length > 0) {
+            totalPrice = cart.products.reduce((total, product) => {
+                const quantity = Math.max(product.quantity, 1);
+                return total + (product.product.price * quantity);
+            }, 0);
         }
 
-        }catch (error){
-            console.log(error.message + ' user userAccount');
-            res.render('404')
+        // Creating deep copy for not manipulating the original orders
+        const ordersCopy = JSON.parse(JSON.stringify(orders));
+
+        // Cancelled orders
+        const cancelledOrders = ordersCopy.filter(order => {
+            order.products = order.products.filter(product => product.status === 'Cancelled');
+            return order.products.length > 0;
+        });
+
+        // sort transactionsin last in first order
+        if (wallet && wallet.transactions) {
+            wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         }
-}
+
+        return res.render('user', {
+            user,
+            addresses: addresses || [],
+            orders: orders || [],
+            cancelledOrders: cancelledOrders || [],
+            cart: cart || { products: [] },
+            totalPrice,
+            wallet: wallet || null
+        });
+
+    } catch (error) {
+        console.error('Error in userAccount:', error);
+        res.status(500).render('error', { message: 'An error occurred while fetching user account details' });
+    }
+};
 
 
 // -----Update Profile----->

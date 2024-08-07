@@ -196,7 +196,7 @@
                       
                       <!-- Modal -->
                       <div class="modal fade" id="editModal<%= product._id %>" tabindex="-1"
-                        aria-labelledby="editModalLabel<%= product._id %>" aria-hidden="true">
+                        aria-labelledby="editModalLabel<%= product._id %>" >
                         <div class="modal-dialog modal-lg">
                           <div class="modal-content">
                             <!-- Modal Header -->
@@ -540,6 +540,9 @@
                     }
                 });
             } else {
+              const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
+                console.log(modal)
+                modal.hide();
                 // Show error alert
                 Swal.fire({
                     title: 'Error',

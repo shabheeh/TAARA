@@ -191,6 +191,7 @@ const editProduct = async (req, res) => {
   } catch (error) {
     console.log("Error Editing Product", error.message);
     res.json({
+      id: req.body.id,
       success: false,
       message: "An error occurred while updating the product",
     });
@@ -449,12 +450,12 @@ const productsGrid = async (req, res) => {
     const { title } = req.params;
     const { categories, brands, sizes, color, gender, sortProducts, search } = req.query;
 
-    // get listed categories and brands 
+    // get listed categories and brands
     const listedCategories = await Category.find({ isListed: true }, '_id');
     const listedBrands = await Brand.find({ isListed: true }, '_id');
 
     // initial match
-    let matchStage = { 
+    let matchStage = {
       isListed: true,
       category: { $in: listedCategories.map(c => c._id) },
       brand: { $in: listedBrands.map(b => b._id) }
@@ -526,6 +527,9 @@ const productsGrid = async (req, res) => {
       });
     }
 
+    // Create a copy of the pipeline for counting
+    const countPipeline = [...pipeline];
+
     // Add sorting stage
     pipeline.push({
       $sort: sortProducts ? getSortStage(sortProducts) : { createdAt: -1 }
@@ -545,8 +549,7 @@ const productsGrid = async (req, res) => {
 
     const products = await Product.aggregate(pipeline);
 
-    // count total products
-    const countPipeline = pipeline.slice(0, -2); // Remove skip and limit stages
+    // Count total products
     countPipeline.push({ $count: 'total' });
     const totalProductsResult = await Product.aggregate(countPipeline);
     const totalProducts = totalProductsResult[0] ? totalProductsResult[0].total : 0;

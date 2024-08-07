@@ -172,8 +172,14 @@
                             </div>
                         </td>
                         <td>
-                            <h6 class="mb-0 w-px-100 d-flex align-items-center text-warning"><i
-                                    class="ri-circle-fill ri-10px me-1"></i>Pending</h6>
+                            <h6 class="mb-0 w-px-100 d-flex align-items-center
+                            <% if (order.paymentStatus === 'Pending') { %>text-primary
+                              <% } else if (order.paymentStatus === 'Paid') { %>text-success
+                              <% } else { %>
+                               text-danger
+                              <% } %>
+                            "><i
+                                    class="ri-circle-fill ri-10px me-1"></i><%= order.paymentStatus %></h6>
                         </td>
                         <td>
                             <div class="d-flex align-items-center text-nowrap"><span><%= order.payment %></span></div>
