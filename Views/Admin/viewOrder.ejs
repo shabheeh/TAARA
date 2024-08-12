@@ -218,15 +218,19 @@
               <tbody>
                 <tr>
                     <td>Subtotal</td>
-                    <td>Rs.<%= order.totalPrice - order.shippingCharge %></td>   
+                    <td>Rs.<%= order.originalSubTotal %></td>   
                 </tr>
+                <tr>
+                  <td>Total Discount</td>
+                  <td>Rs.<%= order.originalSubTotal - order.discountedSubTotal %></td>   
+              </tr>
                 <tr>
                     <td>Shipping</td>
                     <td>Rs.<%= order.shippingCharge %></td>   
                 </tr>
                 <tr>
                     <td><strong>Total</strong></td>
-                    <td><strong>Rs.<%= order.totalPrice %></strong></td>   
+                    <td><strong>Rs.<%= order.finalTotal %></strong></td>   
                 </tr>
                 
     

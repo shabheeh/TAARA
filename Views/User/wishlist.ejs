@@ -37,6 +37,9 @@
             background-color: #f0f0f0;
             border: 1px solid #c96;
         }
+        .price-original {    
+            text-decoration: line-through;
+        }
     </style>
 </head>
 
@@ -63,21 +66,23 @@
 
             <div class="page-content">
             	<div class="container">
-					<table class="table table-wishlist table-mobile">
-						<thead>
-							<tr>
-								<th>Product</th>
-								<th>Price</th>
-								<th>Stock Status</th>
-								<th></th>
-								<th></th>
-							</tr>
-						</thead>
-
-						<tbody>
-                            <% if (wishlist && wishlist.products.length > 0 ) { %>
-                                <% wishlist.products.forEach(current => { %>
-                                    <tr>
+                    <% if (wishlist && wishlist.products.length > 0 ) { %>
+                        <table class="table table-wishlist table-mobile">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Product</th>
+                                    <th class="">Price</th>
+                                    <th>Stock Status</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+    
+                            <tbody>
+                        <% wishlist.products.forEach((current, index) => { %>
+					
+                            
+                                    <tr id="wishlistItem-<%= current.variant._id %>">
                                         <td class="product-col">
                                             <div class="product">
                                                 <figure class="product-media">
@@ -91,8 +96,18 @@
                                                 </h3><!-- End .product-title -->
                                             </div><!-- End .product -->
                                         </td>
-                                        <td class="price-col">Rs. <%= current.product.price %></td>
-                                        <td class="stock-col"><span class="in-stock">In stock</span></td>
+                                        <td class="price-col">
+                                            <span class="price-original text-danger">Rs.<%= current.product.price %></span>
+                                            <span class="price">Rs. <%= current.discountedPrice %></span>
+                                        </td>
+                                        <td class="stock-col">
+                                            <% if (current.variant.quantity === 0) { %>
+                                                <span class="out-of-stock">Out of Stock</span>
+                                                <% } else { %>
+                                                <span class="in-stock">In Stock</span>
+                                            <% } %>
+
+                                        </td>
                                         <td class="action-col">
                                             <div class="dropdown">
                                                 <button class="btn btn-block btn-outline-primary-2" data-toggle="dropdown" aria-haspopup="true"
@@ -114,10 +129,13 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+                                        <td class="remove-col">
+                                            <button class="btn-remove removeItem" data-variantId="<%= current.variant._id %>" data-wishlist-id="<%= wishlist._id %>"><i class="icon-close"></i></button>
+                                        </td>
                                     </tr>
                                 <% }) %>
-                             
+                                <% } else { %>
+                                    <h4 class="text-center" style="color: rgb(102, 102, 102);">Your wishlist is empty. Add products to view </h4>
                             <% } %>
 							
 							
@@ -186,13 +204,13 @@
                             window.location.href = '/authentication';
                         } else {
                             // Show error alert
-                            Swal.fire({
-                                title: 'Error',
-                                text: data.message,
-                                icon: 'error',
-                                confirmButtonColor: '#d33',
-                                confirmButtonText: 'OK'
+                            var notyf = new Notyf({
+                                position: {
+                                    x: 'center',
+                                    y: 'center'
+                                }
                             });
+                            notyf.error(data.message)
                         }
                     })
                     .catch(error => {
@@ -209,7 +227,38 @@
 
         </script>
             
+<script>
 
+document.querySelectorAll('.removeItem').forEach(button => {
+    button.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const variantId = button.getAttribute('data-variantId');
+        const wishlistId = button.getAttribute('data-wishlist-id');
+        console.log(variantId)
+        removeFromWishlist(variantId, wishlistId);
+    });
+});
+
+function removeFromWishlist(variantId, wishlistId) {
+    fetch(`/wishlist/${variantId}/${wishlistId}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`wishlistItem-${variantId}`).remove();
+
+        } else {
+            console.error(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
 
 
 

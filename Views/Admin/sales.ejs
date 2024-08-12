@@ -1,0 +1,402 @@
+<%- include('../Layouts/Admin/header') -%>
+
+
+  <!-- Vendors CSS -->
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/typography.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/katex.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/editor.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/dropzone/dropzone.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/flatpickr/flatpickr.css">
+  <link rel="stylesheet" href="/Admin/assets/vendor/libs/tagify/tagify.css" />
+  
+
+  <!-- Page CSS -->
+
+
+  <!-- Helpers -->
+  <script src="/Admin/assets/vendor/js/helpers.js"></script>
+
+  <script src="/Admin/assets/js/config.js"></script>
+
+  <style>
+    .error-message {
+        color: red !important;
+    }
+    .textSize {
+        font-size: 16px !important;
+    }
+    
+</style>
+
+  </head>
+
+  
+
+
+  <%- include('../Layouts/Admin/navbar') -%>
+
+
+
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+
+      <!-- Content -->
+
+      <div class="container-xxl flex-grow-1 container-p-y">
+
+          <div class="d-flex flex-column justify-content-center my-5">
+            <div class="card">
+                <div class="card-body">
+                        <h4 class="text-center">Sales Report</h4>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="textSize">
+                                    Total Sales: <%= salesData.totalSalesCount %>
+                                </span>
+                                <br>
+                                <span class="textSize">
+                                    Total Amount: <%= salesData.totalOriginalSum %>
+                                </span>
+                                <br>
+                                <span class="textSize">
+                                    Total Discount: <%= salesData.totalDiscount %>
+                                </span>
+                                <br>
+                                <span class="textSize">
+                                    Total Income: <%= salesData.totalDiscountedSum %>
+                                </span>
+                            </div>
+
+                            <div>
+                                <span class="textSize">
+                                    Date: <%= new Date().toLocaleDateString('en-US', { month: 'short', day : 'numeric', year: 'numeric' }) %>
+                                </span>
+                                
+                                <br>
+                                <span class="textSize">
+                                
+                                </span>
+                            </div>
+
+                        </div>
+                        
+            
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Filter</h5>
+                <form id="filter-form">
+                <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+                    <div class="col-md-2">
+                        <select id="filter-sales" name="filterSales" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
+                            <option value="all">All</option>
+                            <option value="daily" <%= filterSales === 'daily' ? 'selected' : '' %>>Daily</option>
+                            <option value="weekly" <%= filterSales === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                            <option value="monthly" <%= filterSales === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                            <option value="yearly" <%= filterSales === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                            <option value="custom" <%= filterSales === 'custom' ? 'selected' : '' %>>Custom</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 product_category ">
+                        <div class="form-floating form-floating-outline date-range" style="display: none;">
+                            <input type="date" value="<%= startDate %>" name="startDate" id="startDate" class="form-control">
+                            <label id="startLabel" for="startDate">Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 product_category">
+                        <div class="form-floating form-floating-outline date-range" style="display: none;">
+                            <input type="date" value="<%= endDate %>" name="endDate" id="endDate" class="form-control">
+                            <label id="endLabel" for="endDate">End Date</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <div class="dt-action-buttons d-flex align-items-center gap-2">
+                            <div class="btn-group">
+                                <button class="btn btn-secondary dropdown-toggle btn-outline-secondary waves-effect waves-light" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ri-download-line ri-16px me-2"></i><span class="d-none d-sm-inline-block">Export</span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                    <li><a class="dropdown-item" href="/admin/sales/pdf?<%= new URLSearchParams(query).toString() %>">PDF</a></li>
+                                    <li><a class="dropdown-item" href="/admin/sales/excel?<%= new URLSearchParams(query).toString() %>">Excel</a></li>
+
+                                    
+                                </ul>
+                            </div>
+                            <button type="submit" id="gnrt-btn" class="btn btn-secondary add-new btn-primary waves-effect waves-light">
+                                <span class=" d-sm-inline-block">Generate</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                    <div class="card-header d-flex border-top rounded-0 flex-wrap py-0 pb-5 pb-md-0">
+                        <div class="d-flex justify-content-between align-items-center w-100 my-5">
+                            
+                        </div>
+                    </div>
+                    
+                
+              <table class="datatables-products table dataTable no-footer dtr-column collapsed" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
+                <thead>
+                    <tr>
+                        <th>order</th>
+                        <th>date</th>
+                        <th>product</th>
+                        <th>customers</th>
+                        <th>payment</th>
+                        <th>price</th>
+                        <th>dicount</th>
+                        <th>quantity</th>
+                        <th>total</th>
+                      </tr>
+                </thead>
+                <tbody>
+                  <% if ( orders.length> 0) { %>
+                    <% orders.forEach((order, index)=> { %>
+                        <% order.products.forEach(product => { %>
+                            <tr>
+                                <td><a href="/admin/order/<%= order._id %>"><span><%= order.orderId %></span></a></td>
+                                <td class="sorting_1"><span class="text-nowrap"><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day : 'numeric', year: 'numeric' }) %></span></td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= product.product.name %></span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-start align-items-center user-name">
+                                        <div class="d-flex flex-column"><a href="pages-profile-user.html"
+                                                class="text-truncate text-heading"><span class="fw-medium"><%= order.user.firstName ? order.user.firstName : 'Name' %></span></a><small class="text-truncate"><%= order.user.email %></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= order.payment %></span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= product.discountedPrice %></span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= product.product.price - product.discountedPrice %></span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= product.quantity %></span></div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-nowrap"><span><%= product.totalPrice %></span></div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% }) %>
+                        <% } %>
+                      
+                </tbody>
+              </table>
+              <div class="row mx-1">
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                    Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalOrders) %> of <%= totalOrders %>
+                          entries
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                  <div class="dataTables_paginate" >
+                    <ul class="pagination">
+                      <li class="paginate_button page-item  <%= page === 1 ? 'disabled' : '' %>">
+                        <a href="?page=<%= page - 1 %><%= filterSales ? '&filterSales=' + encodeURIComponent(filterSales) : '' %>"
+                          class="page-link">Previous</a>
+                      </li>
+                      <% for (let i=1; i <=totalPages; i++) { %>
+                        <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                          <a href="?page=<%= i %><%= filterSales ? '&filterSales=' + encodeURIComponent(filterSales) : '' %>"
+                            class="page-link">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                          <li class="paginate_button page-item  <%= page === totalPages ? 'disabled' : '' %>">
+                            <a href="?page=<%= page + 1 %><%= filterSales ? '&filterSales=' + encodeURIComponent(filterSales) : '' %>"
+                              class="page-link">Next</a>
+                          </li>
+                    </ul>
+                  </div>
+              
+                </div>
+              </div>
+              <div style="width: 1%;"></div>
+            </div>
+          </div>
+        </div>
+
+
+        
+        
+      </div>
+      <!-- / Content -->
+
+
+
+
+
+      <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+    </div>
+    <!-- / Layout page -->
+    </div>
+
+
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+
+    </div>
+    <!-- / Layout wrapper -->
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.getElementById('filter-form');
+            const filterSales = document.getElementById('filter-sales');
+            const dateRangeInputs = document.querySelectorAll('.date-range');
+            const paginationLinks = document.querySelectorAll('.pagination a.page-link');
+            const generateButton = document.getElementById('gnrt-btn');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+        
+            function updateURLParams() {
+                const params = new URLSearchParams(new FormData(filterForm));
+                return params;
+            }
+        
+            function handleGenerateClick(event) {
+                event.preventDefault();
+                if (validateDates()) {
+                    const params = updateURLParams();
+                    window.location.href = `/admin/sales?${params.toString()}`;
+                }
+            }
+        
+            function handlePagination(event) {
+                event.preventDefault();
+                const page = event.target.getAttribute('data-page');
+                const params = updateURLParams();
+                params.set('page', page);
+                window.location.href = `/admin/sales?${params.toString()}`;
+            }
+        
+            function toggleDateRangeInputs() {
+                const isCustom = filterSales.value === 'custom';
+                dateRangeInputs.forEach(input => {
+                    input.style.display = isCustom ? 'block' : 'none';
+                });
+            }
+        
+            function validateDates() {
+                if (filterSales.value !== 'custom') {
+                    return true;  // No validation needed for non-custom filters
+                }
+        
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);  // Set to beginning of today
+        
+                if (startDate >= today) {
+                    document.getElementById('startLabel').textContent = 'Start date must be in the past.'
+                    document.getElementById('startLabel').classList.add('error-message')
+                    return false;
+                } else {
+                    document.getElementById('startLabel').textContent = 'Start Date'
+                    document.getElementById('startLabel').classList.remove('error-message')
+                }
+        
+                if (endDate < startDate) {
+                    document.getElementById('endLabel').textContent = 'End date should be after start'
+                    document.getElementById('endLabel').classList.add('error-message')
+                    return false;
+                } else {
+                    document.getElementById('endLabel').textContent = 'End Date'
+                    document.getElementById('endLabel').classList.remove('error-message')
+                }
+        
+                return true;
+            }
+        
+            filterSales.addEventListener('change', toggleDateRangeInputs);
+        
+            generateButton.addEventListener('click', handleGenerateClick);
+        
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', handlePagination);
+            });
+        
+            // Initialize date range visibility
+            toggleDateRangeInputs();
+        
+            // Set max date for date inputs
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const maxDate = yesterday.toISOString().split('T')[0];
+            startDateInput.setAttribute('max', maxDate);
+            endDateInput.setAttribute('max', maxDate);
+        
+            // Add event listeners for date inputs
+            startDateInput.addEventListener('change', function() {
+                endDateInput.setAttribute('min', this.value);
+            });
+        
+            endDateInput.addEventListener('change', function() {
+                startDateInput.setAttribute('max', this.value);
+            });
+        });
+        </script>
+
+
+
+
+    <!-- Core JS -->
+    <!-- bui:Admin assets/vendor/js/core.js -->
+    <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+    <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+    <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+    <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+    <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+    <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+    
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="/Admin/assets/vendor/libs/quill/katex.js"></script>
+    <script src="/Admin/assets/vendor/libs/quill/quill.js"></script>
+    <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+    <script src="/Admin/assets/vendor/libs/dropzone/dropzone.js"></script>
+    <script src="/Admin/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
+    <script src="/Admin/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="/Admin/assets/vendor/libs/tagify/tagify.js"></script>
+
+    <!-- Main JS -->
+    <script src="/Admin/assets/js/main.js"></script>
+

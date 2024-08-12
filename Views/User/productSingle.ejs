@@ -499,13 +499,13 @@
                     window.location.href = '/authentication';
                 } else {
                     // Show error alert
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message,
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
+                    var notyf = new Notyf({
+                        position: {
+                            x: 'center',
+                            y: 'center'
+                        }
                     });
+                    notyf.error(data.message)
                 }
             })
             .catch(error => {
@@ -575,7 +575,7 @@ function addToWishlist(data) {
             console.error('Error:', error);
             Swal.fire({
                 title: 'Error',
-                text: 'An error occurred while adding the product to the cart.',
+                text: 'An error occurred while adding the product to the wishlist.',
                 icon: 'error',
                 confirmButtonColor: '#d33',
                 confirmButtonText: 'OK'

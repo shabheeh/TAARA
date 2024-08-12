@@ -196,7 +196,7 @@
                                         </thead>
                                         <tbody>
                                             <% cart.products.forEach((current, index) => { %>
-                                                <tr id="cartItem-<%= index %>">
+                                                <tr id="cartItem-<%= current.variant._id %>">
                                                     <td class="product-col">
                                                         <div class="product">
                                                             <figure class="product-media">
@@ -222,7 +222,7 @@
                                                             <% if (current.variant.quantity === 0) { %>
                                                                 <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
                                                             <% } else { %>
-                                                                <input type="number" id="updateCart-<%= index %>" data-index="<%= index %>" data-cart-id="<%= cart._id %>" class="form-control" value="<%= current.quantity %>" min="1" max="<%= Math.min(current.variant.quantity, 5) %>" step="1" data-decimals="0">
+                                                                <input type="number" id="updateCart-<%= current.variant._id %>" data-variantId="<%= current.variant._id %>" data-cart-id="<%= cart._id %>" class="form-control" value="<%= current.quantity %>" min="1" max="<%= Math.min(current.variant.quantity, 5) %>" step="1" data-decimals="0">
                                                                 <% if (current.variant.quantity < 5) { %>
                                                                     <span style="color: red;">
                                                                         Only <%= current.variant.quantity %> left in
@@ -241,7 +241,7 @@
                                                     <% } %>
                                                     
                                                     <td class="remove-col">
-                                                        <button class="btn-remove removeItem" data-index="<%= index %>" data-cart-id="<%= cart._id %>"><i class="icon-close"></i></button>
+                                                        <button class="btn-remove removeItem" data-variantId="<%= current.variant._id %>" data-cart-id="<%= cart._id %>"><i class="icon-close"></i></button>
                                                     </td>
                                                 </tr>
                                                 <% }); %>
@@ -284,7 +284,7 @@
                                             </tbody>
                                         </table><!-- End .table table-summary -->
                                         <% if (filteredProducts.length > 0) { %>
-                                            <a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+                                            <button onclick="proceedToCheckout()" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</button>
                                         <% } %>
                                         
                                     </div><!-- End .summary -->
@@ -301,26 +301,27 @@
         </main><!-- End .main -->
 
         <%- include('../Layouts/User/footer') -%>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 
     <script>
         document.querySelectorAll('.removeItem').forEach(button => {
     button.addEventListener('click', (event) => {
         event.preventDefault();
 
-        const index = button.getAttribute('data-index');
+        const variantId = button.getAttribute('data-variantId');
         const cartId = button.getAttribute('data-cart-id');
-        removeFromCart(index, cartId);
+        removeFromCart(variantId, cartId);
     });
 });
 
-function removeFromCart(index, cartId) {
-    fetch(`/cart/${index}/${cartId}`, {
+function removeFromCart(variantId, cartId) {
+    fetch(`/cart/${variantId}/${cartId}`, {
         method: 'DELETE',
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.getElementById(`cartItem-${index}`).remove();
+            document.getElementById(`cartItem-${variantId}`).remove();
             updateCartSummary(data.cart);
         } else {
             console.error(data.message);
@@ -336,9 +337,9 @@ function updateCartSummary(cart) {
     const shippingCharge = (subTotal <= 500 && subTotal !== 0) ? 50 : 0;
     const totalPrice = subTotal + shippingCharge;
 
-    document.getElementById('subtotal').textContent = `Rs.${subTotal.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = `Rs.${Math.round(subTotal).toFixed(2)}`;
     document.getElementById('shipping-charge').textContent = `Rs.${shippingCharge.toFixed(2)}`;
-    document.getElementById('total-price').textContent = `Rs.${totalPrice.toFixed(2)}`;
+    document.getElementById('total-price').textContent = `Rs.${Math.round(totalPrice).toFixed(2)}`;
 }
 
 
@@ -346,12 +347,12 @@ document.querySelectorAll('input[id^="updateCart-"]').forEach(input => {
     input.addEventListener('change', (event) => {
         event.preventDefault();
 
-        const index = input.getAttribute('data-index');
+        const variantId = input.getAttribute('data-variantId');
         const cartId = input.getAttribute('data-cart-id');
         const quantity = input.value;
 
         const data = {
-            index,
+            variantId,
             cartId,
             quantity
         };
@@ -361,7 +362,7 @@ document.querySelectorAll('input[id^="updateCart-"]').forEach(input => {
 });
 
 function updateCart(data) {
-    fetch(`/cart/${data.index}/${data.cartId}`, {
+    fetch(`/cart/${data.variantId}/${data.cartId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -371,13 +372,14 @@ function updateCart(data) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const product = data.cart.products[data.index];
+            // Find the product in the cart based on variantId
+            const product = data.cart.products.find(p => p.variant._id === data.variantId);
             if (product) {
                 // Update the quantity displayed
-                document.querySelector(`#updateCart-${data.index}`).value = product.quantity;
+                document.querySelector(`#updateCart-${data.variantId}`).value = product.quantity;
 
                 // Update the total for the specific item with discounted price
-                document.querySelector(`#cartItem-${data.index} .total-col`).textContent = `Rs.${(product.discountedPrice * product.quantity).toFixed(2)}`;
+                document.querySelector(`#cartItem-${data.variantId} .total-col`).textContent = `Rs.${Math.round(product.discountedPrice * product.quantity).toFixed(2)}`;
 
                 // Update the cart summary using backend-calculated values
                 document.getElementById('original-subtotal').textContent = `Rs.${data.originalSubTotal.toFixed(2)}`;
@@ -386,24 +388,57 @@ function updateCart(data) {
                 document.getElementById('total-price').textContent = `Rs.${data.totalPriceCart.toFixed(2)}`;
 
                 // Calculate and display savings
-                const savings = data.originalSubTotal - data.discountedSubTotal;
-                document.getElementById('total-savings').textContent = `Rs.${savings.toFixed(2)}`;
+                // const savings = data.originalSubTotal - data.discountedSubTotal;
+                // document.getElementById('total-savings').textContent = `Rs.${savings.toFixed(2)}`;
             } else {
-                console.error(`Product at index ${data.index} not found in cart.`);
+                console.log(`Product with variantId ${data.variantId} not found in cart.`);
             }
         } else {
-            console.error(data.message);
+            console.log(data.message);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.log('Error:', error);
     });
 }
+
 
     
     </script>
     
-    
+    <script>
+
+async function proceedToCheckout() {
+  try {
+    const cartId = '<%= cart._id %>';
+    const response = await fetch('/toCheckout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ cart: cartId }),
+    });
+    const data = await response.json();
+    if (data.success) {
+      window.location.href = '/checkout';
+    } else {
+      // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: data.message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
+    }
+  } catch (error) {
+    console.error('Error proceeding to checkout:', error);
+    alert('An error occurred while proceeding to checkout. Please try again.');
+  }
+}
+
+
+    </script>
 
     <!-- Plugins JS File -->
     <script src="/User/assets/js/jquery.min.js"></script>

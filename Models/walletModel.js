@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const WalletSchema = new mongoose.Schema({
+    
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -26,6 +27,14 @@ const WalletSchema = new mongoose.Schema({
 
             date: {
                 type: Date,
+            },
+
+            orderId: {
+                type: String
+            },
+
+            product: {
+                type: String
             }
 
         }

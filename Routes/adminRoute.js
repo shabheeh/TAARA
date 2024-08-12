@@ -2,13 +2,6 @@ const express = require("express");
 const router = express();
 const path = require("path");
 const upload = require("../Middlewares/multerConfig");
-
-
-//        Set view and  static
-
-router.set("views", path.join(__dirname, "..", "Views", "Admin"));
-router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
-
 //          middlewares
 const authAdmin = require("../Middlewares/authAdmin");
 
@@ -17,6 +10,13 @@ const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController");
 const orderController = require("../Controllers/orderController");
 const offerController = require("../Controllers/offerController")
+
+
+//        Set view and  static
+
+router.set("views", path.join(__dirname, "..", "Views", "Admin"));
+router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
+
 
 //           admin login and dashboard
 router.get("/", authAdmin.isLogin, adminController.login);
@@ -133,7 +133,9 @@ router.put('/coupons', authAdmin.isLogin, offerController.updateCoupon)
 router.delete('/coupons', authAdmin.isLogin, offerController.deleteCoupon)
 
 //                 sales mangement
-// router.get("/sales", authAdmin.isLogin, orderController.sales)
+router.get("/sales", authAdmin.isLogin, orderController.sales)
+router.get('/sales/pdf', authAdmin.isLogin, orderController.generatePdf)
+router.get('/sales/excel', authAdmin.isLogin, orderController.generateExcel)
 
 
 

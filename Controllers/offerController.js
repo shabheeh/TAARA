@@ -200,7 +200,7 @@ const addCoupon = async (req, res) => {
     try {
         const { name, code, description, amount, discount, maxDiscount, maxUses, status, expires } = req.body;
 
-        // Check if a coupon with the same code already exists
+        // check this coupon with the same code already exists
         const existingCoupon = await Coupon.findOne({ code: code });
         if (existingCoupon) {
             return res.json({

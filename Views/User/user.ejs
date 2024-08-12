@@ -475,7 +475,7 @@
                                                                                         <div class="align-items-end"><strong class="text-info" id="orderStatus<%= order._id %>-<%= current.variant._id %>"><%= current.status %></strong></div>
                                                                                     </div>
                                                                                     
-                                                                                    <p class="product-price-1 mb-0">Rs.<%= current.discountedPrice %></p>
+                                                                                    <p class="product-price-1 mb-0">Price: Rs.<%= current.discountedPrice %></p>
                                                                                     <p class="product-total mb-0">Total Quantity: <%= current.quantity %></p>
                                                                                     <p class="product-total mb-0">Total: Rs.<%= current.totalPrice %></p>
                                                                                     
@@ -517,7 +517,7 @@
                                                                         </div>
                                                                         <div>
                                                                             <div>Total</div>
-                                                                            <div><strong>Rs.<%= order.totalPrice %></strong></div>
+                                                                            <div><strong>Rs.<%= order.finalTotal %></strong></div>
                                                                         </div>
                                                                         <div>
                                                                             <div>Ship to</div>
@@ -527,7 +527,7 @@
                                                                             <div>Order # <%= order.orderId %></div>
                                                                             <div>
                                                                                 <a href="#" class="mr-2" data-toggle="collapse" data-target="#order-details-<%= index %>" >View order details</a>
-                                                                                <a href="#">View invoice</a>
+                                                                                <a href="/invoice/<%= order._id %>">View invoice</a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -552,15 +552,19 @@
                                                                                              id="orderStatus<%= order._id %>-<%= current.variant._id %>"><%= current.status %></strong></div>
                                                                                     </div>
                                                                                     
-                                                                                    <p class="product-price-1 mb-0">Rs.<%= current.discountedPrice %></p>
+                                                                                    <p class="product-price-1 mb-0">Price: Rs.<%= current.discountedPrice %></p>
                                                                                     <p class="product-total mb-0">Total Quantity: <%= current.quantity %></p>
-                                                                                    <p class="product-total mb-0">Total: Rs.<%= current.totalPrice %></p>
+                                                                                    <p class="product-total mb-0">Total: Rs.<%= current.discountedPrice * current.quantity %></p>
                                                                                     <% if (current.status === 'Cancelled') { %>
                                                                                         <p class="mb-0">Cancelled Date: <%= new Date(current.cancelDate).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
                                                                                         
                                                                                             <% } else { %>
                                                                                              
-                                                                                                <p class="mb-0">Return or replace items: Eligible through <%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></p>
+                                                                                                <p class="mb-0">
+                                                                                                    Return or replace items: Eligible through 
+                                                                                                    <%= new Date(order.createdAt.getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+                                                                                                  </p>
+                                                                                                  
                                                                                     <% } %>
                                                                                     
                                                                                     <div class=" mt-1">
@@ -680,7 +684,7 @@
                                                                         <div>Order # <%= order.orderId %></div>
                                                                         <div>
                                                                             <a href="#" class="mr-2" data-toggle="collapse" data-target="#order-details-<%= index %>">View order details</a>
-                                                                            <a href="#">View invoice</a>
+                                                                            <a href="/invoice/<%= order._id %>">View invoice</a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -741,7 +745,10 @@
                                                                       <div class="transaction-item d-flex justify-content-between align-items-center mb-2">
                                                                         <div>
                                                                           <p class="mb-0 font-weight-bold"><%= transaction.type %></p>
-                                                                          <small class="text-muted"><%= new Date(transaction.date).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></small>
+                                                                          <small class="text-muted"><%= new Date(transaction.date).toLocaleDateString('en-US', { month: 'long', day : 'numeric', year: 'numeric' }) %></small><br>
+                                                                          <small class="text-muted py-0"><%= transaction.orderId %></small><br>
+                                                                          <small class="text-muted mb-0"><%= transaction.product %></small>
+
                                                                         </div>
                                                                         <% if (transaction.entry === 'Credit') { %>
                                                                             <span class="text-success">+ ₹<%= transaction.amount %></span>

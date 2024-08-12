@@ -545,15 +545,15 @@ function addToCart(data) {
 
                     window.location.href = '/authentication';
                 } else {
-                    // Show error alert
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message,
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
+                                    // Show error alert
+                var notyf = new Notyf({
+                    position: {
+                        x: 'center',
+                        y: 'center'
+                    }
                     });
-                }
+                notyf.error(data.message)
+            }
             })
             .catch(error => {
                 console.error('Error:', error);

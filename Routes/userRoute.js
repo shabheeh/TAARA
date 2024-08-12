@@ -16,7 +16,7 @@ const cartController = require('../Controllers/cartController')
 const orderController = require('../Controllers/orderController')
 
 //             middlewares
-const authUser = require("../Middlewares/authUser")
+const authUser = require("../Middlewares/authUser");
 
 
 
@@ -52,12 +52,14 @@ router.delete('/deleteAddress', userController.deleteAddress)
 //                        cart
 router.get('/cart', authUser.isLogin, authUser.isBlocked, cartController.cart)
 router.post('/cart', authUser.authorization, cartController.addToCart)
-router.delete('/cart/:index/:cartId', authUser.authorization, cartController.removeFromCart)
-router.put('/cart/:index/:cartId', authUser.authorization, cartController.updateCart)
+router.delete('/cart/:variantId/:cartId', authUser.authorization, cartController.removeFromCart)
+router.put('/cart/:variantId/:cartId', authUser.authorization, cartController.updateCart)
+router.post('/toCheckout', authUser.authorization, cartController.proceedToCheckout)
 
 //                       wishlist
 router.get('/wishlist', authUser.isLogin, cartController.wishlist)
 router.post('/wishlist', authUser.authorization, cartController.addToWishlist)
+router.delete('/wishlist/:variantId/:wishlistId', authUser.authorization, cartController.removeFromWishlist)
 
 //                              checkout
 router.get('/checkout', authUser.isLogin, authUser.isBlocked, orderController.loadCheckout)
@@ -69,6 +71,7 @@ router.get('/checkout/success/:orderId', authUser.isLogin, authUser.isBlocked, o
 router.post('/order', authUser.authorization , orderController.updateOrderStatus)
 router.put('/order', authUser.authorization, orderController.updatePaymentStatus)
 router.patch('/order', authUser.authorization, orderController.retryPayment)
+router.get('/invoice/:orderId', authUser.authorization, orderController.generateInvoice)
 
 //            404
 // router.get('/404', userController.fourNotFour)
