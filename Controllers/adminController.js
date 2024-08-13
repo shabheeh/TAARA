@@ -1,7 +1,7 @@
 const User = require("../Models/userModel");
 const Category = require ("../Models/categoryModel")
-const Product = require ("../Models/productModel")
 const Brand = require("../Models/brandModel")
+const Order = require('../Models/orderModel')
 
 
 
@@ -23,17 +23,7 @@ const login = async (req, res) => {
 
 // ------Dashboard------>
 
-const loadHome = async (req, res) => {
 
-    try {
-        
-            res.render('adminHome')
-        
-        
-    } catch (error) {
-        console.log(error.message + ' user loadhome');
-    }
-}
 
 
 // ------Admin Signin------>
@@ -521,10 +511,248 @@ const editBrand = async (req, res) => {
 };
 
 
+// Function to get sales data
+const getSalesData = async (match = {}) => {
+    return Order.aggregate([
+      { $match: match },
+      { $unwind: '$products' },
+      {
+        $group: {
+          _id: '$products.product',
+          name: { $first: '$products.name' },
+          totalQuantity: { $sum: '$products.quantity' }
+        }
+      },
+      { $sort: { totalQuantity: -1 } }
+    ]);
+  };
+  
+  // Function to get chart data
+  const getChartData = (productSales, topCount = 3) => {
+    const topProducts = productSales.slice(0, topCount);
+    const topQuantity = topProducts.reduce((acc, product) => acc + product.totalQuantity, 0);
+    const othersQuantity = productSales.slice(topCount).reduce((acc, product) => acc + product.totalQuantity, 0);
+    const totalQuantity = topQuantity + othersQuantity;
+  
+    const chartData = topProducts.map(product => ({
+      name: product.name,
+      value: Math.round((product.totalQuantity / totalQuantity) * 100)
+    }));
+  
+    chartData.push({
+      name: 'Other Sales',
+      value: Math.round((othersQuantity / totalQuantity) * 100)
+    });
+  
+    return { chartData, totalSales: totalQuantity };
+  };
+  
+  // Function to get top N best-selling products
+  const getTopProducts = async (n = 10) => {
+    const productSales = await getSalesData({ paymentStatus: { $in: ["Paid", "Pending"] } });
+    return productSales.slice(0, n);
+  };
+  
+  // Function to get top N best-selling categories
+  const getTopCategories = async (n = 10) => {
+    return Order.aggregate([
+      { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
+      { $unwind: '$products' },
+      {
+        $group: {
+          _id: '$products.category',
+          name: { $first: '$products.category' },
+          totalQuantity: { $sum: '$products.quantity' }
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: n }
+    ]);
+  };
+  
+  // Function to get top N best-selling brands
+  const getTopBrands = async (n = 10) => {
+    return Order.aggregate([
+      { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
+      { $unwind: '$products' },
+      {
+        $group: {
+          _id: '$products.brand',
+          name: { $first: '$products.brand' },
+          totalQuantity: { $sum: '$products.quantity' }
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: n }
+    ]);
+  };
+  
+  const createMatchStage = (filterSales) => {
+    const currentDate = moment().startOf('day');
+    let matchStage = {
+        'paymentStatus': { $in: ["Paid", "Pending"] }
+    };
+
+    switch (filterSales) {
+      case 'daily':
+        matchStage.createdAt = {
+          $gte: currentDate.toDate(),
+          $lt: moment(currentDate).endOf('day').toDate()
+        };
+        break;
+      case 'weekly':
+        matchStage.createdAt = {
+          $gte: moment(currentDate).subtract(7, 'days').toDate(),
+          $lt: moment(currentDate).endOf('day').toDate()
+        };
+        break;
+      case 'monthly':
+        matchStage.createdAt = {
+          $gte: moment(currentDate).subtract(1, 'month').toDate(),
+          $lt: moment(currentDate).endOf('day').toDate()
+        };
+        break;
+      case 'yearly':
+        matchStage.createdAt = {
+          $gte: moment(currentDate).subtract(1, 'year').toDate(),
+          $lt: moment(currentDate).endOf('day').toDate()
+        };
+        break;
+      case 'custom':
+        if (startDate && endDate) {
+          matchStage.createdAt = {
+            $gte: moment(startDate).startOf('day').toDate(),
+            $lt: moment(endDate).endOf('day').toDate()
+          };
+        }
+        break;
+      default:
+        
+        break;
+    }
+  
+    return matchStage;
+  };
+
+
+  const dashboard = async (req, res) => {
+    try {
+      const productSales = await getSalesData({ paymentStatus: { $in: ["Paid", "Pending"] } });
+      const { chartData, totalSales } = getChartData(productSales);
+  
+      const topProducts = await getTopProducts();
+      const topCategories = await getTopCategories();
+      const topBrands = await getTopBrands();
+  
+      res.render('dashboard', {
+        chartData,
+        totalSales,
+        topProducts,
+        topCategories,
+        topBrands
+      });
+    } catch (error) {
+      console.log('error loading dashboard', error.message);
+      res.status(500).json({ success: false, message: 'Error loading dashboard' });
+    }
+  };
+  
+//----dashboard sales filter------->
+
+const salesFilter = async (req, res) => {
+    try {
+        const { filterSales } = req.query;
+        let matchStage = {};
+
+        // Define date ranges based on the filterSales option
+        if (filterSales === 'weekly') {
+            const today = new Date();
+            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+            matchStage = {
+                $match: {
+                    paymentStatus: { $in: ['Paid', 'Pending'] },
+                    createdAt: { $gte: startOfWeek }
+                }
+            };
+        } else if (filterSales === 'monthly') {
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            matchStage = {
+                $match: {
+                    paymentStatus: { $in: ['Paid', 'Pending'] },
+                    createdAt: { $gte: startOfMonth }
+                }
+            };
+        } else if (filterSales === 'yearly') {
+            const today = new Date();
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            matchStage = {
+                $match: {
+                    paymentStatus: { $in: ['Paid', 'Pending'] },
+                    createdAt: { $gte: startOfYear }
+                }
+            };
+        } else {
+            matchStage = {
+                $match: {
+                    paymentStatus: { $in: ['Paid', 'Pending'] }
+                }
+            };
+        }
+
+        // Group the data accordingly
+        let groupStage = {};
+        if (filterSales === 'weekly') {
+            groupStage = {
+                $group: {
+                    _id: { $dayOfWeek: '$createdAt' },
+                    totalSales: { $sum: '$totalAmount' },
+                    count: { $sum: 1 }
+                }
+            };
+        } else if (filterSales === 'monthly') {
+            groupStage = {
+                $group: {
+                    _id: { $week: '$createdAt' },
+                    totalSales: { $sum: '$totalAmount' },
+                    count: { $sum: 1 }
+                }
+            };
+        } else if (filterSales === 'yearly') {
+            groupStage = {
+                $group: {
+                    _id: { $month: '$createdAt' },
+                    totalSales: { $sum: '$totalAmount' },
+                    count: { $sum: 1 }
+                }
+            };
+        }
+
+        const salesData = await Order.aggregate([
+            matchStage,
+            groupStage,
+            { $sort: { _id: 1 } } // Sort by time period (day/week/month)
+        ]);
+
+        res.json({
+            success: true,
+            salesData,
+        });
+
+    } catch (error) {
+        console.log('Error fetching the sales data:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching sales data'
+        });
+    }
+};
+
+
 
 module.exports = {
     login,
-    loadHome, 
+    dashboard, 
     loadSignin,
     verifySignIn,
     logout,
@@ -541,4 +769,5 @@ module.exports = {
     editBrand,
     unlistBrand,
     listBrand,
+    salesFilter,
 }

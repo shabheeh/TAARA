@@ -570,7 +570,7 @@ const orders = async ( req, res ) => {
 
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         let searchTerm = '';
         let query = {
@@ -590,7 +590,7 @@ const orders = async ( req, res ) => {
 
         const orders = await Order.find(query).populate('user').populate('address').sort({ createdAt: -1 }).skip(skip)
         .limit(limit);
-        const totalOrders = await Order.countDocuments();
+        const totalOrders = await Order.countDocuments(query);
 
             res.render("orders", {
                 orders,
@@ -642,106 +642,110 @@ const viewOrder = async ( req, res ) => {
 // -----Update status by admin------>
 
 const updateStatus = async (req, res) => {
+  try {
+      const { orderId, productId, variantId, status } = req.body;
 
-    try {
+      const order = await Order.findById(orderId).populate('user');
+      const user = order.user._id;
+      if (!order) {
+          return res.json({ 
+              success: false,
+              message: 'Order not found' 
+          });
+      }
 
-        const { orderId, productId, variantId, status } = req.body;
+      const productIndex = order.products.findIndex(p => 
+          p.product.toString() === productId && p.variant.toString() === variantId
+      );
+      if (productIndex === -1) {
+          return res.json({ 
+              success: false,
+              message: 'Product or variant not found in the order' 
+          });
+      }
 
-        
-        const order = await Order.findById(orderId).populate('user')
-        const user = order.user._id
-        if (!order) {
-            return res.json({ 
-                success: false,
-                message: 'Order not found' 
-            });
-        }
+      const currentStatus = order.products[productIndex].status;
+      const validTransitions = {
+          'Pending': ['Dispatched', 'Cancelled'],
+          'Dispatched': ['Out for Delivery', 'Cancelled'],
+          'Out for Delivery': ['Delivered'],
+          'Return Requested': ['Returned', 'Return Rejected'],
+          'Delivered': [],
+          'Cancelled': []
+      };
 
-        
-        const productIndex = order.products.findIndex(p => 
-            p.product.toString() === productId && p.variant.toString() === variantId
-        );
-        if (productIndex === -1) {
-            return res.json({ 
-                success: false,
-                message: 'Product or variant not found in the order' 
-            });
-        }
+      if (!validTransitions[currentStatus].includes(status)) {
+          return res.json({
+              id: variantId,
+              success: false,
+              message: `Invalid status transition from ${currentStatus} to ${status}`
+          });
+      }
 
-        const currentStatus = order.products[productIndex].status;
-        const validTransitions = {
-            'Pending': ['Dispatched', 'Cancelled'],
-            'Dispatched': ['Out for Delivery', 'Cancelled'],
-            'Out for Delivery': ['Delivered'],
-            'Return Requested': ['Returned', 'Return Rejected'],
-            'Delivered': [],
-            'Cancelled': []
+      order.products[productIndex].status = status;
 
-        };
-
-        if (!validTransitions[currentStatus].includes(status)) {
-            return res.json({
-                id: variantId,
-                success: false,
-                message: `Invalid status transition from ${currentStatus} to ${status}`
-            });
-        }
-
-        order.products[productIndex].status = status;
-        
-
-        if (status === "Cancelled" || status === "Returned") {
-          
-          // update stocks
+      if (status === "Cancelled" || status === "Returned") {
+          // Update stocks
           const updateStock = await Variant.findById(variantId);
           updateStock.quantity += order.products[productIndex].quantity;
           await updateStock.save();
 
-          // if order cancelled or returned refund the money
-          let wallet = await Wallet.findOne({ user });
-          if (!wallet) {
-            wallet = new Wallet({
-              user: User, 
-              balance: 0,
-              transactions: [],
-            });
+      
+          let refund = false;
+          if (status === "Cancelled" && order.payment === "Razorpay") {
+              refund = true;
+          } else if (status === "Returned") {
+              refund = true;
           }
-  
-          const refundAmount = order.products[productIndex].totalPrice;
-          const transaction = {
-            amount: refundAmount,
-            type: status === "Cancelled" ? "Cancellation Refund" : "Return Refund",
-            entry: 'Credit',
-            date: new Date(),
-            orderId: order.orderId,
-            product: order.products[productIndex].name
-          };
-  
-          wallet.balance += refundAmount;
-          wallet.transactions.push(transaction);
-          await wallet.save();
-        }
 
-        if( status === "Delivered"){
-          order.paymentStatus = "Paid"
-        }
-        
-        await order.save();
+          if (refund) {
+   
+              let wallet = await Wallet.findOne({ user });
+              if (!wallet) {
+                  wallet = new Wallet({
+                      user: user, 
+                      balance: 0,
+                      transactions: [],
+                  });
+              }
 
-        res.json({
-            id: variantId,
-            status: status,
-            success: true,
-            message: 'Status updated successfully'
-        });
-    } catch (error) {
-        console.error('Error updating status admin:', error.message);
-        res.json({
-            success: false,
-            message: 'Error updating status'
-        });
-    }
-};
+              const refundAmount = order.products[productIndex].totalPrice;
+              const transaction = {
+                  amount: refundAmount,
+                  type: status === "Cancelled" ? "Cancellation Refund" : "Return Refund",
+                  entry: 'Credit',
+                  date: new Date(),
+                  orderId: order.orderId,
+                  product: order.products[productIndex].name
+              };
+
+              wallet.balance += refundAmount;
+              wallet.transactions.push(transaction);
+              await wallet.save();
+          }
+      }
+
+      if (status === "Delivered") {
+          order.paymentStatus = "Paid";
+      }
+
+      await order.save();
+
+      res.json({
+          id: variantId,
+          status: status,
+          success: true,
+          message: 'Status updated successfully'
+      });
+  } catch (error) {
+      console.error('Error updating status admin:', error.message);
+      res.json({
+          success: false,
+          message: 'Error updating status'
+      });
+  }
+}
+
 
 // -------Cancel or Return Order------->
 
@@ -756,13 +760,15 @@ const updateOrderStatus = async (req, res) => {
           });
       }
 
-      const order = await Order.findById(orderId);
+      const order = await Order.findById(orderId).populate('user');
+      
       if (!order) {
           return res.json({ 
               success: false,
               message: 'Order not found' 
           });
       }
+      const user = order.user._id;
 
       const productIndex = order.products.findIndex(p => 
           p.product.toString() === productId && p.variant.toString() === variantId
@@ -779,31 +785,38 @@ const updateOrderStatus = async (req, res) => {
       order.products[productIndex].reason = reason;
       order.products[productIndex].date = new Date();
 
-      if (status === "Cancelled") {
-        // if order cancelled refund the amount
-        let wallet = await Wallet.findOne({ user: req.userId });
-        if (!wallet) {
-          wallet = new Wallet({
-            user: req.userId,
-            balance: 0,
-            transactions: [],
-          });
-        }
+      let refund = false;
+          if (status === "Cancelled" && order.payment === "Razorpay") {
+              refund = true;
+          } else if (status === "Returned") {
+              refund = true;
+          }
 
-        const refundAmount = order.products[productIndex].totalPrice;
-        const transaction = {
-          amount: refundAmount,
-          type: "Cancellation Refund",
-          entry: 'Credit',
-          date: new Date(),
-          orderId: order.orderId,
-          product: order.products[productIndex].name
-        };
+          if (refund) {
+   
+              let wallet = await Wallet.findOne({ user });
+              if (!wallet) {
+                  wallet = new Wallet({
+                      user: user, 
+                      balance: 0,
+                      transactions: [],
+                  });
+              }
 
-        wallet.balance += refundAmount;
-        wallet.transactions.push(transaction);
-        await wallet.save();
-      }
+              const refundAmount = order.products[productIndex].totalPrice;
+              const transaction = {
+                  amount: refundAmount,
+                  type: status === "Cancelled" ? "Cancellation Refund" : "Return Refund",
+                  entry: 'Credit',
+                  date: new Date(),
+                  orderId: order.orderId,
+                  product: order.products[productIndex].name
+              };
+
+              wallet.balance += refundAmount;
+              wallet.transactions.push(transaction);
+              await wallet.save();
+          }
 
       await order.save();
 
@@ -1253,101 +1266,106 @@ const generateInvoice = async (req, res) => {
   try {
     const orderId = req.params.orderId;
 
-    const order = await Order.findById(orderId).populate('user').populate('products.product');
+    const order = await Order.findById(orderId)
+      .populate('user')
+      .populate('products.product');
     if (!order) {
       return res.status(404).json('Order not found');
     }
-
-    const invoice = {
-      order: order.orderId,
-      user: order.user.firstName,
-      address: order.address,
-      products: order.products.map(product => ({
-        product: product.product.name,
-        quantity: product.quantity,
-        price: product.originalPrice,
-        discount: product.originalPrice - product.discountedPrice,
-        total: product.finalPrice
-      })),
-      total: order.products.reduce((acc, product) => 
-        acc + product.total, 0),
-      date: new Date(),
-    };
 
     // Create a document
     const doc = new PDFDocument({ margin: 50 });
 
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoice.order}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=invoice-${order.orderId}.pdf`
+    );
 
     // Pipe the PDF directly to the response
     doc.pipe(res);
 
-    // Add content to the PDF
-    doc.fontSize(20).text('Materio', 50, 50);
-    doc.fontSize(10).text('Office 149, 450 South Brand Brooklyn', 50, 80);
-    doc.text('San Diego County, CA 91905, USA', 50, 95);
-    doc.text('+1 (123) 456 7891, +44 (876) 543 2198', 50, 110);
+    // Add header content to the PDF
+    doc.fontSize(20).text('TAARA', 50, 50);
+    doc.fontSize(10).text('3rd Floor KINFRA INFOPARK',  50, 80);
+    doc.text('NH66 CALICUT UNIVERSITY', 50, 95);
+    doc.text('MALAPPURAM, KERALA 673634', 50, 110);
+    doc.text('+91 (99) 999 9999, +91 (88) 888 8888', 50, 125);
 
     // Add invoice details
-    doc.fontSize(16).text(`Invoice #${invoice.order}`, 400, 50);
-    doc.fontSize(10).text(`Date Issues: ${moment(invoice.date).format('MMMM D, YYYY')}`, 400, 70);
-    doc.text(`Date Due: ${moment(invoice.date).add(30, 'days').format('MMMM D, YYYY')}`, 400, 85);
+    doc.fontSize(16).text(`Invoice #${order.orderId}`, 400, 50);
+    doc.fontSize(10).text(`Date Issued: ${moment(order.createdAt).format('MMMM D, YYYY')}`, 400, 70);
+    doc.text(`Date Due: ${moment(order.createdAt).add(30, 'days').format('MMMM D, YYYY')}`, 400, 85);
 
     // Add client details
     doc.text('Invoice To:', 50, 150);
-    doc.text(invoice.user, 50, 170);
-    doc.text(invoice.address.name, 50, 185);
-    doc.text(`${invoice.address.address}, ${invoice.address.street}`, 50, 200);
-    doc.text(`${invoice.address.city}, ${invoice.address.state} - ${invoice.address.pincode}`, 50, 215);
-    doc.text(invoice.address.phone, 50, 230);
+    // doc.text(order.user.firstName || 'N/A', 50, 170);
+    doc.text(order.address.name, 50, 170);
+    doc.text(`${order.address.address}, ${order.address.street}`, 50, 185);
+    doc.text(`${order.address.city}, ${order.address.state} - ${order.address.pincode}`, 50, 200);
+    doc.text(order.address.phone.toString(), 50, 215);
+
+    // Define table column positions
+    const tableTop = 280;
+    const itemCol = 50;
+    const quantityCol = 200;
+    const priceCol = 280;
+    const discountCol = 360;
+    const totalCol = 460;
 
     // Add table headers
-    const tableTop = 280;
     doc.font('Helvetica-Bold');
-    doc.text('Item', 50, tableTop);
-    doc.text('Description', 150, tableTop);
-    doc.text('Cost', 280, tableTop);
-    doc.text('Qty', 350, tableTop);
-    doc.text('Price', 400, tableTop);
+    doc.text('Item', itemCol, tableTop);
+    doc.text('Quantity', quantityCol, tableTop);
+    doc.text('Price', priceCol, tableTop);
+    doc.text('Discount', discountCol, tableTop);
+    doc.text('Total', totalCol, tableTop);
+
+    // Draw table header border
+    doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
 
     // Add table rows
     doc.font('Helvetica');
     let tableRowTop = tableTop + 20;
-    invoice.products.forEach(item => {
-      doc.text(item.product, 50, tableRowTop);
-      doc.text('Product Description', 150, tableRowTop); // You may want to add a description field to your products
-      doc.text(`₹${item.price.toFixed(2)}`, 280, tableRowTop);
-      doc.text(item.quantity.toString(), 350, tableRowTop);
-      doc.text(`₹${item.total.toFixed(2)}`, 400, tableRowTop);
+
+    order.products.forEach((item) => {
+      doc.text(item.name, itemCol, tableRowTop);
+      doc.text(item.quantity.toString(), quantityCol, tableRowTop);
+      doc.text(`Rs.${item.originalPrice.toFixed(2)}`, priceCol, tableRowTop);
+      doc.text(`Rs.${(item.originalPrice - item.discountedPrice).toFixed(2)}`, discountCol, tableRowTop);
+      doc.text(`Rs.${item.totalPrice.toFixed(2)}`, totalCol, tableRowTop);
+
+      // Draw row border
+      doc.moveTo(50, tableRowTop + 15).lineTo(550, tableRowTop + 15).stroke();
+
       tableRowTop += 20;
     });
 
     // Add totals
-    doc.text('Subtotal:', 300, tableRowTop + 20);
-    doc.text(`₹${invoice.total.toFixed(2)}`, 400, tableRowTop + 20);
-    doc.text('Discount:', 300, tableRowTop + 40);
-    doc.text(`₹${invoice.products.reduce((acc, product) => acc + product.discount, 0).toFixed(2)}`, 400, tableRowTop + 40);
-    doc.text('Tax:', 300, tableRowTop + 60);
-    doc.text('₹0.00', 400, tableRowTop + 60);
+    doc.text('Subtotal:', discountCol, tableRowTop + 20);
+    doc.text(`Rs.${order.originalSubTotal.toFixed(2)}`, totalCol, tableRowTop + 20);
+    doc.text('Discount:', discountCol, tableRowTop + 40);
+    doc.text(`Rs.${(order.originalSubTotal - order.discountedSubTotal).toFixed(2)}`, totalCol, tableRowTop + 40);
+    doc.text('Shipping:', discountCol, tableRowTop + 60);
+    doc.text(`Rs.${order.shippingCharge.toFixed(2)}`, totalCol, tableRowTop + 60);
     doc.font('Helvetica-Bold');
-    doc.text('Total:', 300, tableRowTop + 80);
-    doc.text(`₹${invoice.total.toFixed(2)}`, 400, tableRowTop + 80);
+    doc.text('Total:', discountCol, tableRowTop + 80);
+    doc.text(`Rs.${order.finalTotal.toFixed(2)}`, totalCol, tableRowTop + 80);
 
     // Add note
     doc.font('Helvetica');
-    doc.text('Note:', 50, tableRowTop + 120);
-    doc.text('Thank you for your business!', 50, tableRowTop + 140);
+    doc.text('Note:', itemCol, tableRowTop + 120);
+    doc.text('Thank you for shopping with us!', itemCol, tableRowTop + 140);
 
     // Finalize PDF file
     doc.end();
-
   } catch (error) {
-    console.log('error generating invoice', error.message);
+    console.log('Error generating invoice:', error.message);
     res.status(500).json({ success: false, message: 'Error generating invoice' });
   }
-};
+}
+
 
 
 

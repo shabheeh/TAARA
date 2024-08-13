@@ -221,7 +221,7 @@
                       <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
                         class="page-link">Previous</a>
                     </li>
-                    <% for (let i=1; i <=totalPages; i++) { %>
+                    <% for (let i=1; i <= totalPages; i++) { %>
                       <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
                         <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
                           class="page-link">

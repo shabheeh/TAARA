@@ -627,23 +627,42 @@ input[type="radio"]:checked + label::after {
                                                     </div><!-- End .card-body -->
                                                 </div><!-- End .collapse -->
                                             </div><!-- End .card -->
-                                        
+                                        <% if (totalPriceCart > 1000) { %>
                                             <div class="card">
                                                 <div class="card-header" id="heading-3">
                                                     <h2 class="card-title">
                                                         <!-- Radio Button with Label -->
-                                                        <input type="radio" name="paymentMethod" id="payment-method-3" value="COD">
-                                                        <label for="payment-method-3" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+                                                        <input type="radio" disabled>
+                                                        <label for="payment-method-3" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
                                                             Cash on Delivery
                                                         </label>
                                                     </h2>
                                                 </div><!-- End .card-header -->
-                                                <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+                                                <div id="collapse-4" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
                                                     <div class="card-body">
-                                                        A method of collecting payment that requires customers to pay for goods at the time of delivery.
+                                                        Cash on delivery is not Available for orders above 1000rs.
                                                     </div><!-- End .card-body -->
                                                 </div><!-- End .collapse -->
                                             </div><!-- End .card -->
+                                            <% } else { %>
+                                                <div class="card">
+                                                    <div class="card-header" id="heading-3">
+                                                        <h2 class="card-title">
+                                                            <!-- Radio Button with Label -->
+                                                            <input type="radio" name="paymentMethod" id="payment-method-3" value="COD">
+                                                            <label for="payment-method-3" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+                                                                Cash on Delivery
+                                                            </label>
+                                                        </h2>
+                                                    </div><!-- End .card-header -->
+                                                    <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+                                                        <div class="card-body">
+                                                            A method of collecting payment that requires customers to pay for goods at the time of delivery.
+                                                        </div><!-- End .card-body -->
+                                                    </div><!-- End .collapse -->
+                                                </div><!-- End .card -->
+                                        <% } %>
+                                            
                                         </div><!-- End .accordion-summary -->
                                         
 

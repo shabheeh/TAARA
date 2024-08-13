@@ -5,7 +5,7 @@ const nocache = require('nocache');
 require('dotenv').config();
 const passport = require('./passport');
 const { v4: uuidv4 } = require('uuid');
-const dbConnect = require('./Middlewares/dbConnect')
+const dbConnect = require('./Configs/dbConnect')
 const adminRoute = require("./Routes/adminRoute");
 const userRoute = require("./Routes/userRoute");
 const path = require('path');

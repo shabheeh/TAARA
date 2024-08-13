@@ -1,0 +1,680 @@
+<%- include('../Layouts/Admin/header') -%>
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/apex-charts/apex-charts.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/css/pages/app-ecommerce-dashboard.css" />
+
+<!-- Helpers -->
+<script src="/Admin/assets/vendor/js/helpers.js"></script>
+
+<script src="/Admin/assets/js/config.js"></script>
+
+</head>
+
+
+<body>
+  
+<%- include('../Layouts/Admin/navbar') -%>
+
+      
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        
+          <div class="container-xxl flex-grow-1 container-p-y">
+            
+            
+<div class="row gy-6">
+  <!-- Congratulations card -->
+  <div class="col-xl-8 col-lg-7 align-self-end mt-md-7 mt-lg-4 pt-md-2 pt-lg-0">
+    <div class="card">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card-body">
+            <h4 class="card-title mb-9 text-truncate">Congratulations <span class="fw-bold">John!</span>🎉</h4>
+            <p class="mb-0">You have done 72% 😎 more sales today. Check your new raising badge in your profile.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 position-relative text-center">
+          <img src="/Admin/assets/img/illustrations/illustration-john-2.png" class="card-img-position bottom-0 w-auto end-0 scaleX-n1-rtl" alt="View Profile">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--/ Congratulations card -->
+  <!-- Cards with icon profit and loss info -->
+  <div class="col-xl-4 col-lg-5">
+    <div class="row g-6">
+      <div class="col-sm-6">
+        <div class="card h-100">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="avatar">
+              <div class="avatar-initial bg-success rounded-circle shadow-xs">
+                <i class="ri-money-dollar-circle-line ri-24px"></i>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn text-muted p-0" type="button" id="revenueID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="ri-more-2-line ri-24px"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="revenueID">
+                <a class="dropdown-item" href="">Refresh</a>
+                <a class="dropdown-item" href="">Share</a>
+                <a class="dropdown-item" href="">Update</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="mb-1">Revenue</h6>
+            <div class="d-flex flex-wrap mb-1 align-items-center">
+              <h4 class="mb-0 me-2">$95.2k</h4>
+              <p class="text-success mb-0">+12%</p>
+            </div>
+            <small>Revenue Increase</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card h-100">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="avatar">
+              <div class="avatar-initial bg-info rounded-circle shadow-xs">
+                <i class="ri-bank-card-line ri-24px"></i>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn text-muted p-0" type="button" id="transactionsID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="ri-more-2-line ri-24px"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionsID">
+                <a class="dropdown-item" href="">Refresh</a>
+                <a class="dropdown-item" href="">Share</a>
+                <a class="dropdown-item" href="">Update</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="mb-1">Transactions</h6>
+            <div class="d-flex flex-wrap mb-1 align-items-center">
+              <h4 class="mb-0 me-2">1.2k</h4>
+              <p class="text-success mb-0">+38%</p>
+            </div>
+            <small>Daily Transactions</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Sales Chart -->
+  <div class="col-xl-6">
+    <div class="card h-100">
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                <h5 class="mb-0">Sales Overview</h5>
+                <div class="dropdown">
+                    <div class="">
+                        <select id="filter-sales" name="filterSales" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
+                            <option value="all">All</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-lg-5">
+            <div class="row align-items-center">
+                <div class="col-md-12" style="position: relative;">
+                    <div id="salesChart" style="min-height: 247.8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  <!-- Sales Overview Chart -->
+  <div class="col-xl-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <div class="d-flex justify-content-between">
+          <h5 class="mb-0">Sales Overview</h5>
+          <div class="dropdown">
+            <div class="">
+              <select id="filter-sales" name="filterSales" class="select2 form-select" data-placeholder="Option"
+                data-allow-clear="true">
+                <option value="all">All</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-lg-5">
+        <div class="row align-items-center">
+          <div class="col-md-6" style="position: relative;">
+            <div id="salesOverviewChart" style="min-height: 247.8px;"></div>
+          </div>
+          <div class="col-md-6 mt-3 mt-md-0">
+            <div class="d-flex align-items-center">
+              <div class="avatar">
+                <div class="avatar-initial bg-label-primary rounded">
+                  <i class="ri-wallet-line ri-24px"></i>
+                </div>
+              </div>
+              <div class="ms-3 d-flex flex-column">
+                <p class="mb-0">Number of Sales</p>
+                <h5 class="mb-0"><%= totalSales %></h5>
+              </div>
+            </div>
+            <hr class="my-6">
+            <div class="row g-4">
+              <% chartData.forEach((item, index) => { %>
+                <div class="col-6">
+                  <div class="d-flex align-items-center mb-1">
+                    <div class="badge badge-dot bg-primary me-2"></div>
+                    <p class="mb-0"><%= item.name %></p>
+                  </div>
+                  <p class="fw-medium mb-0"><%= item.value %>%</p>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!--/ Total Profit Chart & Last month balance -->
+  <!-- three chart -->
+  
+
+  <!--/ three chart -->
+  <!-- Transactions -->
+  <div class="col-lg-6 col-xxl-4 mb-6 order-2 order-xxl-2">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h5 class="m-0 me-2">Delivery Performance</h5>
+          <span class="card-subtitle">12% increase in this month</span>
+        </div>
+        <div class="dropdown">
+          <button class="btn p-0" type="button" id="deliveryPerformance" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-more-2-line ri-20px"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="deliveryPerformance">
+            <a class="dropdown-item waves-effect" href="javascript:void(0);">Select All</a>
+            <a class="dropdown-item waves-effect" href="javascript:void(0);">Refresh</a>
+            <a class="dropdown-item waves-effect" href="javascript:void(0);">Share</a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="p-0 m-0">
+          <li class="d-flex mb-4 pb-1 align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-primary"><i class="ri-gift-line ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Packages in transit</h6>
+                <small class="text-success fw-normal d-block">
+                  <i class="ri-arrow-up-s-line me-1 ri-24px"></i>
+                  25.8%
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">10k</h6>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1 align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-info"><i class="ri-car-line ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Packages out for delivery</h6>
+                <small class="text-success fw-normal d-block">
+                  <i class="ri-arrow-up-s-line me-1 ri-24px"></i>
+                  4.3%
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">5k</h6>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1 align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-success"><i class="ri-check-line text-success ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Packages delivered</h6>
+                <small class="text-danger fw-normal d-block">
+                  <i class="ri-arrow-down-s-line me-1 ri-24px"></i>
+                  12.5
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">15k</h6>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1 align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-warning"><i class="ri-home-6-line ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Delivery success rate</h6>
+                <small class="text-success fw-normal d-block">
+                  <i class="ri-arrow-up-s-line me-1 ri-24px"></i>
+                  35.6%
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">95%</h6>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex mb-4 pb-1 align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-secondary"><i class="ri-time-line ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Average delivery time</h6>
+                <small class="text-danger fw-normal d-block">
+                  <i class="ri-arrow-down-s-line me-1 ri-24px"></i>
+                  2.15
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">2.5 Days</h6>
+              </div>
+            </div>
+          </li>
+          <li class="d-flex">
+            <div class="avatar flex-shrink-0 me-4">
+              <span class="avatar-initial rounded bg-label-danger"><i class="ri-user-3-line ri-26px"></i></span>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0 fw-normal">Customer satisfaction</h6>
+                <small class="text-success fw-normal d-block">
+                  <i class="ri-arrow-up-s-line me-1 ri-24px"></i>
+                  5.7%
+                </small>
+              </div>
+              <div class="user-progress">
+                <h6 class="mb-0">4.5/5</h6>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!--/ Transactions -->
+  <!-- New visitors cards -->
+  
+  <!--/ Website Statistics -->
+  <!-- Card DataTable -->
+  
+  <!--/ Card DataTable -->
+  <!-- Meeting Schedule -->
+  <div class="col-xxl-4 col-md-6 order-xxl-2 order-1">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Meeting Schedule</h5>
+        <div class="dropdown">
+          <button class="btn text-muted p-0" type="button" id="meetingSchedule" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-more-2-line ri-24px"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="meetingSchedule">
+            <a class="dropdown-item" href="">Last 28 Days</a>
+            <a class="dropdown-item" href="">Last Month</a>
+            <a class="dropdown-item" href="">Last Year</a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="p-0 m-0">
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/4.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Call with Woods</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-primary rounded-pill">Business</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/5.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Conference call</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-warning rounded-pill">Dinner</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/3.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Meeting with Mark</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-secondary rounded-pill">Meetup</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/14.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Meeting in Oakland</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-danger rounded-pill">Dinner</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/8.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Call with hilda</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-success rounded-pill">Meditation</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center mb-4 pb-2">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/7.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Meeting with hilda</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-info rounded-pill">Meetup</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center">
+            <div class="avatar flex-shrink-0 me-4">
+              <img src="assets/img/avatars/1.png" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-1">Meeting with Carl</h6>
+                <small class="d-flex align-items-center">
+                  <i class="ri-calendar-line ri-14px"></i>
+                  <span class="ms-2">21 Jul | 08:20-10:30</span>
+                </small>
+              </div>
+              <div class="badge bg-label-primary rounded-pill">Business</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!--/ Meeting Schedule -->
+</div>
+
+          </div>
+          <!-- / Content -->
+
+          
+          
+
+<!-- Footer -->
+<footer class="content-footer footer bg-footer-theme">
+  <div class="container-xxl">
+    <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
+      
+    </div>
+  </div>
+</footer>
+<!-- / Footer -->
+
+          
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+      </div>
+      <!-- / Layout page -->
+    </div>
+
+    
+    
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    
+    
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    
+  </div>
+  <!-- / Layout wrapper -->
+
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const chartData = <%- JSON.stringify(chartData) %>;
+      
+      const options = {
+        series: chartData.map(item => item.value),
+        chart: {
+          width: 300,
+          type: 'donut',
+        },
+        labels: chartData.map(item => item.name),
+        dataLabels: {
+          enabled: false
+        },
+        colors: ['#8c57ff', '#9055fdb3', '#9055fd80', '#f0f2f8'],
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '70%',
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+                  fontSize: '15px',
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#6d6777',
+                  offsetY: -10
+                },
+                value: {
+                  show: true,
+                  fontSize: '24px',
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#433c50',
+                  offsetY: 10,
+                  formatter: function (val) {
+                    return val + '%';
+                  }
+                },
+                total: {
+                  show: true,
+                  label: 'Best Sellers',
+                  color: '#6d6777',
+                  formatter: function () {
+                    return '' ;
+                  }
+                }
+              }
+            }
+          }
+        },
+        legend: {
+          show: false
+        }
+      };
+    
+      const chart = new ApexCharts(document.querySelector("#salesOverviewChart"), options);
+      chart.render();
+    });
+    </script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterSales = document.getElementById('filter-sales');
+        
+        function fetchAndRenderSalesData(filter) {
+            fetch(`/api/sales-overview?filter=${filter}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSalesChart(data.chartData);
+                })
+                .catch(error => console.error('Error fetching sales data:', error));
+        }
+
+        function renderSalesChart(chartData) {
+            const options = {
+                series: [{
+                    name: 'Sales',
+                    data: chartData.map(item => item.value)
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '50%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                xaxis: {
+                    categories: chartData.map(item => item.name),
+                },
+                yaxis: {
+                    title: {
+                        text: 'Total Sales'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                colors: ['#8c57ff'],
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return `$${val}`;
+                        }
+                    }
+                },
+                title: {
+                    text: 'Sales Overview',
+                    align: 'left'
+                },
+                legend: {
+                    position: 'bottom',
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#salesOverviewChart"), options);
+            chart.render();
+        }
+
+        // Fetch data and render the chart initially with 'All' data
+        fetchAndRenderSalesData('all');
+
+        // Update chart when filter changes
+        filterSales.addEventListener('change', function () {
+            const selectedFilter = filterSales.value;
+            fetchAndRenderSalesData(selectedFilter);
+        });
+    });
+</script>
+
+    <!-- Core JS -->
+  <!-- build:js assets/vendor/js/core.js -->
+  <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+  <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="/Admin/assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="/Admin/assets/vendor/libs/moment/moment.js"></script>
+<script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="/Admin/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="/Admin/assets/vendor/libs/rateyo/rateyo.js"></script>
+<script src="/Admin/assets/vendor/libs/cleavejs/cleave.js"></script>
+<script src="/Admin/assets/vendor/libs/cleavejs/cleave-phone.js"></script>
+<script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+
+
+
+<script src="/Admin/assets/js/app-ecommerce-dashboard.js"></script>
+
+  <!-- Main JS -->
+  <script src="/Admin/assets/js/main.js"></script>
+</body>
+
+
+<!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-dashboard.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:47:59 GMT -->
+</html>
+
+<!-- beautify ignore:end -->
+

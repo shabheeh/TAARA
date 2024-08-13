@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express();
 const path = require("path");
-const upload = require("../Middlewares/multerConfig");
+const upload = require("../Configs/multerConfig");
 //          middlewares
 const authAdmin = require("../Middlewares/authAdmin");
 
@@ -22,7 +22,7 @@ router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
 router.get("/", authAdmin.isLogin, adminController.login);
 router.get("/login", authAdmin.isLogout, adminController.loadSignin);
 router.post("/login", adminController.verifySignIn);
-router.get("/dashboard", authAdmin.isLogin, adminController.loadHome);
+router.get("/dashboard", authAdmin.isLogin, adminController.dashboard);
 router.post("/logout", adminController.logout);
 
 //               user management

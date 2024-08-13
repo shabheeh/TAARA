@@ -322,7 +322,7 @@ function removeFromCart(variantId, cartId) {
     .then(data => {
         if (data.success) {
             document.getElementById(`cartItem-${variantId}`).remove();
-            updateCartSummary(data.cart);
+            updateCartSummary(data);
         } else {
             console.error(data.message);
         }
@@ -332,14 +332,16 @@ function removeFromCart(variantId, cartId) {
     });
 }
 
-function updateCartSummary(cart) {
-    const subTotal = cart.products.reduce((sum, product) => sum + parseFloat(product.discountedPrice) * parseInt(product.quantity), 0);
-    const shippingCharge = (subTotal <= 500 && subTotal !== 0) ? 50 : 0;
-    const totalPrice = subTotal + shippingCharge;
+function updateCartSummary(data) {
+    // const subTotal = cart.products.reduce((sum, product) => sum + parseFloat(product.discountedPrice) * parseInt(product.quantity), 0);
+    // const shippingCharge = (subTotal <= 500 && subTotal !== 0) ? 50 : 0;
+    // const totalPrice = subTotal + shippingCharge;
 
-    document.getElementById('subtotal').textContent = `Rs.${Math.round(subTotal).toFixed(2)}`;
-    document.getElementById('shipping-charge').textContent = `Rs.${shippingCharge.toFixed(2)}`;
-    document.getElementById('total-price').textContent = `Rs.${Math.round(totalPrice).toFixed(2)}`;
+// Update the cart summary using backend-calculated values
+document.getElementById('original-subtotal').textContent = `Rs.${data.originalSubTotal.toFixed(2)}`;
+                document.getElementById('discounted-subtotal').textContent = `- Rs.${(data.originalSubTotal - data.discountedSubTotal).toFixed(2)}`;
+                document.getElementById('shipping-charge').textContent = `Rs.${data.shippingCharge.toFixed(2)}`;
+                document.getElementById('total-price').textContent = `Rs.${data.totalPriceCart.toFixed(2)}`;
 }
 
 

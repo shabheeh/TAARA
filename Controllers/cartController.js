@@ -165,51 +165,86 @@ const addToCart = async (req, res) => {
 
 // --------Remove from cart------->
 
-const removeFromCart = async ( req, res ) => {
+const removeFromCart = async (req, res) => {
+  try {
+      const { variantId, cartId } = req.params;
 
-    try {
-        const { variantId, cartId } = req.params;
+      const cart = await Cart.findById(cartId)
+      .populate({
+        path: 'products.product',
+        populate: {
+          path: 'offers',
+          model: 'Offer'
+        }
+      })
+      .populate('products.variant')
+    
 
-        const cart = await Cart.findById(cartId).populate('products.product')
-        .populate('products.variant');
-
-        if (!cart) {
-            return res.json({ 
+      if (!cart) {
+          return res.json({ 
               success: false,
               message: 'Cart not found' 
-            });
-        }
-
-
-        const productIndex = cart.products.findIndex(
-          (product) => product.variant._id.toString() === variantId
-        );
-    
-        if (productIndex === -1) {
-          return res.json({
-            success: false,
-            message: 'Product variant not found in cart',
           });
-        }
-    
-        cart.products.splice(productIndex, 1);
-    
-        await cart.save();
+      }
 
-        res.json({ 
+      const productIndex = cart.products.findIndex(
+          (product) => product.variant._id.toString() === variantId
+      );
+  
+      if (productIndex === -1) {
+          return res.json({
+              success: false,
+              message: 'Product variant not found in cart',
+          });
+      }
+  
+      cart.products.splice(productIndex, 1);
+  
+      await cart.save();
+
+      // Recalculate totals
+      let originalSubTotal = 0;
+      let discountedSubTotal = 0;
+
+      cart.products.forEach((cartProduct) => {
+          const productPrice = cartProduct.product.price;
+          const quantity = cartProduct.quantity;
+
+          originalSubTotal += productPrice * quantity;
+
+          let discountedPrice = productPrice;
+          if (cartProduct.product.offers && cartProduct.product.offers.length > 0) {
+              const bestOffer = cartProduct.product.offers.reduce((best, current) =>
+                  (current.discount > best.discount) ? current : best
+              );
+              discountedPrice = productPrice * (1 - bestOffer.discount / 100);
+          }
+
+          discountedSubTotal += discountedPrice * quantity;
+      });
+
+      // Calculate shipping charge and total price
+      const shippingCharge = (discountedSubTotal >= 500 && discountedSubTotal !== 0) ? 0 : 50;
+      const totalPriceCart = discountedSubTotal + shippingCharge;
+
+
+      res.json({ 
           success: true,
           cart,
-          
-        
-        });
+          originalSubTotal,
+          discountedSubTotal,
+          shippingCharge,
+          totalPriceCart,
+          variantId,
+      });
 
-    } catch (error) {
-        console.error('Error removing product from cart:', error);
-        res.json({ 
+  } catch (error) {
+      console.error('Error removing product from cart:', error);
+      res.json({ 
           success: false, 
           message: 'An error occurred while removing product from cart' 
-        });
-    }
+      });
+  }
 }
 
 // -------Update Cart------>
