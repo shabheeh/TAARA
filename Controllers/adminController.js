@@ -2,7 +2,7 @@ const User = require("../Models/userModel");
 const Category = require ("../Models/categoryModel")
 const Brand = require("../Models/brandModel")
 const Order = require('../Models/orderModel')
-
+const { bestSellingBrands, getSalesAndRevenue } = require('../Helpers/dashboard')
 
 
 
@@ -511,7 +511,7 @@ const editBrand = async (req, res) => {
 };
 
 
-// Function to get sales data
+
 const getSalesData = async (match = {}) => {
     return Order.aggregate([
       { $match: match },
@@ -527,33 +527,15 @@ const getSalesData = async (match = {}) => {
     ]);
   };
   
-  // Function to get chart data
-  const getChartData = (productSales, topCount = 3) => {
-    const topProducts = productSales.slice(0, topCount);
-    const topQuantity = topProducts.reduce((acc, product) => acc + product.totalQuantity, 0);
-    const othersQuantity = productSales.slice(topCount).reduce((acc, product) => acc + product.totalQuantity, 0);
-    const totalQuantity = topQuantity + othersQuantity;
+
   
-    const chartData = topProducts.map(product => ({
-      name: product.name,
-      value: Math.round((product.totalQuantity / totalQuantity) * 100)
-    }));
-  
-    chartData.push({
-      name: 'Other Sales',
-      value: Math.round((othersQuantity / totalQuantity) * 100)
-    });
-  
-    return { chartData, totalSales: totalQuantity };
-  };
-  
-  // Function to get top N best-selling products
+//  best procucts
   const getTopProducts = async (n = 10) => {
     const productSales = await getSalesData({ paymentStatus: { $in: ["Paid", "Pending"] } });
     return productSales.slice(0, n);
   };
   
-  // Function to get top N best-selling categories
+  // best selling categories
   const getTopCategories = async (n = 10) => {
     return Order.aggregate([
       { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
@@ -570,7 +552,6 @@ const getSalesData = async (match = {}) => {
     ]);
   };
   
-  // Function to get top N best-selling brands
   const getTopBrands = async (n = 10) => {
     return Order.aggregate([
       { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
@@ -587,66 +568,23 @@ const getSalesData = async (match = {}) => {
     ]);
   };
   
-  const createMatchStage = (filterSales) => {
-    const currentDate = moment().startOf('day');
-    let matchStage = {
-        'paymentStatus': { $in: ["Paid", "Pending"] }
-    };
-
-    switch (filterSales) {
-      case 'daily':
-        matchStage.createdAt = {
-          $gte: currentDate.toDate(),
-          $lt: moment(currentDate).endOf('day').toDate()
-        };
-        break;
-      case 'weekly':
-        matchStage.createdAt = {
-          $gte: moment(currentDate).subtract(7, 'days').toDate(),
-          $lt: moment(currentDate).endOf('day').toDate()
-        };
-        break;
-      case 'monthly':
-        matchStage.createdAt = {
-          $gte: moment(currentDate).subtract(1, 'month').toDate(),
-          $lt: moment(currentDate).endOf('day').toDate()
-        };
-        break;
-      case 'yearly':
-        matchStage.createdAt = {
-          $gte: moment(currentDate).subtract(1, 'year').toDate(),
-          $lt: moment(currentDate).endOf('day').toDate()
-        };
-        break;
-      case 'custom':
-        if (startDate && endDate) {
-          matchStage.createdAt = {
-            $gte: moment(startDate).startOf('day').toDate(),
-            $lt: moment(endDate).endOf('day').toDate()
-          };
-        }
-        break;
-      default:
-        
-        break;
-    }
   
-    return matchStage;
-  };
 
 
   const dashboard = async (req, res) => {
     try {
-      const productSales = await getSalesData({ paymentStatus: { $in: ["Paid", "Pending"] } });
-      const { chartData, totalSales } = getChartData(productSales);
-  
+ 
+      const chartData = await bestSellingBrands();
       const topProducts = await getTopProducts();
       const topCategories = await getTopCategories();
       const topBrands = await getTopBrands();
+      const { totalSales, totalRevenue, totalProductsSold } = await getSalesAndRevenue();
   
       res.render('dashboard', {
         chartData,
         totalSales,
+        totalRevenue,
+        totalProductsSold,
         topProducts,
         topCategories,
         topBrands
@@ -656,87 +594,105 @@ const getSalesData = async (match = {}) => {
       res.status(500).json({ success: false, message: 'Error loading dashboard' });
     }
   };
-  
+   
+
 //----dashboard sales filter------->
 
-const salesFilter = async (req, res) => {
+const salesGraph = async (req, res) => {
     try {
-        const { filterSales } = req.query;
+        const { filterSales, date } = req.query;
         let matchStage = {};
-
-        // Define date ranges based on the filterSales option
-        if (filterSales === 'weekly') {
-            const today = new Date();
-            const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-            matchStage = {
-                $match: {
-                    paymentStatus: { $in: ['Paid', 'Pending'] },
-                    createdAt: { $gte: startOfWeek }
-                }
-            };
-        } else if (filterSales === 'monthly') {
-            const today = new Date();
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            matchStage = {
-                $match: {
-                    paymentStatus: { $in: ['Paid', 'Pending'] },
-                    createdAt: { $gte: startOfMonth }
-                }
-            };
-        } else if (filterSales === 'yearly') {
-            const today = new Date();
-            const startOfYear = new Date(today.getFullYear(), 0, 1);
-            matchStage = {
-                $match: {
-                    paymentStatus: { $in: ['Paid', 'Pending'] },
-                    createdAt: { $gte: startOfYear }
-                }
-            };
-        } else {
-            matchStage = {
-                $match: {
-                    paymentStatus: { $in: ['Paid', 'Pending'] }
-                }
-            };
-        }
-
-        // Group the data accordingly
         let groupStage = {};
-        if (filterSales === 'weekly') {
+        let startDate, endDate;
+
+        if (filterSales === 'daily') {
+            const [year, month] = date.split('-');
+            startDate = new Date(year, month - 1, 1);
+            endDate = new Date(year, month, 0);
             groupStage = {
                 $group: {
-                    _id: { $dayOfWeek: '$createdAt' },
-                    totalSales: { $sum: '$totalAmount' },
-                    count: { $sum: 1 }
+                    _id: { $dayOfMonth: '$createdAt' },
+                    totalSales: { $sum: '$finalTotal' }
                 }
             };
         } else if (filterSales === 'monthly') {
-            groupStage = {
-                $group: {
-                    _id: { $week: '$createdAt' },
-                    totalSales: { $sum: '$totalAmount' },
-                    count: { $sum: 1 }
-                }
-            };
-        } else if (filterSales === 'yearly') {
+            startDate = new Date(date, 0, 1);
+            endDate = new Date(date, 11, 31);
             groupStage = {
                 $group: {
                     _id: { $month: '$createdAt' },
-                    totalSales: { $sum: '$totalAmount' },
-                    count: { $sum: 1 }
+                    totalSales: { $sum: '$finalTotal' }
+                }
+            };
+        } else if (filterSales === 'yearly') {
+            startDate = new Date(new Date().getFullYear() - 4, 0, 1);
+            endDate = new Date();
+            groupStage = {
+                $group: {
+                    _id: { $year: '$createdAt' },
+                    totalSales: { $sum: '$finalTotal' }
                 }
             };
         }
 
+        matchStage = {
+            $match: {
+                paymentStatus: { $in: ['Paid', 'Pending'] },
+                createdAt: { $gte: startDate, $lte: endDate }
+            }
+        };
+        
         const salesData = await Order.aggregate([
             matchStage,
             groupStage,
-            { $sort: { _id: 1 } } // Sort by time period (day/week/month)
+            { $sort: { _id: 1 } }
         ]);
+
+        // console.log('salesData:', salesData);
+
+        // Transform and fill in missing data
+        let transformedData;
+        if (filterSales === 'daily') {
+            const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+            transformedData = Array.from({length: daysInMonth}, (_, i) => ({
+                name: (i + 1).toString(),
+                value: 0
+            }));
+            salesData.forEach(item => {
+                transformedData[item._id - 1].value = item.totalSales;
+            });
+        } else if (filterSales === 'monthly') {
+            transformedData = Array.from({length: 12}, (_, i) => ({
+                name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
+                value: 0
+            }));
+            salesData.forEach(item => {
+                transformedData[item._id - 1].value = item.totalSales;
+            });
+        } else if (filterSales === 'yearly') {
+            const currentYear = new Date().getFullYear();
+            transformedData = Array.from({length: 5}, (_, i) => ({
+                name: (currentYear - 4 + i).toString(),
+                value: 0
+            }));
+            salesData.forEach(item => {
+                const index = item._id - (currentYear - 4);
+                if (index >= 0 && index < 5) {
+                    transformedData[index].value = item.totalSales;
+                }
+            });
+        }
+
+        // console.log('transformedData:', transformedData);
+
+        const totalSales = transformedData.reduce((sum, item) => sum + item.value, 0);
+
+        // console.log('totalSales:', totalSales);
 
         res.json({
             success: true,
-            salesData,
+            data: transformedData,
+            totalSales: totalSales
         });
 
     } catch (error) {
@@ -747,6 +703,8 @@ const salesFilter = async (req, res) => {
         });
     }
 };
+
+
 
 
 
@@ -769,5 +727,5 @@ module.exports = {
     editBrand,
     unlistBrand,
     listBrand,
-    salesFilter,
+    salesGraph,
 }

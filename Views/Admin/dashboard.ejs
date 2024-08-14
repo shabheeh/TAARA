@@ -116,29 +116,48 @@
   <!-- Weekly Sales Chart -->
   <div class="col-xl-6">
     <div class="card h-100">
-        <div class="card-header">
-            <div class="d-flex justify-content-between">
-                <h5 class="mb-0">Sales Overview</h5>
-                <div class="dropdown">
-                    <div class="">
-                        <select id="filter-sales" name="filterSales" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
-                            <option value="all">All</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
-                    </div>
-                </div>
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" id="salesTitle">Sales Overview</h5>
+          <div class="d-flex align-items-center">
+            <div class="me-2">
+              <input type="month" id="month-select" class="form-control" style="display: none;">
+              <input type="number" id="year-select" class="form-control" min="2000" max="2099" step="1" style="display: none;">
             </div>
-        </div>
-        <div class="card-body pt-lg-5">
-            <div class="row align-items-center">
-                <div class="col-md-12" style="position: relative;">
-                    <div id="salesChart" style="min-height: 247.8px;"></div>
-                </div>
+            <div class="dropdown">
+              <select id="filter-sales" class="form-select">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
+          </div>
         </div>
+        <!-- <p class="text-body mb-0" id="totalSales">Total Sales: Loading...</p> -->
+      </div>
+      <div class="card-body">
+        <div id="salesChart"></div>
+        <!-- <div class="d-flex align-items-center justify-content-around mt-4">
+          <div class="d-flex align-items-center">
+            <div class="avatar bg-light-primary rounded">
+              <i class="ri-pie-chart-2-line text-primary"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="mb-0" id="totalSalesCount">Loading...</h6>
+              <small>Sales</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="avatar bg-light-success rounded">
+              <i class="ri-money-dollar-circle-line text-success"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="mb-0" id="totalProfit">Loading...</h6>
+              <small>Total Profit</small>
+            </div>
+          </div>
+        </div> -->
+      </div>
     </div>
 </div>
   <!-- Sales Overview Chart -->
@@ -146,19 +165,7 @@
     <div class="card h-100">
       <div class="card-header">
         <div class="d-flex justify-content-between">
-          <h5 class="mb-0">Sales Overview</h5>
-          <div class="dropdown">
-            <div class="">
-              <select id="filter-sales" name="filterSales" class="select2 form-select" data-placeholder="Option"
-                data-allow-clear="true">
-                <option value="all">All</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-            </div>
-          </div>
+          <h5 class="mb-0">Best Selling Brands</h5>
         </div>
       </div>
       <div class="card-body pt-lg-5">
@@ -174,8 +181,8 @@
                 </div>
               </div>
               <div class="ms-3 d-flex flex-column">
-                <p class="mb-0">Number of Sales</p>
-                <h5 class="mb-0"><%= totalSales %></h5>
+                <p class="mb-0">Number of Products Sold</p>
+                <h5 class="mb-0"><%= totalProductsSold %></h5>
               </div>
             </div>
             <hr class="my-6">
@@ -186,7 +193,7 @@
                     <div class="badge badge-dot bg-primary me-2"></div>
                     <p class="mb-0"><%= item.name %></p>
                   </div>
-                  <p class="fw-medium mb-0"><%= item.value %>%</p>
+                  <p class="fw-medium mb-0"><%= item.count %></p>
                 </div>
               <% }); %>
             </div>
@@ -567,78 +574,141 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const filterSales = document.getElementById('filter-sales');
+    const filterSales = document.getElementById('filter-sales');
+    const monthSelect = document.getElementById('month-select');
+    const yearSelect = document.getElementById('year-select');
+    const salesTitle = document.getElementById('salesTitle');
+    let chart;
+
+    function updateInputVisibility() {
+        const filter = filterSales.value;
+        monthSelect.style.display = filter === 'daily' ? 'block' : 'none';
+        yearSelect.style.display = filter === 'monthly' ? 'block' : 'none';
         
-        function fetchAndRenderSalesData(filter) {
-            fetch(`/api/sales-overview?filter=${filter}`)
-                .then(response => response.json())
-                .then(data => {
-                    renderSalesChart(data.chartData);
-                })
-                .catch(error => console.error('Error fetching sales data:', error));
+        if (filter === 'daily') {
+            salesTitle.textContent = 'Daily Sales';
+        } else if (filter === 'monthly') {
+            salesTitle.textContent = 'Monthly Sales';
+        } else {
+            salesTitle.textContent = 'Yearly Sales';
+        }
+    }
+
+    function fetchAndRenderSalesData() {
+        const filter = filterSales.value;
+        let date;
+        
+        if (filter === 'daily') {
+            date = monthSelect.value;
+        } else if (filter === 'monthly') {
+            date = yearSelect.value;
+        } else {
+            // For yearly, we don't need a specific date
+            date = '';
         }
 
-        function renderSalesChart(chartData) {
-            const options = {
-                series: [{
-                    name: 'Sales',
-                    data: chartData.map(item => item.value)
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 350,
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '50%',
-                        endingShape: 'rounded'
-                    },
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                xaxis: {
-                    categories: chartData.map(item => item.name),
-                },
-                yaxis: {
-                    title: {
-                        text: 'Total Sales'
-                    }
-                },
-                fill: {
-                    opacity: 1
-                },
-                colors: ['#8c57ff'],
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return `$${val}`;
-                        }
-                    }
-                },
-                title: {
-                    text: 'Sales Overview',
-                    align: 'left'
-                },
-                legend: {
-                    position: 'bottom',
+        fetch(`/admin/dashboard/salesgraph?filterSales=${filter}&date=${date}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    renderSalesChart(result.data, filter);
+                    // updateTotals(result.totalSales);
+                } else {
+                    console.error('Error in API response:', result.message);
                 }
-            };
+            })
+            .catch(error => console.error('Error fetching sales data:', error));
+    }
 
-            const chart = new ApexCharts(document.querySelector("#salesOverviewChart"), options);
+    function renderSalesChart(data, filter) {
+        const options = {
+            series: [{
+                name: 'Sales',
+                data: data.map(item => item.value)
+            }],
+            chart: {
+                type: 'bar',
+                height: 300,
+                toolbar: {
+                    show: false
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    columnWidth: '60%',
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            xaxis: {
+                categories: data.map(item => item.name),
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Sales'
+                }
+            },
+            colors: ['#e7e7ff'],
+            states: {
+                hover: {
+                    filter: {
+                        type: 'darken',
+                        value: 0.9
+                    }
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return `$${val.toFixed(2)}`;
+                    }
+                }
+            }
+        };
+
+        if (chart) {
+            chart.updateOptions(options);
+        } else {
+            chart = new ApexCharts(document.querySelector("#salesChart"), options);
             chart.render();
         }
 
-        // Fetch data and render the chart initially with 'All' data
-        fetchAndRenderSalesData('all');
+        // Highlight the highest sales
+        const maxIndex = data.reduce((iMax, x, i, arr) => x.value > arr[iMax].value ? i : iMax, 0);
+        chart.toggleDataPointSelection(0, maxIndex);
+    }
 
-        // Update chart when filter changes
-        filterSales.addEventListener('change', function () {
-            const selectedFilter = filterSales.value;
-            fetchAndRenderSalesData(selectedFilter);
-        });
+    // function updateTotals(totalSales) {
+    //     document.getElementById('totalSales').textContent = `Total Sales: $${totalSales.toFixed(2)}`;
+    //     document.getElementById('totalSalesCount').textContent = `${(totalSales / 1000).toFixed(1)}k`;
+    //     document.getElementById('totalProfit').textContent = `$${(totalSales * 0.2).toFixed(2)}k`;
+    // }
+
+    // Update chart when filter or date changes
+    filterSales.addEventListener('change', function() {
+        updateInputVisibility();
+        fetchAndRenderSalesData();
     });
+    monthSelect.addEventListener('change', fetchAndRenderSalesData);
+    yearSelect.addEventListener('change', fetchAndRenderSalesData);
+
+    // Set initial values
+    const currentDate = new Date();
+    monthSelect.value = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+    yearSelect.value = currentDate.getFullYear();
+
+    // Initial setup
+    updateInputVisibility();
+    fetchAndRenderSalesData();
+});
 </script>
 
     <!-- Core JS -->

@@ -9,7 +9,8 @@ const authAdmin = require("../Middlewares/authAdmin");
 const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController");
 const orderController = require("../Controllers/orderController");
-const offerController = require("../Controllers/offerController")
+const offerController = require("../Controllers/offerController");
+const { auth } = require("firebase-admin");
 
 
 //        Set view and  static
@@ -22,8 +23,11 @@ router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
 router.get("/", authAdmin.isLogin, adminController.login);
 router.get("/login", authAdmin.isLogout, adminController.loadSignin);
 router.post("/login", adminController.verifySignIn);
-router.get("/dashboard", authAdmin.isLogin, adminController.dashboard);
 router.post("/logout", adminController.logout);
+router.get("/dashboard", authAdmin.isLogin, adminController.dashboard);
+router.get('/dashboard/salesgraph', authAdmin.isLogin, adminController.salesGraph)
+
+
 
 //               user management
 router.get("/users", authAdmin.isLogin, adminController.loadUsers);

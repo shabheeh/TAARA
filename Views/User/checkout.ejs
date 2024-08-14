@@ -869,7 +869,7 @@ input[type="radio"]:checked + label::after {
         });
     
         function editCheckoutAddress(data) {
-                fetch('/editAddress', {
+                fetch('/address', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -917,6 +917,7 @@ input[type="radio"]:checked + label::after {
 
 document.addEventListener('DOMContentLoaded', () => {
         const addAddressForm = document.getElementById('add-address');
+        console.log(addAddressForm)
         if (addAddressForm) {
             addAddressForm.addEventListener('submit', (event) => {
                 event.preventDefault();
@@ -1055,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     function addCheckoutAddress(data) {
-            fetch('/addAddress', {
+            fetch('/address', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
