@@ -5,12 +5,14 @@ const Order = require('../Models/orderModel')
 async function bestSellingBrands(limit = 3) {
   try {
       const brandSales = await Order.aggregate([
+
+          { $unwind: '$products' },
           {
               $match: {
-                  paymentStatus: { $in: ['Paid', 'Pending'] }
+                  'products.status': { $in: ['Delivered', 'Return Requested'] }
               }
           },
-          { $unwind: '$products' },
+          
           {
               $lookup: {
                   from: 'products',
@@ -80,17 +82,18 @@ async function bestSellingBrands(limit = 3) {
 async function getSalesAndRevenue() {
   try {
       const result = await Order.aggregate([
-          {
-              $match: {
-                  paymentStatus: { $in: ['Paid', 'Pending'] }
-              }
-          },
+        { $unwind: '$products' },
+        {
+            $match: {
+                'products.status': { $in: ['Delivered', 'Return Requested'] }
+            }
+        },
           {
               $group: {
                   _id: null,
                   totalOrders: { $sum: 1 },
-                  totalProductsSold: { $sum: '$totalQuantity' },
-                  totalRevenue: { $sum: '$finalTotal' }
+                  totalProductsSold: { $sum: '$products.quantity' },
+                  totalRevenue: { $sum: '$products.totalPrice' }
               }
           }
       ]);

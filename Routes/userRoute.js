@@ -17,6 +17,7 @@ const orderController = require('../Controllers/orderController')
 
 //             middlewares
 const authUser = require("../Middlewares/authUser");
+const { auth } = require("firebase-admin");
 
 
 
@@ -35,6 +36,8 @@ router.post('/forgotPass', userController.forgotPassVerify)
 router.get('/reset/:token', userController.resetPass)
 router.post('/reset/:token', userController.resetPassVerify)
 router.post('/signout', userController.signout)
+
+router.get('/about', authUser.authorization, userController.about)
 
 //                products grid and product viewing
 router.get('/products/:title', authUser.authorization, productController.productsGrid)
@@ -57,7 +60,7 @@ router.put('/cart/:variantId/:cartId', authUser.authorization, cartController.up
 router.post('/toCheckout', authUser.authorization, cartController.proceedToCheckout)
 
 //                       wishlist
-router.get('/wishlist', authUser.isLogin, cartController.wishlist)
+router.get('/wishlist', authUser.isLogin, authUser.isBlocked, cartController.wishlist)
 router.post('/wishlist', authUser.authorization, cartController.addToWishlist)
 router.delete('/wishlist/:variantId/:wishlistId', authUser.authorization, cartController.removeFromWishlist)
 
@@ -71,7 +74,11 @@ router.get('/checkout/success/:orderId', authUser.isLogin, authUser.isBlocked, o
 router.post('/order', authUser.authorization , orderController.updateOrderStatus)
 router.put('/order', authUser.authorization, orderController.updatePaymentStatus)
 router.patch('/order', authUser.authorization, orderController.retryPayment)
-router.get('/invoice/:orderId', authUser.authorization, orderController.generateInvoice)
+router.get('/invoice/:orderId', authUser.isLogin, orderController.generateInvoice)
+
+//                          review
+router.post('/review', authUser.authorization, productController.review)
+router.put('/review', authUser.authorization, productController.editReview)
 
 //            404
 // router.get('/404', userController.fourNotFour)

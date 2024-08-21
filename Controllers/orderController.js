@@ -28,18 +28,23 @@ const loadCheckout = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const user = await User.findOne({ _id: userId });
-        const addresses = await Address.find({ user: userId });
-        const cart = await Cart.findOne({ user: userId })
-            .populate({
-                path: "products.product",
-                populate: {
-                    path: 'offers',
-                    model: 'Offer'
-                }
-            })
-            .populate("products.variant");
+        const [user, addresses, cart, wallet] = await Promise.all([
 
+          User.findOne({ _id: userId }),
+          Address.find({ user: userId }),
+          Cart.findOne({ user: userId })
+              .populate({
+                  path: "products.product",
+                  populate: {
+                      path: 'offers',
+                      model: 'Offer'
+                  }
+              })
+              .populate("products.variant"),
+          Wallet.findOne({user: userId})
+      ]);
+
+        
         let originalSubTotal = 0;
         let discountedSubTotal = 0;
         let shippingCharge = 0;
@@ -83,6 +88,7 @@ const loadCheckout = async (req, res) => {
             addresses,
             cart: { products: filteredProducts },
             coupons,
+            wallet: wallet ? wallet : null,
             originalSubTotal: Math.round(originalSubTotal.toFixed(2)),
             discountedSubTotal: Math.round(discountedSubTotal.toFixed(2)),
             shippingCharge,
@@ -101,7 +107,7 @@ const loadCheckout = async (req, res) => {
 const validateCoupon = async (req, res) => {
   try {
     const { couponCode, total } = req.body;
-    const userId = req.user._id;
+    const userId = req.userId;
 
     // Find the coupon
     const coupon = await Coupon.findOne({ code: couponCode, status: 'Active' });
@@ -166,7 +172,7 @@ const checkout = async (req, res) => {
     const { addressId, paymentMethod, couponCode } = req.body;
     const userId = req.userId;
 
-    const [user, address, cart, wishlist] = await Promise.all([
+    const [user, address, cart, wishlist, wallet] = await Promise.all([
       User.findById(userId),
       Address.findById(addressId),
       Cart.findOne({ user: userId })
@@ -181,6 +187,8 @@ const checkout = async (req, res) => {
       Wishlist.findOne({ user: userId })
         .populate("products.product")
         .populate("products.variant"),
+
+      Wallet.findOne({ user: userId }),
     ]);
 
     if (!cart) {
@@ -225,7 +233,6 @@ const checkout = async (req, res) => {
       product.appliedOffer = bestOffer;
     });
 
-    // Initialize coupon-related variables
     let appliedCoupon = null;
     let couponDiscount = 0;
 
@@ -385,7 +392,7 @@ const checkout = async (req, res) => {
     // Handle Razorpay payment
     if (paymentMethod === "Razorpay") {
       const razorpayOrder = await razorpay.orders.create({
-        amount:  Math.round(finalTotal * 100),
+        amount: Math.round(finalTotal * 100),
         currency: "INR",
         receipt: orderId,
         payment_capture: 1,
@@ -403,6 +410,40 @@ const checkout = async (req, res) => {
           amount: finalTotal,
           razorpayOrderId: razorpayOrder.id,
           razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+        },
+        user: {
+          id: userId,
+          email: user.email,
+        },
+      });
+      // if wallet payment
+    } else if (paymentMethod === "Wallet") {
+      // Update user wallet balance
+      if (wallet) {
+        const transaction = {
+          amount: order.finalTotal,
+          type: "Wallet Payment",
+          entry: "Debit",
+          date: new Date(),
+          orderId: order.orderId,
+        };
+
+        wallet.balance -= order.finalTotal;
+        wallet.transactions.push(transaction);
+        await wallet.save();
+      }
+
+      // Update order status to paid
+      order.paymentStatus = "Paid";
+      await order.save();
+
+      res.json({
+        success: true,
+        orderId: order._id,
+        message: "Order placed successfully and paid from wallet",
+        order: {
+          id: order._id,
+          amount: finalTotal, 
         },
         user: {
           id: userId,
@@ -435,15 +476,17 @@ const checkout = async (req, res) => {
     });
     await cart.save();
 
-    // Update wishlist by removing purchased products
-    wishlist.products = wishlist.products.filter((wishlistProduct) => {
-      return !filteredProducts.some(
-        (filteredProduct) =>
-          wishlistProduct.variant._id.toString() ===
-          filteredProduct.variant._id.toString()
-      );
-    });
-    await wishlist.save();
+    // update the wishlist only the user has a wishlist
+    if (wishlist) {
+      wishlist.products = wishlist.products.filter((wishlistProduct) => {
+        return !filteredProducts.some(
+          (filteredProduct) =>
+            wishlistProduct.variant._id.toString() ===
+            filteredProduct.variant._id.toString()
+        );
+      });
+      await wishlist.save();
+    }
   } catch (error) {
     console.log("Error placing order:", error);
     res.json({ success: false, message: "Error placing order" });
@@ -465,6 +508,7 @@ const updatePaymentStatus = async ( req, res ) => {
         message: 'Order not found' })
     }
       order.paymentStatus = status
+      
 
       await order.save()
       res.json({ 

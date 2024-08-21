@@ -54,9 +54,9 @@
                                 <a href="#">Links</a>
                                 <ul>
                                     <li><a href="tel:#"><i class="icon-phone"></i>Call: +0123 456 789</a></li>
-                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist <span>(3)</span></a></li>
-                                    <li><a href="about.html">About Us</a></li>
-                                    <li><a href="contact.html">Contact Us</a></li>
+                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist <span></span></a></li>
+                                    <li><a href="/about">About Us</a></li>
+
                                     <li><a href="/account"><i class="icon-user"></i><%= user ? user.firstName || 'Account' : 'Sign In' %></a></li>
         
         
@@ -76,7 +76,8 @@
                         </button>
         
                         <a href="/" class="logo">
-                            Taara
+                            <img src="/User/assets/images/taaraLogo-1.png" alt="Molla Logo" width="105" height="25">
+
                         </a>
         
                         <nav class="main-nav">
@@ -97,11 +98,11 @@
         
                                     
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <a href="blog.html" class="">SALE</a>
         
                                     
-                                </li>
+                                </li> -->
                                 
                             </ul><!-- End .menu -->
                         </nav><!-- End .main-nav -->
@@ -121,58 +122,10 @@
                         
         
                         <div class="dropdown cart-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                            <a href="/cart" class="dropdown-toggle" role="button" >
                                 <i class="icon-shopping-cart"></i>
-                                <span class="cart-count"><%= cart.products.length %></span>
+                                
                             </a>
-                        
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <% if (cart.products.length > 0) { %>
-                                    <div class="dropdown-cart-products">
-                                        <% cart.products.slice(0, 3).forEach(current => { %>
-                                            <div class="product pb-3">
-                                                <div class="product-cart-details">
-                                                    <h4 class="product-title">
-                                                        <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
-                                                    </h4>
-                                                    <span class="cart-product-info">
-                                                        <% if (current.quantity > 0 ) { %>
-                                                            <span class="cart-product-qty"><%= current.quantity %></span>
-                                                            <% } else { %>
-                                                                <span class="cart-product-qty"> 1 </span>
-                                                        <% } %>
-                                                        
-                                                        x Rs.<%= current.product.price %>
-                                                    </span>
-                                                </div><!-- End .product-cart-details -->
-                                
-                                                <figure class="product-image-container" style="width: 40px; height: 50px;">
-                                                    <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="product-image">
-                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product" style="width: 52px; height: auto;">
-                                                    </a>
-                                                </figure>
-                                                <!-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a> -->
-                                            </div><!-- End .product -->
-                                        <% }); %>
-                                    </div><!-- End .dropdown-cart-products -->
-                                
-                                    <div class="dropdown-cart-total">
-                                        <span>Total</span>
-                                        <span class="cart-total-price">Rs.<%= totalPrice %></span>
-                                    </div><!-- End .dropdown-cart-total -->
-                                
-                                    <div class="dropdown-cart-action">
-                                        <a href="/cart" class="btn btn-primary">View Cart</a>
-                                        <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                                    </div><!-- End .dropdown-cart-action -->
-                                <% } else { %>
-                                    <div class="dropdown-cart-action">
-                                        <p>Your cart is empty  </p>
-                                        <a href="/cart" class="btn btn-primary">View Cart</a>
-
-                                    </div><!-- End .dropdown-cart-action -->
-                                <% } %>
-                            </div><!-- End .dropdown-menu -->
                             
                         </div><!-- End .cart-dropdown -->
                     </div><!-- End .header-right -->
@@ -259,12 +212,12 @@
                         
                                             <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
                                               <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
-                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[1] %>" alt="Product image" class="product-image-hover">
+                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[3] %>" alt="Product image" class="product-image-hover">
                                             </a>
                                   
                                             <div class="product-action-vertical">
                                               <a href="#" id="addToWishlist-<%= product.variants[0]._id %>" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                              <a href="quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                              
                                             </div><!-- End .product-action-vertical -->
                                   
                                             <div class="product-action">
@@ -499,7 +452,7 @@
     <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
 
 
-    //             add to cart
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -569,7 +522,7 @@ function addToCart(data) {
 
     </script>
 
-//               add to wishlist
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
@@ -638,7 +591,7 @@ function addToWishlist(data) {
 
 </script>
 
-//                searching filtering sorting
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const filterForm = document.getElementById('filter-form');

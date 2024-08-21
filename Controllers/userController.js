@@ -5,9 +5,14 @@ const Cart = require('../Models/cartModel')
 const Address = require('../Models/addressModel')
 const Order = require('../Models/orderModel')
 const Wallet = require('../Models/walletModel')
+const Review = require('../Models/reviewModel')
+const Offer = require('../Models/offerModel')
+const Product = require('../Models/productModel')
+const Banner = require('../Models/bannerModel')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+
 
 
 
@@ -28,43 +33,72 @@ const transporter = nodemailer.createTransport({
 // ------Home Page------>
 
 const loadHome = async (req, res) => {
-
-    try {
-        if (!req.userId) {
-            return res.render('home',{
-                cart: { products: [] } 
-            });
-        }
-
-        const [user, cart ] = await Promise.all([
-            User.findById(req.userId),
-            Cart.findOne({ user: req.userId }).populate('products.product').populate('products.variant'),
-        ])
-        
-
-        if (!cart || cart.products.length === 0) {
-            // Handle case where cart is empty
-                cart: { products: [] }  
-            
-        }
-
-        let totalPrice = 0;
-
-      cart.products.forEach((product) => {
-        totalPrice += product.product.price * product.quantity;
-      });
-
-        res.render('home', {
-            user,
-            cart,
-            totalPrice
-        });
-    } catch (error) {
-
-        console.log('Error loading home:', error.message);
-        res.render('404')
+  try {
+    let user = null;
+    if (req.userId) {
+      user = await User.findById(req.userId);
     }
+    const products = await Product.find()
+      .populate("variants")
+      .populate("category")
+      .populate("brand");
+
+    const banners = await Banner.find()
+
+    const offerIds = products.reduce((ids, product) => {
+      if (product.offers && Array.isArray(product.offers)) {
+        return ids.concat(product.offers);
+      }
+      return ids;
+    }, []);
+
+    const offers = await Offer.find({
+      _id: { $in: offerIds },
+      status: "Active",
+    }).lean();
+
+    // Process offers for each product
+    const newProduct = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    products.forEach((product) => {
+      product.isNew = product.createdAt > newProduct;
+      if (
+        product.offers &&
+        Array.isArray(product.offers) &&
+        product.offers.length > 0
+      ) {
+        const productOffers = offers.filter((offer) =>
+          product.offers.some(
+            (offerId) => offerId.toString() === offer._id.toString()
+          )
+        );
+        if (productOffers.length > 0) {
+          const bestOffer = productOffers.reduce((best, current) =>
+            current.discount > best.discount ? current : best
+          );
+          product.bestOffer = bestOffer;
+          product.discountedPrice = Math.round(
+            (product.price * (1 - bestOffer.discount / 100)).toFixed(2)
+          );
+        } else {
+          product.discountedPrice = Number(product.price.toFixed(2));
+        }
+      } else {
+        product.discountedPrice = Number(product.price.toFixed(2));
+      }
+    });
+
+    res.render("home", {
+      user: user ? user : null,
+      products: products,
+      banners: banners ? banners : []
+    });
+  } catch (error) {
+    console.log("Error loading home:", error.message);
+    res.render("404");
+  }
 };
+
 
 
 
@@ -300,6 +334,7 @@ const verifySignIn = async (req, res) => {
                 }
 
                 req.session.user = userData;
+                
                 res.redirect('/');
 
             } else {
@@ -318,7 +353,7 @@ const verifySignIn = async (req, res) => {
         }
     } catch ( error ) {
         console.log(error.message + ' user verifySignIn');
-        res.render('404')
+
     }
 };
 
@@ -504,20 +539,15 @@ const userAccount = async (req, res) => {
             return res.status(404).render('404', { message: 'User not found' });
         }
 
-        const [addresses, orders, wallet, cart] = await Promise.all([
+        const [addresses, orders, wallet, cart, reviews] = await Promise.all([
             Address.find({ user: userId }),
             Order.find({ user: userId }).populate('products.product').populate('products.variant').sort({ createdAt: -1 }),
             Wallet.findOne({ user: userId }),
-            Cart.findOne({ user: userId }).populate('products.product').populate('products.variant')
+            Cart.findOne({ user: userId }).populate('products.product').populate('products.variant'),
+            Review.find({'user': userId})
         ]);
 
-        let totalPrice = 0;
-        if (cart && cart.products.length > 0) {
-            totalPrice = cart.products.reduce((total, product) => {
-                const quantity = Math.max(product.quantity, 1);
-                return total + (product.product.price * quantity);
-            }, 0);
-        }
+        
 
         // Creating deep copy for not manipulating the original orders
         const ordersCopy = JSON.parse(JSON.stringify(orders));
@@ -533,14 +563,15 @@ const userAccount = async (req, res) => {
             wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         }
 
+
         return res.render('user', {
             user,
             addresses: addresses || [],
             orders: orders || [],
             cancelledOrders: cancelledOrders || [],
-            cart: cart || { products: [] },
-            totalPrice,
-            wallet: wallet || null
+
+            wallet: wallet || null,
+            reviews: reviews || [],
         });
 
     } catch (error) {
@@ -740,7 +771,7 @@ const deleteAddress = async ( req, res ) => {
         
     }
 }
-
+// --------404------->
 const fourNotFour = async ( req, res ) => {
     try {
         let user = null;
@@ -755,6 +786,25 @@ const fourNotFour = async ( req, res ) => {
         console.log('Error rendering 404:', error.message);
         res.render('404')
 
+    }
+}
+
+
+// --------about----->
+
+const about = async ( req, res ) => {
+    try {
+        let user = null;
+        if (req.userId) {
+          user = await User.findById(req.userId);
+        }
+
+        res.render('about', {
+            user: user ? user : null,
+
+        })
+    } catch (error) {
+        console.log('Error rendering about:', error.message);
     }
 }
 
@@ -779,6 +829,7 @@ module.exports = {
     editAddress,
     deleteAddress,
     fourNotFour,
+    about,
 
 
 }

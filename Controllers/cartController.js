@@ -99,8 +99,8 @@ const addToCart = async (req, res) => {
 
     const user = await User.findById(userId);
     const variant = await Variant.findById(variantId);
-    
-    // Check the variant is in stock
+
+    // Check if the variant is in stock
     if (variant.quantity === 0) {
       return res.json({
         success: false,
@@ -115,22 +115,28 @@ const addToCart = async (req, res) => {
     const existingCart = await Cart.findOne({ user: userId });
 
     if (existingCart) {
+      // Check if the product with the same variant is already in the cart
       const existingProduct = existingCart.products.find(
         (product) =>
           product.product.toString() === productId.toString() &&
-          product.variant.toString() === variantId.toString()
+          product.variant.toString() === variantId.toString() &&
+          product.size === size
       );
 
       if (existingProduct) {
-        existingProduct.quantity = Math.min(existingProduct.quantity + Number(quantity), 5);
-      } else {
-        existingCart.products.push({
-          product: product._id,
-          variant: variant._id,
-          size: size,
-          quantity: Number(quantity),
+        return res.json({
+          success: false,
+          user : true,
+          message: "Product already added to cart.",
         });
       }
+
+      existingCart.products.push({
+        product: product._id,
+        variant: variant._id,
+        size: size,
+        quantity: Number(quantity),
+      });
 
       await existingCart.save();
     } else {
@@ -151,7 +157,7 @@ const addToCart = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Added to cart",
+      message: "Added to cart.",
     });
   } catch (error) {
     console.log("Error adding product to cart", error);
@@ -160,7 +166,8 @@ const addToCart = async (req, res) => {
       message: "An error occurred while adding the product to the cart.",
     });
   }
-}
+};
+
 
 
 // --------Remove from cart------->
@@ -385,15 +392,6 @@ const wishlist = async (req, res) => {
         .populate('products.variant'),
     ]);
 
-    // Calculate total price of the cart
-    let totalPrice = 0;
-    if (cart && cart.products.length > 0) {
-      totalPrice = cart.products.reduce((total, product) => {
-        const quantity = Math.max(product.quantity, 1);
-        return total + (product.product.price * quantity);
-      }, 0);
-    }
-
     // Process offers for products in the wishlist
     if (wishlist && wishlist.products.length > 0) {
       wishlist.products.forEach(product => {
@@ -417,8 +415,7 @@ const wishlist = async (req, res) => {
     res.render('wishlist', {
       wishlist: wishlist || { products: [] },
       user,
-      cart: cart || { products: [] },
-      totalPrice,
+
     });
   } catch (error) {
     console.error('Error loading wishlist:', error.message);

@@ -1,0 +1,468 @@
+<%- include('../Layouts/Admin/header') -%>
+
+    
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" /> 
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css">
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css">
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/apex-charts/apex-charts.css" />
+<link rel="stylesheet" href="/Admin/assets/vendor/libs/rateyo/rateyo.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css">
+
+    <!-- Page CSS -->
+    
+<link rel="stylesheet" href="/Admin/assets/vendor/css/pages/app-ecommerce.css">
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+   
+    <script src="/Admin/assets/js/config.js"></script>
+    
+</head>
+
+
+  <%- include('../Layouts/Admin/navbar') -%>
+      
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+        
+          <div class="container-xxl flex-grow-1 container-p-y">
+            
+
+            <div class="card">
+              <div class="card-datatable table-responsive">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                  <div class="card-header d-flex align-items-md-center flex-wrap pb-md-0 pt-0 flex-column flex-md-row">
+                    <div class="me-5 ms-n1">
+                      <div class="dataTables_filter">
+                        <label>
+                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search review">
+                        </label>
+                    </div>
+                    </div>
+                    <div
+                      class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-md-end pt-0 gap-4 flex-wrap">
+                      
+                      <div class="review_filter">
+                        <form id="filter-form">
+                        <select id="review-status" name="filter" class="form-select form-select-sm">
+                          <option value="" <%=filter==='' ? 'selected' : '' %>>All</option>
+                          <option value="published" <%=filter==='published' ? 'selected' : '' %>>Published</option>
+                          <option value="unpublished" <%=filter==='unpublished' ? 'selected' : '' %>>Unpublished</option>
+                        </select>
+                        </form>
+                      </div>
+                      
+                    </div>
+                  </div>
+                  <table class="datatables-review table dataTable no-footer dtr-column collapsed" id="DataTables_Table_0"
+                    aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th class="text-nowrap">Reviewer</th>
+                        <th>Review</th>
+                        <th>Date</th>
+                        <th class="text-nowrap">Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (reviews && reviews.length > 0) { %>
+                        <% reviews.forEach(review => { %>
+                         <tr class="odd">
+                           <td class="sorting_1">
+                             <div class="d-flex justify-content-start align-items-center customer-name">
+                               <div class="avatar-wrapper">
+                                 <div class="avatar me-4 rounded-2 bg-label-secondary" style="width: 50px; height: 70px;"><img
+                                     src="/Admin/assets/Products-Images/<%= review.product.variants[0].images[0] %>" alt="Product-9" class="image-fluid" style="max-width: 100%; max-height: 100%;"></div>
+                               </div>
+                               <div class="d-flex flex-column">
+                                 <span class="text-nowrap text-heading fw-medium">
+                                   <%= review.product.name %>
+                                 </span>
+                                 <small>
+                                   <%= review.product.brand.name %>
+                                 </small>
+                               </div>
+                             </div>
+                           </td>
+                           <td>
+                             <div class="d-flex justify-content-start align-items-center customer-name">
+                               <div class="avatar-wrapper me-4">
+                                 <div class="avatar avatar-sm"><img src="/Admin/assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">
+                                 </div>
+                               </div>
+                               <div class="d-flex flex-column">
+                                 <a>
+                                   <span class="fw-medium"><%= review.user.firstName || 'Name' %></span>
+                                 </a>
+                                 <small class="text-nowrap">
+                                   <%= review.user.email %>
+                                 </small>
+                               </div>
+                             </div>
+                           </td>
+                           <td>
+                             <div>
+                               <div class="read-only-ratings ps-0 mb-1 jq-ry-container" readonly="readonly" style="width: 120px;">
+                                 <div class="jq-ry-group-wrapper">
+                                   <div class="jq-ry-normal-group jq-ry-group">
+                                     <% for( let i = 0; i < review.rating; i++ ) { %>
+                                       <svg xmlns="http://www.w3.org/2000/svg" width="24px"
+                                       height="24px" viewBox="0 0 24 24" fill="gray">
+                                       <path
+                                         d="M12.0002 17L6.12223 20.59L7.72023 13.89L2.49023 9.41L9.35523 8.86L12.0002 2.5L14.6452 8.86L21.5112 9.41L16.2802 13.89L17.8782 20.59L12.0002 17Z"
+                                         fill="#FFB400"></path>
+                                     </svg>
+                                     <% } %>
+                                     
+                                   </div>
+                                 </div>
+                               </div>
+                               <h6 class="mb-1 text-truncate text-capitalize"><%= review.title %></h6>
+                               <small class="text-break pe-3">
+                                 <%= review.comment %>
+                               </small>
+                             </div>
+                           </td>
+                          
+                           <td>
+                             <span class="text-nowrap"><%= new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day : 'numeric', year: 'numeric' }) %></span>
+                           </td>
+                           <td class="dtr-hidden" >
+                             <% if (review.isListed) { %>
+                               <span id="published-<%= review._id %>" class="badge rounded-pill bg-label-success"
+                               text-capitalized="">Published
+                             </span>
+                             <% } else { %>
+                              <span id="unpublished-<%= review._id %>" class="badge rounded-pill bg-label-danger"
+                              text-capitalized="">Unpublished
+                              </span>
+                             <% } %>
+                             
+                             </td>
+                           <td class="dtr-hidden" >
+                             <div>
+                               <div class="dropdown">
+                                 <a class="btn btn-sm btn-icon btn-text-secondary waves-effect rounded-pill dropdown-toggle hide-arrow text-body p-0"
+                                   data-bs-toggle="dropdown"><i class="ri-more-2-line ri-22px"></i></a>
+                                 <div class="dropdown-menu dropdown-menu-end">
+                                   <% if (review.isListed) { %>
+                                     <a id="unpublish-<%= review._id %>" class="dropdown-item publish-btn" data-review-id="<%= review._id %>">Change</a>
+                                     <% } else { %>
+                                       <a id="publish-<%= review._id %>" class="dropdown-item publish-btn" data-review-id="<%= review._id %>">Change</a>
+                                   <% } %>
+                                   <div class="dropdown-divider"></div>
+                                   <a 
+                                     class="dropdown-item delete-record text-danger"  onclick="deleteReview('<%= review._id %>')">Delete
+                                   </a>
+                                 </div>
+                               </div>
+                             </div>
+                           </td>
+                         </tr>
+                        <% }) %>
+                        <% } else { %>
+                         <tr>
+                           <td class="text-center" colspan="6">
+                             no reviews
+                           </td>
+                         </tr>
+                       <% } %>
+                    </tbody>
+                  </table>
+                  <div class="row mx-1">
+                    <div class="col-sm-12 col-md-6">
+                      <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+                        Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalReviews) %> of <%= totalReviews %>
+                              entries
+                      </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                      <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                        <ul class="pagination">
+                          <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
+                            <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                              class="page-link">Previous</a>
+                          </li>
+                          <% for (let i=1; i <=totalPages; i++) { %>
+                            <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                              <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                                class="page-link">
+                                <%= i %>
+                              </a>
+                            </li>
+                            <% } %>
+                              <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
+                                <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
+                                  class="page-link">Next</a>
+                              </li>
+                        </ul>
+                      </div>
+                  
+                    </div>
+                    </div>
+                  <div style="width: 1%;"></div>
+                  <div style="width: 1%;"></div>
+                </div>
+              </div>
+            </div>
+
+
+<!-- review List Table -->
+
+
+
+          </div>
+          <!-- / Content -->
+
+
+          
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+      </div>
+      <!-- / Layout page -->
+    </div>
+
+    
+    
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    
+    
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    
+  </div>
+  <!-- / Layout wrapper -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const publishBtn = document.querySelectorAll('.publish-btn');
+      
+      publishBtn.forEach((btn) => {
+        btn.addEventListener('click', function() {
+          const reviewId = this.getAttribute('data-review-id');
+          
+          fetch('/admin/reviews', { // Corrected URL and added missing comma
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              reviewId: reviewId
+            })    
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              let publishPill = document.getElementById(data.review.isListed ? `published-${data.review._id}` : `unpublished-${data.review._id}`);
+              let publishbtn = document.getElementById(data.review.isListed ? `unpublish-${data.review._id}` : `publish-${data.review._id}`);
+             
+
+              if(!publishBtn){
+
+                publishbtn = document.getElementById(data.review.isListed ? `publish-${data.review._id}` : `unpublish-${data.review._id}`);
+              }
+              if (!publishPill) {
+                publishPill = document.getElementById(data.review.isListed ? `unpublished-${data.review._id}` : `published-${data.review._id}`);
+              }
+
+              if (publishPill) {
+
+                publishPill.textContent = data.review.isListed ? "Published" : "Unpublished";
+                publishPill.id = data.review.isListed ? `published-${data.review._id}` : `unpublished-${data.review._id}`;
+                publishPill.classList.toggle('bg-label-success', data.review.isListed);
+                publishPill.classList.toggle('bg-label-danger', !data.review.isListed);
+
+                if(publishBtn){
+                publishBtn.textContent = data.review.isListed ? "Unpublish" : "Publish";
+                
+              }
+
+                // Show success alert
+                var notyf = new Notyf();
+                notyf.success(data.message, 1000);
+              } else {
+                console.error('Could not find pill element to update');
+                // Optionally, show an error message to the user
+              }
+            } else {
+              // Show error alert
+              Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Fetch error:', error);
+            Swal.fire({
+              title: 'Error',
+              text: 'An error occurred while updating the review status.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'OK'
+            });
+          });
+        });
+      });
+    });
+  </script>
+  
+  
+  <script>
+    // Delete offer function
+    function deleteReview(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this review.',
+            icon: 'warning',
+            showCancelButton: true,
+            
+            confirmButtonColor: '#8c57ff',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+            if (result.value) {
+                fetch('/admin/reviews', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            $(`#review-${id}`).remove();
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: 'Review has been deleted.',
+                                icon: 'success',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                        Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                    });
+            }
+        });
+    }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const filterForm = document.getElementById('filter-form');
+    const paginationLinks = document.querySelectorAll('.pagination a.page-link');
+
+
+    function updateURLParams() {
+      const params = new URLSearchParams(new FormData(filterForm));
+
+      if (searchInput.value.trim()) {
+        params.set('search', searchInput.value.trim());
+      } else {
+        params.delete('search');
+      }
+
+      return params;
+    }
+
+    function handleFormChange() {
+      const params = updateURLParams();
+      window.location.href = `/admin/reviews?${params.toString()}`;
+    }
+
+    function handlePagination(event) {
+      event.preventDefault();
+      const page = event.target.getAttribute('data-page');
+      const params = updateURLParams();
+      params.set('page', page);
+      window.location.href = `/admin/reviews?${params.toString()}`;
+    }
+
+    filterForm.addEventListener('change', handleFormChange);
+
+    paginationLinks.forEach(link => {
+      link.addEventListener('click', handlePagination);
+    });
+
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleFormChange();
+      }
+    });
+  });
+</script>
+
+
+  <!-- Core JS -->
+  <!-- bui:Admin assets/vendor/js/core.js -->
+  <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+  <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+  <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+  <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+  <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="/Admin/assets/vendor/js/menu.js"></script>
+  
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="/Admin/assets/vendor/libs/moment/moment.js"></script>
+<script src="/Admin/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="/Admin/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="/Admin/assets/vendor/libs/rateyo/rateyo.js"></script>
+
+  <!-- Main JS -->
+  <script src="/Admin/assets/js/main.js"></script>
+  
+
+  <!-- Page JS -->
+  <!-- <script src="/Admin/assets/js/app-ecommerce-reviews.js"></script> -->
+  
+</body>
+
+
+<!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-manage-reviews.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:39 GMT -->
+</html>
+
+<!-- beautify ignore:end -->
+

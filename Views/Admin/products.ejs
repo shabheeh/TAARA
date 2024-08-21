@@ -220,7 +220,7 @@
                                 <div class="row mb-5">
                                   <div class="col-md-6">
                                     <div class="form-floating form-floating-outline mb-5">
-                                      <select id="product-gender-<%= product._id %>" class="form-select" aria-label="Gender" name="gender">
+                                      <select id="product-gender-<%= product._id %>" class="select2 form-select" aria-label="Gender" name="gender">
                                         <option value="">Select gender</option>
                                         <option value="Men" <% if (product.gender==='Men' ) { %>selected<% } %>>Men</option>
                                         <option value="Women" <% if (product.gender==='Women' ) { %>selected<% } %>>Women</option>
@@ -231,11 +231,11 @@
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-floating form-floating-outline mb-5">
-                                      <select id="product-category-<%= product._id %>" class="form-select" aria-label="Category"
+                                      <select id="product-category-<%= product._id %>" class="select2 form-select" aria-label="Category"
                                         name="category">
                                         <option value="">Select category</option>
                                         <% categories.forEach(category=> { %>
-                                          <option value="<%= category._id %>" <%= category._id.equals(product.category._id) ? 'selected' : '' %>><%= category.name %></option>
+                                          <option value="<%= category._id %>" <%= category._id.equals(product.category._id) ? 'selected' : '' %>><%= category.name %> (<%= category.gender %>)</option>
                                           <% }); %>
                                       </select>
                                       <label for="product-category-<%= product._id %>"
@@ -246,7 +246,7 @@
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-floating form-floating-outline mb-5">
-                                      <select id="product-brand-<%= product._id %>" class="form-select" aria-label="Brand" name="brand">
+                                      <select id="product-brand-<%= product._id %>" class="select2 form-select" aria-label="Brand" name="brand">
                                         <option value="">Select brand</option>
                                         <% brands.forEach(brand=> { %>
                                           <option value="<%= brand._id %>" <%= brand._id.equals(product.brand._id) ? 'selected' : '' %>><%= brand.name %></option>

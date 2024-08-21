@@ -1,0 +1,328 @@
+<%- include('../Layouts/Admin/header') -%>
+
+
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/typeahead-js/typeahead.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/typography.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/katex.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/quill/editor.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/select2/select2.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/dropzone/dropzone.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/flatpickr/flatpickr.css">
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/tagify/tagify.css" />
+    <link rel="stylesheet" href="/Admin/assets/vendor/libs/sweetalert2/sweetalert2.css">
+
+    <!-- Page CSS -->
+    
+
+    <!-- Helpers -->
+    <script src="/Admin/assets/vendor/js/helpers.js"></script>
+    
+    <script src="/Admin/assets/js/config.js"></script>
+
+    <style>
+        
+
+        .error-message {
+            color: red !important;
+        }
+    </style>
+
+    </head>
+
+    <body>
+
+        <%- include('../Layouts/Admin/navbar') -%>
+
+
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+
+                <!-- Content -->
+
+                <div class="container-xxl flex-grow-1 container-p-y">
+
+
+
+
+                    <!-- Order Details Table -->
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">Large Banner 1</h5>
+                                    <a class="btn btn-primary" href="/admin/editBanner/<%= banners[0]._id %>">Edit</a>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="banner banner-big position-relative">
+                                        <img src="/Admin/assets/Banner-Images/<%= banners[0].image %>" alt="Banner" class="card-img">
+                                        <div class="banner-content position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center p-4" style="margin-left: 5%;">
+                                            <div >
+                                                <h3 class="banner-title text-white text-center"><%= banners[0].title %></h3>
+                                                <p class="d-none d-lg-block text-white text-center"><%= banners[0].description %></p> 
+                                                <div class="text-start mt-3">
+                                                    <!-- Additional content if needed -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">Large Banner 2</h5>
+                                    <a class="btn btn-primary" href="/admin/editBanner/<%= banners[1]._id %>">Edit</a>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="banner banner-big position-relative">
+                                        <img src="/Admin/assets/Banner-Images/<%= banners[1].image %>" alt="Banner" class="card-img">
+                                        <div class="banner-content position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center p-4" style="margin-left: 5%;">
+                                            <div style="max-width: 50%;">
+                                                <h3 class="banner-title text-white"><%= banners[1].title %></h3>
+                                                <p class="d-none d-lg-block text-white"><%= banners[1].description %></p> 
+                                                <div class="text-start mt-3">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card mb-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">2 Columns</h5>
+                                    <a class="btn btn-primary" href="/admin/editBanner/<%= banners[2]._id %>">Edit</a>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="banner position-relative">
+                                        <img src="/Admin/assets/Banner-Images/<%= banners[2].image %>" alt="Banner" class="img-fluid w-100">
+                                        <div class="banner-content position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center p-4">
+                                            <h4 class="banner-subtitle"><%= banners[2].title %></h4>
+                                            <h3 class="banner-title"><%= banners[2].description %></h3>
+                               
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card mb-6">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title m-0">2 Columns</h5>
+                                    <a class="btn btn-primary" href="/admin/editBanner/<%= banners[3]._id %>">Edit</a>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="banner position-relative">
+                                        <img src="/Admin/assets/Banner-Images/<%= banners[3].image %>" alt="Banner" class="img-fluid w-100">
+                                        <div class="banner-content position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center p-4">
+                                            <h4 class="banner-subtitle"><%= banners[3].title %></h4>
+                                            <h3 class="banner-title"><%= banners[3].description %></h3>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <!--add coupon Modal -->
+                    <div class="modal fade" id="addCoupon" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel1">Add Coupon</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="add-coupon">
+                                        <div class="row">
+                                            <div class="col mb-3 mt-2">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="name" class="form-control" placeholder="Enter Name">
+                                                    <label for="name" id="nameLabel">Name</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col mb-3 mt-2">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="code" class="form-control" placeholder="Enter Coupon Code">
+                                                    <label for="code" id="codeLabel">Coupon Code</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Description -->
+                                        <div class="row">
+                                            <div class="col mb-3 mt-2">
+                                                <div class="form-floating form-floating-outline fv-plugins-icon-container">
+                                                    <textarea id="description" class="form-control" placeholder="Enter description"
+                                                        aria-label="description" name="description" rows="4"></textarea>
+                                                    <label for="description" id="desLabel">Description</label>
+                                                    <div
+                                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col mb-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="number"  id="amount" class="form-control"
+                                                        placeholder="Minimum order amount">
+                                                    <label for="amount" id="amountLabel">Minimum Order Amount</label>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col mb-3">
+                                                <div class="col mb-2">
+                                                    <div class="col mb-2">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="number" id="maxUses" class="form-control"
+                                                                placeholder="Max Usage count">
+                                                            <label for="maxUses" id="maxUsesLabel">Max Usages</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col mb-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="discount" class="form-control"
+                                                        placeholder="Enter discount in percentage">
+                                                    <label for="discount" id="discountLabel">Discount percentage</label>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col mb-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="number" id="maxDiscount" class="form-control"
+                                                        placeholder="Max Discount amount">
+                                                    <label for="maxDiscont" id="maxDiscountLabel">Maximum Discount</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="row g-4">
+                                            <div class="col mb-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="status" class="select2 form-select" aria-label="Status" name="status">
+                                                        <option value="">Select status</option>
+                                                        <option value="Active">Active</option>
+                                                        <option value="Inactive">Inactive</option>
+                                                    </select>
+                                                    <label for="status" id="statusLabel">Status</label>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col mb-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="date" id="expires" class="form-control">
+                                                    <label for="expires" id="expiresLabel">Expires in</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                    
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+
+                </div>
+                <!-- / Content -->
+
+                
+
+
+
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
+            </div>
+
+
+
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+
+
+            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+            <div class="drag-target"></div>
+
+            </div>
+            <!-- / Layout wrapper -->
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+   
+
+
+            <!-- Core JS -->
+            <!-- build:js /Admin/assets/vendor/js/core.js -->
+            <script src="/Admin/assets/vendor/libs/jquery/jquery.js"></script>
+            <script src="/Admin/assets/vendor/libs/popper/popper.js"></script>
+            <script src="/Admin/assets/vendor/js/bootstrap.js"></script>
+            <script src="/Admin/assets/vendor/libs/node-waves/node-waves.js"></script>
+            <script src="/Admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+            <script src="/Admin/assets/vendor/libs/hammer/hammer.js"></script>
+            <script src="/Admin/assets/vendor/libs/i18n/i18n.js"></script>
+            <script src="/Admin/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+            <script src="/Admin/assets/vendor/js/menu.js"></script>
+
+            <!-- endbuild -->
+
+            <!-- Vendors JS -->
+            <script src="/Admin/assets/vendor/libs/quill/katex.js"></script>
+            <script src="/Admin/assets/vendor/libs/quill/quill.js"></script>
+            <script src="/Admin/assets/vendor/libs/select2/select2.js"></script>
+            <script src="/Admin/assets/vendor/libs/dropzone/dropzone.js"></script>
+            <script src="/Admin/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
+            <script src="/Admin/assets/vendor/libs/flatpickr/flatpickr.js"></script>
+            <script src="/Admin/assets/vendor/libs/tagify/tagify.js"></script>
+            <!-- <script src="/Admin/assets/vendor/libs/sweetalert2/sweetalert2.js"></script> -->
+
+            <!-- Main JS -->
+            <script src="/Admin/assets/js/main.js"></script>
+
+
+            <!-- Page JS -->
+            <script src="/Admin/assets/js/app-ecommerce-product-add.js"></script>
+
+
+            <!-- Page JS -->
+
+
+
+    </body>
+
+
+    <!-- Mirrored from demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-order-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 05:50:34 GMT -->
+
+    </html>
+
+    <!-- beautify ignore:end -->

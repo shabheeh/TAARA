@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express();
 const path = require("path");
-const upload = require("../Configs/multerConfig");
+const { upload, uploadBanner } = require("../Configs/multerConfig");
+
 //          middlewares
 const authAdmin = require("../Middlewares/authAdmin");
 
@@ -10,7 +11,7 @@ const adminController = require("../Controllers/adminController");
 const productController = require("../Controllers/productController");
 const orderController = require("../Controllers/orderController");
 const offerController = require("../Controllers/offerController");
-const { auth } = require("firebase-admin");
+const bannerController = require('../Controllers/bannerController')
 
 
 //        Set view and  static
@@ -141,8 +142,14 @@ router.get("/sales", authAdmin.isLogin, orderController.sales)
 router.get('/sales/pdf', authAdmin.isLogin, orderController.generatePdf)
 router.get('/sales/excel', authAdmin.isLogin, orderController.generateExcel)
 
+//                    review management
+router.get('/reviews', authAdmin.isLogin, productController.reviews)
+router.post('/reviews', authAdmin.isLogin, productController.reviewStatus)
+router.delete('/reviews', authAdmin.isLogin, productController.deleteReview)
 
-
-
+//                     banners mangement
+router.get('/banners', authAdmin.isLogin, bannerController.banners)
+router.get('/editBanner/:id', authAdmin.isLogin, bannerController.loadEditBanner)
+router.put("/banners", uploadBanner.single('bannerImage'), bannerController.editBanner);
 
 module.exports = router;

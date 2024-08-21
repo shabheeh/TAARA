@@ -47,7 +47,7 @@
                         <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
                     </ol>
 
-                    <nav class="product-pager ml-auto" aria-label="Product">
+                    <!-- <nav class="product-pager ml-auto" aria-label="Product">
                         <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
                             <i class="icon-angle-left"></i>
                             <span>Prev</span>
@@ -57,7 +57,7 @@
                             <span>Next</span>
                             <i class="icon-angle-right"></i>
                         </a>
-                    </nav><!-- End .pager-nav -->
+                    </nav>End .pager-nav -->
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
 
@@ -84,13 +84,24 @@
                           <div class="col-md-6">
                             <div class="product-details sticky-content">
                               <h1 class="product-title"><%= product.name %></h1><!-- End.product-title -->
-                      
-                              <div class="ratings-container">
-                                <div class="ratings">
-                                  <div class="ratings-val" style="width: 80%;"></div><!-- End.ratings-val -->
-                                </div><!-- End.ratings -->
-                                <a class="ratings-text" href="#product-accordion" id="review-link">( 2 Reviews )</a>
-                              </div><!-- End.rating-container -->
+                                <% if (reviews && reviews.length > 0) { %>
+                                    <div class="ratings-container">
+                                        <div class="ratings-container">
+                                                                            
+                                            <% for( let i = 0; i < reviews[1].rating; i++ ) { %>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14px"
+                                                height="14px" viewBox="0 0 20 20" fill="gray">
+                                                <path
+                                                  d="M12.0002 17L6.12223 20.59L7.72023 13.89L2.49023 9.41L9.35523 8.86L12.0002 2.5L14.6452 8.86L21.5112 9.41L16.2802 13.89L17.8782 20.59L12.0002 17Z"
+                                                  fill="#FFB400"></path>
+                                              </svg>
+                                              <% } %><!-- End .ratings-val -->
+                                        
+                                    </div><!-- End .rating-container -->
+                                        <a class="ratings-text" href="#product-accordion" id="review-link">( 2 Reviews )</a>
+                                      </div><!-- End.rating-container -->
+                                <% } %>
+                              
                       
                               <div class="product-price">
                                 <% if (product.bestOffer) { %>
@@ -144,7 +155,7 @@
                                   </select>
                                 </div><!-- End.select-custom -->
                       
-                                <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
+                                <!-- <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a> -->
                               </div><!-- End.details-filter-row -->
                                     <div class="details-filter-row details-row-size">
                                         <label id="quantityLabel" for="qty">Qty:</label>
@@ -203,51 +214,19 @@
                                                     </a>
                                                 </h2>
                                             </div><!-- End .card-header -->
-                                            <div id="product-accordion-desc" class="collapse" aria-labelledby="product-desc-heading" data-parent="#product-accordion">
+                                            <div id="product-accordion-desc" class="collapse show" aria-labelledby="product-desc-heading" data-parent="#product-accordion">
                                                 <div class="card-body">
                                                     <div class="product-desc-content">
-                                                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci.</p>
-                                                        <ul>
-                                                            <li>Nunc nec porttitor turpis. In eu risus enim. In vitae mollis elit. </li>
-                                                            <li>Vivamus finibus vel mauris ut vehicula.</li>
-                                                            <li>Nullam a magna porttitor, dictum risus nec, faucibus sapien.</li>
-                                                        </ul>
+                                                        <p><%= product.description %></p>
+                                                        
 
-                                                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede.</p>
+                                                        
                                                     </div><!-- End .product-desc-content -->
                                                 </div><!-- End .card-body -->
                                             </div><!-- End .collapse -->
                                         </div><!-- End .card -->
 
-                                        <div class="card card-box card-sm">
-                                            <div class="card-header" id="product-info-heading">
-                                                <h2 class="card-title">
-                                                    <a role="button" data-toggle="collapse" href="#product-accordion-info" aria-expanded="true" aria-controls="product-accordion-info">
-                                                        Additional Information
-                                                    </a>
-                                                </h2>
-                                            </div><!-- End .card-header -->
-                                            <div id="product-accordion-info" class="collapse show" aria-labelledby="product-info-heading" data-parent="#product-accordion">
-                                                <div class="card-body">
-                                                    <div class="product-desc-content">
-                                                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. </p>
-
-                                                        <h3>Fabric & care</h3>
-                                                        <ul>
-                                                            <li>100% Polyester</li>
-                                                            <li>Do not iron</li>
-                                                            <li>Do not wash</li>
-                                                            <li>Do not bleach</li>
-                                                            <li>Do not tumble dry</li>
-                                                            <li>Professional dry clean only</li>
-                                                        </ul>
-
-                                                        <h3>Size</h3>
-                                                        <p>S, M, L, XL</p>
-                                                    </div><!-- End .product-desc-content -->
-                                                </div><!-- End .card-body -->
-                                            </div><!-- End .collapse -->
-                                        </div><!-- End .card -->
+                                        
 
                                         <div class="card card-box card-sm">
                                             <div class="card-header" id="product-shipping-heading">
@@ -266,70 +245,55 @@
                                                 </div><!-- End .card-body -->
                                             </div><!-- End .collapse -->
                                         </div><!-- End .card -->
-
+                                        
                                         <div class="card card-box card-sm">
                                             <div class="card-header" id="product-review-heading">
                                                 <h2 class="card-title">
                                                     <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-review" aria-expanded="false" aria-controls="product-accordion-review">
-                                                        Reviews (2)
+                                                        Reviews (<%= reviews.length %>)
                                                     </a>
                                                 </h2>
                                             </div><!-- End .card-header -->
                                             <div id="product-accordion-review" class="collapse" aria-labelledby="product-review-heading" data-parent="#product-accordion">
                                                 <div class="card-body">
                                                     <div class="reviews">
-                                                        <div class="review">
-                                                            <div class="row no-gutters">
-                                                                <div class="col-auto">
-                                                                    <h4><a href="#">Samanta J.</a></h4>
-                                                                    <div class="ratings-container">
-                                                                        <div class="ratings">
-                                                                            <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                                                        </div><!-- End .ratings -->
-                                                                    </div><!-- End .rating-container -->
-                                                                    <span class="review-date">6 days ago</span>
-                                                                </div><!-- End .col -->
-                                                                <div class="col">
-                                                                    <h4>Good, perfect size</h4>
-
-                                                                    <div class="review-content">
-                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus cum dolores assumenda asperiores facilis porro reprehenderit animi culpa atque blanditiis commodi perspiciatis doloremque, possimus, explicabo, autem fugit beatae quae voluptas!</p>
-                                                                    </div><!-- End .review-content -->
-
-                                                                    <div class="review-action">
-                                                                        <a href="#"><i class="icon-thumbs-up"></i>Helpful (2)</a>
-                                                                        <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                                                    </div><!-- End .review-action -->
-                                                                </div><!-- End .col-auto -->
-                                                            </div><!-- End .row -->
-                                                        </div><!-- End .review -->
-
+                                                        <% if (reviews && reviews.length > 0) { %>
+                                                         <% reviews.forEach(review => { %>
+                                                            <div class="review">
+                                                                <div class="row no-gutters">
+                                                                    <div class="col-auto">
+                                                                        <h4><%= review.user.firstName || 'User' %></h4>
+                                                                  
+                                                                        <div class="ratings-container">
+                                                                            
+                                                                                <% for( let i = 0; i < review.rating; i++ ) { %>
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14px"
+                                                                                    height="14px" viewBox="0 0 20 20" fill="gray">
+                                                                                    <path
+                                                                                      d="M12.0002 17L6.12223 20.59L7.72023 13.89L2.49023 9.41L9.35523 8.86L12.0002 2.5L14.6452 8.86L21.5112 9.41L16.2802 13.89L17.8782 20.59L12.0002 17Z"
+                                                                                      fill="#FFB400"></path>
+                                                                                  </svg>
+                                                                                  <% } %><!-- End .ratings-val -->
+                                                                            
+                                                                        </div><!-- End .rating-container -->
+                                                                        <span class="review-date"><%= new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day : 'numeric', year: 'numeric' }) %></span>
+                                                                    </div><!-- End .col -->
+                                                                    <div class="col">
+                                                                        <h4><%= review.title %></h4>
+    
+                                                                        <div class="review-content">
+                                                                            <p><%= review.comment %></p>
+                                                                        </div><!-- End .review-content -->
+    
+                                                                        
+                                                                    </div><!-- End .col-auto -->
+                                                                </div><!-- End .row -->
+                                                            </div><!-- End .review -->
+                                                         <% }) %>
+                                                        <% } %>
                                                         
-                                                        <div class="review">
-                                                            <div class="row no-gutters">
-                                                                <div class="col-auto">
-                                                                    <h4><a href="#">John Doe</a></h4>
-                                                                    <div class="ratings-container">
-                                                                        <div class="ratings">
-                                                                            <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
-                                                                        </div><!-- End .ratings -->
-                                                                    </div><!-- End .rating-container -->
-                                                                    <span class="review-date">5 days ago</span>
-                                                                </div><!-- End .col -->
-                                                                <div class="col">
-                                                                    <h4>Very good</h4>
 
-                                                                    <div class="review-content">
-                                                                        <p>Sed, molestias, tempore? Ex dolor esse iure hic veniam laborum blanditiis laudantium iste amet. Cum non voluptate eos enim, ab cumque nam, modi, quas iure illum repellendus, blanditiis perspiciatis beatae!</p>
-                                                                    </div><!-- End .review-content -->
 
-                                                                    <div class="review-action">
-                                                                        <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
-                                                                        <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                                                    </div><!-- End .review-action -->
-                                                                </div><!-- End .col-auto -->
-                                                            </div><!-- End .row -->
-                                                        </div><!-- End .review -->
                                                     </div><!-- End .reviews -->
                                                 </div><!-- End .card-body -->
                                             </div><!-- End .collapse -->

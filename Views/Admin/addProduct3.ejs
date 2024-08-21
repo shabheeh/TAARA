@@ -101,9 +101,15 @@
                                                         <select id="productCategory" name="productCategory" class="select2 form-select" data-placeholder="Option" data-allow-clear="true">
                                                             <option value="">Category</option>
                                                             <% categories.forEach(category => { %>
-                                                              <option value="<%= category._id %>"><%= category.name %></option>
+                                                              <option value="<%= category._id %>">
+                                                                <%= category.name %> 
+                                                                <% if (category.gender) { %>
+                                                                  <small>(<%= category.gender %>)</small>
+                                                                <% } %>
+                                                              </option>
                                                             <% }); %>
                                                           </select>
+                                                          
                                                         <label for="productCategory" id="categoryLabel">Category</label>
                                                     </div>
                                                 </div>
@@ -615,7 +621,7 @@ $('#cropModal').on('hidden.bs.modal', function () {
                                 confirmButtonText: 'OK'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = `/admin/products`;
+                                    window.location.href = `/admin/products/variants/single/${data.id}`;
                                 }
                             });
                         } else {

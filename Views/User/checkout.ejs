@@ -181,9 +181,9 @@ input[type="radio"]:checked + label::after {
                                 <a href="#">Links</a>
                                 <ul>
                                     <li><a href="tel:#"><i class="icon-phone"></i>Call: +0123 456 789</a></li>
-                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist <span>(3)</span></a></li>
-                                    <li><a href="about.html">About Us</a></li>
-                                    <li><a href="contact.html">Contact Us</a></li>
+                                    <li><a href="/wishlist"><i class="icon-heart-o"></i>Wishlist <span></span></a></li>
+                                    <li><a href="/about">About Us</a></li>
+     
                                     <li><a href="/account"><i class="icon-user"></i><%= user ? user.firstName || 'Account' : 'Sign In' %></a></li>
         
         
@@ -203,7 +203,8 @@ input[type="radio"]:checked + label::after {
                         </button>
         
                         <a href="/" class="logo">
-                            Taara
+                            <img src="/User/assets/images/taaraLogo-1.png" alt="Molla Logo" width="105" height="25">
+
                         </a>
         
                         <nav class="main-nav">
@@ -224,11 +225,11 @@ input[type="radio"]:checked + label::after {
         
                                     
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <a href="blog.html" class="">SALE</a>
         
                                     
-                                </li>
+                                </li> -->
                                 
                             </ul><!-- End .menu -->
                         </nav><!-- End .main-nav -->
@@ -248,58 +249,10 @@ input[type="radio"]:checked + label::after {
                         
         
                         <div class="dropdown cart-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                            <a href="/cart" class="dropdown-toggle" role="button" >
                                 <i class="icon-shopping-cart"></i>
-                                <span class="cart-count"><%= cart.products.length %></span>
+                                
                             </a>
-                        
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <% if (cart.products.length > 0) { %>
-                                    <div class="dropdown-cart-products">
-                                        <% cart.products.slice(0, 3).forEach(current => { %>
-                                            <div class="product pb-3">
-                                                <div class="product-cart-details">
-                                                    <h4 class="product-title">
-                                                        <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
-                                                    </h4>
-                                                    <span class="cart-product-info">
-                                                        <% if (current.quantity > 0 ) { %>
-                                                            <span class="cart-product-qty"><%= current.quantity %></span>
-                                                            <% } else { %>
-                                                                <span class="cart-product-qty"> 1 </span>
-                                                        <% } %>
-                                                        
-                                                        x Rs.<%= current.discountedPrice %>
-                                                    </span>
-                                                </div><!-- End .product-cart-details -->
-                                
-                                                <figure class="product-image-container" style="width: 40px; height: 50px;">
-                                                    <a href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>" class="product-image">
-                                                        <img src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" style="width: 52px; height: auto;" alt="Product">
-                                                    </a>
-                                                </figure>
-                                                <!-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a> -->
-                                            </div><!-- End .product -->
-                                        <% }); %>
-                                    </div><!-- End .dropdown-cart-products -->
-                                
-                                    <div class="dropdown-cart-total">
-                                        <span>Total</span>
-                                        <span class="cart-total-price">Rs.<%= locals.totalPriceCart %></span>
-                                    </div><!-- End .dropdown-cart-total -->
-                                
-                                    <div class="dropdown-cart-action">
-                                        <a href="/cart" class="btn btn-primary">View Cart</a>
-                                        <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                                    </div><!-- End .dropdown-cart-action -->
-                                <% } else { %>
-                                    <div class="dropdown-cart-action">
-                                        <p>Your cart is empty  </p>
-                                        <a href="/cart" class="btn btn-primary">View Cart</a>
-        
-                                    </div><!-- End .dropdown-cart-action -->
-                                <% } %>
-                            </div><!-- End .dropdown-menu -->
                             
                         </div><!-- End .cart-dropdown -->
                     </div><!-- End .header-right -->
@@ -349,7 +302,7 @@ input[type="radio"]:checked + label::after {
                               
                           </div>
                           
-            			<form >
+            			
 		                	<div class="row">
 		                		<div class="col-lg-9">
                                     <div class="checkout-container mb-3">
@@ -456,51 +409,8 @@ input[type="radio"]:checked + label::after {
                                             </a>
                                         </div>
 
-                                </div>
-
-                                    <div class="order-summary checkout-container mb-3" id="order-summary">
-                                        <div class="address-heading-container">
-                                            <h4 class="address-heading">Order Summary</h4>
-                                        </div>
-                                    
-                                        <div class="cart-products">
-                                            <% if (cart && cart.products && cart.products.length > 0) { %>
-                                                <% cart.products.forEach((current, index) => { %>
-                                                <div class="cart-product" id="cartItem-<%= index %>">
-                                                    <div class="product-media-1">
-                                                        <a href="#">
-                                                            <img class="product-image" src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product image">
-                                                        </a>
-                                                    </div>
-                                                    <div class="product-details">
-                                                        <h5 class="product-heading mb-1" >
-                                                            <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
-                                                        </h5>
-                                                        <p class="product-amount">Rs.<%= current.discountedPrice %></p>
-                                                        <div class="cart-product-quantity">
-                                                            
-                                                        </div>
-                                                        <p class="product-total">Total Quantity: <%= current.quantity %></p>
-                                                        <p class="product-total">Total: Rs.<%= current.discountedPrice * current.quantity %></p>
-                                                    </div>
-                                                </div>
-                                                <% }); %>
-                                            <% } else { %>
-                                            <% } %>
-                                        </div>
-                                        
-                                        <!-- <div class="">
-                                            <a id="" data-toggle="modal" href="#" class="nav-link btn btn-primary">CONTINUE</a>
-                                        </div> -->
-                                    </div>
-                                    
-                                    
-
-
-                                </div>
-                                
-                                <!-- Add Address Modal -->
-                                <div class="modal-wide modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+                                        <!-- Add Address Modal -->
+                                <div class="modal-wide modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel">
                                     <div class="modal-dialog" role="document"> 
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -564,6 +474,51 @@ input[type="radio"]:checked + label::after {
                                         </div>
                                     </div>
                                 </div>
+
+                                </div>
+
+                                    <div class="order-summary checkout-container mb-3" id="order-summary">
+                                        <div class="address-heading-container">
+                                            <h4 class="address-heading">Order Summary</h4>
+                                        </div>
+                                    
+                                        <div class="cart-products">
+                                            <% if (cart && cart.products && cart.products.length > 0) { %>
+                                                <% cart.products.forEach((current, index) => { %>
+                                                <div class="cart-product" id="cartItem-<%= index %>">
+                                                    <div class="product-media-1">
+                                                        <a href="#">
+                                                            <img class="product-image" src="/Admin/assets/Products-Images/<%= current.variant.images[0] %>" alt="Product image">
+                                                        </a>
+                                                    </div>
+                                                    <div class="product-details">
+                                                        <h5 class="product-heading mb-1" >
+                                                            <a style="color: black;" href="/product/<%= current.product._id %>/variant/<%= current.variant._id %>"><%= current.product.name %></a>
+                                                        </h5>
+                                                        <p class="product-amount">Rs.<%= current.discountedPrice %></p>
+                                                        <div class="cart-product-quantity">
+                                                            
+                                                        </div>
+                                                        <p class="product-total">Total Quantity: <%= current.quantity %></p>
+                                                        <p class="product-total">Total: Rs.<%= current.discountedPrice * current.quantity %></p>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                             <% } else { %>
+                                        <% } %>
+                                        </div>
+                                        
+                                        <!-- <div class="">
+                                            <a id="" data-toggle="modal" href="#" class="nav-link btn btn-primary">CONTINUE</a>
+                                        </div> -->
+                                    </div>
+                                    
+                                    
+
+
+                                </div>
+                                
+                                
                                 
                                 
                                 <!-- End .col-lg-9 -->
@@ -610,42 +565,43 @@ input[type="radio"]:checked + label::after {
                                                     </h2>
                                                 </div><!-- End .card-header -->
                                             </div><!-- End .card -->
-                                        
+                                            
                                             <div class="card mb-1">
-                                                <div class="card-header" id="heading-2">
+                                                <div class="card-header" id="heading-1">
                                                     <h2 class="card-title">
                                                         <!-- Radio Button with Label -->
-                                                        <input type="radio" name="paymentMethod" id="payment-method-2" value="Razorpay">
-                                                        <label for="payment-method-2" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+                                                        <input type="radio" name="paymentMethod" id="payment-method-1" value="Razorpay">
+                                                        <label for="payment-method-1" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="false" aria-controls="collapse-1">
                                                             NetBanking/UPI
                                                         </label>
                                                     </h2>
                                                 </div><!-- End .card-header -->
-                                                <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
+                                                <div id="collapse-1" class="collapse" aria-labelledby="heading-1" data-parent="#accordion-payment">
                                                     <div class="card-body">
                                                         Razorpay is a secure payment gateway that allows you to make online payments using cards, net banking, UPI, and digital wallets.
                                                     </div><!-- End .card-body -->
                                                 </div><!-- End .collapse -->
                                             </div><!-- End .card -->
-                                        <% if (totalPriceCart > 1000) { %>
-                                            <div class="card">
-                                                <div class="card-header" id="heading-3">
-                                                    <h2 class="card-title">
-                                                        <!-- Radio Button with Label -->
-                                                        <input type="radio" disabled>
-                                                        <label for="payment-method-3" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
-                                                            Cash on Delivery
-                                                        </label>
-                                                    </h2>
-                                                </div><!-- End .card-header -->
-                                                <div id="collapse-4" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
-                                                    <div class="card-body">
-                                                        Cash on delivery is not Available for orders above 1000rs.
-                                                    </div><!-- End .card-body -->
-                                                </div><!-- End .collapse -->
-                                            </div><!-- End .card -->
+                                            
+                                            <% if (totalPriceCart > 1000) { %>
+                                                <div class="card mb-1">
+                                                    <div class="card-header" id="heading-2">
+                                                        <h2 class="card-title">
+                                                            <!-- Radio Button with Label -->
+                                                            <input type="radio" disabled>
+                                                            <label for="payment-method-2" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+                                                                Cash on Delivery
+                                                            </label>
+                                                        </h2>
+                                                    </div><!-- End .card-header -->
+                                                    <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
+                                                        <div class="card-body">
+                                                            Cash on delivery is not available for orders above 1000rs.
+                                                        </div><!-- End .card-body -->
+                                                    </div><!-- End .collapse -->
+                                                </div><!-- End .card -->
                                             <% } else { %>
-                                                <div class="card">
+                                                <div class="card mb-1">
                                                     <div class="card-header" id="heading-3">
                                                         <h2 class="card-title">
                                                             <!-- Radio Button with Label -->
@@ -661,9 +617,28 @@ input[type="radio"]:checked + label::after {
                                                         </div><!-- End .card-body -->
                                                     </div><!-- End .collapse -->
                                                 </div><!-- End .card -->
-                                        <% } %>
+                                            <% } %>
                                             
+                                            <% if (wallet) { %>
+                                                <div class="card mb-1">
+                                                    <div class="card-header" id="heading-4">
+                                                        <h2 class="card-title">
+                                                            <!-- Radio Button with Label -->
+                                                            <input type="radio" name="paymentMethod" id="payment-method-4" value="Wallet">
+                                                            <label for="payment-method-4" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
+                                                                Wallet
+                                                            </label>
+                                                        </h2>
+                                                    </div><!-- End .card-header -->
+                                                    <div id="collapse-4" class="collapse" aria-labelledby="heading-4" data-parent="#accordion-payment">
+                                                        <div class="card-body">
+                                                            Make payment with your Taara wallet balance, easy and secure.
+                                                        </div><!-- End .card-body -->
+                                                    </div><!-- End .collapse -->
+                                                </div><!-- End .card -->
+                                            <% } %>
                                         </div><!-- End .accordion-summary -->
+                                        
                                         
 
 		                				<button id="checkout" class="btn btn-outline-primary-2 btn-order btn-block">
@@ -712,7 +687,7 @@ input[type="radio"]:checked + label::after {
 
 		                		</aside><!-- End .col-lg-3 -->
 		                	</div><!-- End .row -->
-            			</form>
+
 	                </div><!-- End .container -->
                 </div><!-- End .checkout -->
             </div><!-- End .page-content -->
@@ -758,7 +733,7 @@ input[type="radio"]:checked + label::after {
     
                     const phonePattern = /^\d{10}$/;
                     const namePattern = /^[a-z][a-z '-.,]{0,31}$|^$/i
-                    const pincodePattern = /[1-9]{1}[0-9]{5}|[1-9]{1}[0-9]{3}\\s[0-9]{3}/;
+                    const pincodePattern = /^[1-9][0-9]{5}$/;
     
                     let isValid = true
     
@@ -920,6 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(addAddressForm)
         if (addAddressForm) {
             addAddressForm.addEventListener('submit', (event) => {
+                console.log('form called')
                 event.preventDefault();
 
 

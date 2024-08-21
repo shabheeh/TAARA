@@ -247,6 +247,22 @@
   max-height: 200px; /* adjust the max height as needed */
 }
 
+
+    .star-rating {
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .star-rating i {
+        margin-right: 5px;
+    }
+    .fas.fa-star {
+        color: #ffc107;
+    }
+    .fas.fa-star-half-alt {
+        color: #ffc107;
+    }
+
+
     </style>
 
 
@@ -577,7 +593,48 @@
                                                                                                  
                                                                                                 <a id="cancelBtn<%= order._id %>-<%= current.variant._id %>" data-toggle="modal" href="#cancelOrderModal<%= order._id %>-<%= current.variant._id %>" class="btn btn-sm btn-outline-danger mr-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= current.variant._id %>">Cancel</a>
                                                                                         <% } %>
-                                                                                        
+                                                                                        <% if (current.status === 'Delivered' || current.status === 'Return Requested' || current.status === 'Returned') { %>
+                                                                                            <% if (reviews && reviews.length > 0) { %>
+                                                                                                <% let reviewExists = false; %>
+                                                                                                <% reviews.forEach(review => { %>
+                                                                                                    <% if (review.product && review.product.toString() === current.product._id.toString()) { %>
+                                                                                                        <% reviewExists = true; %>
+                                                                                                        <a id="editReviewBtn<%= order._id %>-<%= current.variant._id %>" 
+                                                                                                            class="btn btn-sm btn-outline-info mr-2" 
+                                                                                                            data-rating="<%= review.rating %>"
+                                                                                                            data-review="<%= review.comment %>"
+                                                                                                            data-title="<%= review.title %>"
+                                                                                                            data-order-id="<%= order._id %>"
+                                                                                                            data-product-id="<%= current.product._id %>"
+                                                                                                            data-variant-id="<%= current.variant._id %>">
+                                                                                                            Edit Review
+                                                                                                         </a>
+                                                                                                         
+                                                                                                    <% } %>
+                                                                                                <% }); %>
+                                                                                                
+                                                                                                <% if (!reviewExists) { %>
+                                                                                                    <a id="reviewBtn<%= order._id %>-<%= current.variant._id %>" 
+                                                                                                       data-toggle="modal" 
+                                                                                                       href="#reviewProductModal<%= order._id %>-<%= current.variant._id %>" 
+                                                                                                       class="btn btn-sm btn-outline-info mr-2" 
+                                                                                                       data-bs-toggle="modal" 
+                                                                                                       data-bs-target="#reviewProductModal<%= current.variant._id %>">
+                                                                                                        Review
+                                                                                                    </a>
+                                                                                                <% } %>
+                                                                                            <% } else { %>
+                                                                                                <a id="reviewBtn<%= order._id %>-<%= current.variant._id %>" 
+                                                                                                   data-toggle="modal" 
+                                                                                                   href="#reviewProductModal<%= order._id %>-<%= current.variant._id %>" 
+                                                                                                   class="btn btn-sm btn-outline-info mr-2" 
+                                                                                                   data-bs-toggle="modal" 
+                                                                                                   data-bs-target="#reviewProductModal<%= current.variant._id %>">
+                                                                                                    Review
+                                                                                                </a>
+                                                                                            <% } %>
+                                                                                             
+                                                                                        <% } %>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -626,7 +683,7 @@
                                                                                                 <label id="returnOrderLabel-<%= order._id %>-<%= current.variant._id %>">Reason for Returning</label>
                                                                                                 <textarea name="resonForReturn" id="returnOrder-<%= order._id %>-<%= current.variant._id %>" class="form-control"></textarea>
                                                                                                 
-                                                                                                <button type="submit" class="btn btn-primary">
+                                                                                                <button type="submit" class="btn btn-primary ">
                                                                                                     REQUEST
                                                                                                 </button>
                                                                                                 <button type="button" class="btn btn-outline-primary" data-dismiss="modal">DISCARD</button>
@@ -636,8 +693,93 @@
                                                                                 </div>
                                                                             </div>
     
+                                                                            <!-- Review  Modal -->
+                                                                            <div class="modal fade" id="reviewProductModal<%= order._id %>-<%= current.variant._id %>" tabindex="-1" role="dialog" aria-labelledby="reviewProductModalLabel">
+                                                                                <div class="modal-dialog" role="document">
+                                                                                    <div class="modal-content">
+                                                                                        <div class="modal-header">
+                                                                                            <h5 class="modal-title" id="reviewProductModalLabel">Review Product</h5>
+                                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                                <span aria-hidden="true">&times;</span>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                        <div class="modal-body m-5">
+                                                                                            <!-- Form Content -->
+                                                                                            <form id="review-product-<%= order._id %>-<%= current.product._id %>-<%= current.variant._id %>">
+                                                                                                <label id="rateLabel-<%= order._id %>-<%= current.variant._id %>">Rate this Product</label>
+                                                                                                <div class="star-rating">
+                                                                                                    <i class="far fa-star" data-rating="1"></i>
+                                                                                                    <i class="far fa-star" data-rating="2"></i>
+                                                                                                    <i class="far fa-star" data-rating="3"></i>
+                                                                                                    <i class="far fa-star" data-rating="4"></i>
+                                                                                                    <i class="far fa-star" data-rating="5"></i>
+                                                                                                    <input type="hidden" name="rating" id="rating-<%= order._id %>-<%= current.variant._id %>" >
+                                                                                                </div>
+                                                                                                <div class='mt-2'>
+                                                                                                    <label id="titleLabel-<%= order._id %>-<%= current.variant._id %>">Enter the title</label>
+                                                                                                    <input class="form-control" name="reviewTitle" id="title-<%= order._id %>-<%= current.variant._id %>" type="text">
+                                                                                                    </div>
+                                                                                                <label id="reviewProductLabel-<%= order._id %>-<%= current.variant._id %>">Review this Product</label>
+                                                                                                <textarea name="comment" placeholder="Write your review here" id="reviewProduct-<%= order._id %>-<%= current.variant._id %>" class="form-control"></textarea>
+                                                                                                
+                                                                                                <button type="submit" class="btn btn-primary mt-3">
+                                                                                                    SUBMIT REVIEW
+                                                                                                </button>
+                                                                                                <button type="button" class="btn btn-outline-primary mt-3" data-dismiss="modal">DISCARD</button>
+                                                                                            </form>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <script>
+                                                                                document.addEventListener('DOMContentLoaded', function() {
+                                                                                    const starContainers = document.querySelectorAll('.star-rating');
+                                                                                    
+                                                                                    starContainers.forEach(container => {
+                                                                                        const stars = container.querySelectorAll('i');
+                                                                                        const ratingInput = container.querySelector('input[type="hidden"]');
+                                                                                        
+                                                                                        stars.forEach(star => {
+                                                                                            star.addEventListener('mouseover', function() {
+                                                                                                const rating = this.getAttribute('data-rating');
+                                                                                                highlightStars(stars, rating);
+                                                                                            });
+                                                                                            
+                                                                                            star.addEventListener('mouseout', function() {
+                                                                                                const currentRating = ratingInput.value;
+                                                                                                highlightStars(stars, currentRating);
+                                                                                            });
+                                                                                            
+                                                                                            star.addEventListener('click', function() {
+                                                                                                const rating = this.getAttribute('data-rating');
+                                                                                                ratingInput.value = rating;
+                                                                                                highlightStars(stars, rating);
+                                                                                            });
+                                                                                        });
+                                                                                    });
+                                                                                    
+                                                                                    function highlightStars(stars, rating) {
+                                                                                        stars.forEach((star, index) => {
+                                                                                            if (index < rating) {
+                                                                                                if (index + 0.5 == rating) {
+                                                                                                    star.className = 'fas fa-star-half-alt';
+                                                                                                } else {
+                                                                                                    star.className = 'fas fa-star';
+                                                                                                }
+                                                                                            } else {
+                                                                                                star.className = 'far fa-star';
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                });
+                                                                                </script>
     
+                                                                                <!-- Edit Review Modal -->
+                                                                                
+
                                                                         <% }); %>
+
+                                                                        
                                                                         <div class="address-card my-2" >
                                                                             <div>
                                                                                 <p><strong>Payment Method: </strong><%= order.payment %></p>
@@ -1216,7 +1358,7 @@
         </script>
 
         <script>
-
+document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('add-address').addEventListener('submit', (event) => {
                 event.preventDefault();
 
@@ -1351,7 +1493,7 @@
                 
 
             })
-
+        })
             function addAddress(data) {
     fetch('/address', {
         method: 'POST',
@@ -2143,6 +2285,304 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
     </script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('form[id^="review-product-"]');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formId = this.id.split('review-product-')[1];
+                const [orderId, productId, variantId] = formId.split('-');
+            
+                const title = document.getElementById(`title-${orderId}-${variantId}`).value.trim()
+                const comment = document.getElementById(`reviewProduct-${orderId}-${variantId}`).value.trim()
+                const rating = document.getElementById(`rating-${orderId}-${variantId}`).value
+
+                const titleLabel = document.getElementById(`titleLabel-${orderId}-${variantId}`)
+                const rateLabel = document.getElementById(`rateLabel-${orderId}-${variantId}`)
+                const commentLabel = document.getElementById(`reviewProductLabel-${orderId}-${variantId}`)
+              
+                let isValid = true
+
+
+                if(!title){
+                    titleLabel.classList.add('error-message')
+                    titleLabel.innerHTML = 'Title is required'
+                    isValid = false
+                } else {
+                    titleLabel.classList.remove('error-message')
+                    titleLabel.innerHTML = 'Enter the title'
+                }
+
+                if(!comment){
+                    commentLabel.classList.add('error-message')
+                    commentLabel.innerHTML = 'Review is required'
+                    isValid = false
+                } else {
+                    commentLabel.classList.remove('error-message')
+                    commentLabel.innerHTML = 'Review this Product'
+                }
+
+                if(!rating){
+                    rateLabel.classList.add('error-message')
+                    rateLabel.innerHTML = 'Rating is required'
+                    isValid = false
+                } else {
+                    rateLabel.classList.remove('error-message')
+                    rateLabel.innerHTML = 'Rate this Product'
+                }
+
+                
+
+                if(isValid){
+
+                    const data = {
+                        orderId,
+                        productId,
+                        variantId,  
+                        title,
+                        comment,
+                        rating                    }
+
+                    reviewProduct(data)
+                }
+            });
+        });
+    });
+
+    function reviewProduct(data) {
+            fetch('/review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+   
+                    
+                    $(`#reviewProductModal${data.orderId}-${data.variantId}`).modal('hide');
+                    // $(`#orderStatus${data.orderId}-${data.variantId}`).text('Return Requested');
+                    // $(`#reviewBtn${data.orderId}-${data.variantId}`).hide();
+                    
+
+
+                    
+
+
+                    // Show success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    
+                })
+
+                
+                    
+
+                } else {
+
+                    $(`#reviewProductModal${data.orderId}-${data.variantId}`).modal('hide');
+                    // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+                }
+            })
+            .catch(err => {
+                $(`#reviewProductModal${err.orderId}-${err.variantId}`).modal('hide');
+                // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: err.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    
+
+    
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editReviewButtons = document.querySelectorAll('[id^="editReviewBtn"]');
+
+    editReviewButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+
+
+            const orderId = this.getAttribute('data-order-id');
+            const productId = this.getAttribute('data-product-id');
+            const variantId = this.getAttribute('data-variant-id');
+            const rating = this.getAttribute('data-rating');
+            const review = this.getAttribute('data-review');
+            const title = this.getAttribute('data-title');
+
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById(`editReviewProductModal-${orderId}-${variantId}`);
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Create the modal HTML
+            const modalHTML = `
+                <div class="modal fade" id="editReviewProductModal-${orderId}-${variantId}" tabindex="-1" role="dialog" aria-labelledby="editReviewProductModalLabel-${orderId}-${productId}-${variantId}">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editReviewProductModalLabel-${orderId}-${variantId}">Edit Review</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body m-5">
+                                <form id="edit-review-product-${orderId}-${productId}-${variantId}">
+                                    <label id="editRateLabel-${orderId}-${variantId}">Rate this Product</label>
+                                    <div class="edit-star-rating-${orderId}-${variantId}">
+                                        ${[...Array(5)].map((_, i) => `
+                                            <i class="far fa-star" data-rating="${i + 1}"></i>
+                                        `).join('')}
+                                        <input type="hidden" name="editRating" id="editRating-${orderId}-${variantId}" value="${rating}">
+                                    </div>
+                                    <div class='mt-2'>
+                                    <label id="titleLabel-${orderId}-${variantId}">Enter the title</label>
+                                    <input class="form-control" name="reviewTitle" id="title-${orderId}-${variantId}" type="text" value="${title}">
+                                    </div>
+            
+                                    <label  id="editReviewProductLabel-${orderId}-${variantId}">Review this Product</label>
+                                    <textarea name="editComment" placeholder="Write your review here" id="editReviewProduct-${orderId}-${variantId}" class="form-control">${review}</textarea>
+                                    <button type="submit" class="btn btn-primary mt-3">UPDATE REVIEW</button>
+                                    <button type="button" class="btn btn-outline-primary mt-3" data-dismiss="modal">DISCARD</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Append the modal to the body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            // Initialize the modal
+            const newModal = document.getElementById(`editReviewProductModal-${orderId}-${variantId}`);
+            $(newModal).modal('show');
+
+            // Add star rating functionality
+            const container = newModal.querySelector(`.edit-star-rating-${orderId}-${variantId}`);
+            const stars = container.querySelectorAll('i');
+            const ratingInput = container.querySelector('input[type="hidden"]');
+
+            // Highlight stars according to the current rating
+            highlightStars(stars, rating);
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const ratingValue = this.getAttribute('data-rating');
+                    highlightStars(stars, ratingValue);
+                });
+
+                star.addEventListener('mouseout', function() {
+                    highlightStars(stars, ratingInput.value);
+                });
+
+                star.addEventListener('click', function() {
+                    const ratingValue = this.getAttribute('data-rating');
+                    ratingInput.value = ratingValue;
+                    highlightStars(stars, ratingValue);
+                });
+            });
+
+            function highlightStars(stars, rating) {
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.className = 'fas fa-star';
+                    } else {
+                        star.className = 'far fa-star';
+                    }
+                });
+            }
+
+            // Handle form submission
+            const form = newModal.querySelector('form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const ratingValue = ratingInput.value;
+                const reviewText = form.querySelector('textarea[name="editComment"]').value;
+                const title = form.querySelector('input[name="reviewTitle"]').value
+
+                fetch('/review', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        productId: productId,
+                        title: title,
+                        rating: ratingValue,
+                        comment: reviewText
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success){
+
+                        $(newModal).modal('hide');
+                        Swal.fire({
+                            title: 'Success',
+                            text: data.message,
+                            icon: 'success',
+                        })
+                        
+                    } else {
+                        $(newModal).modal('hide');
+                        Swal.fire({
+                            title: 'Error',
+                            text: error.message,
+                            icon: 'error',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+
+                    
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+                });
+            });
+        });
+    });
+});
+
+</script>
+
+
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 

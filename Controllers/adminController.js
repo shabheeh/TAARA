@@ -512,61 +512,120 @@ const editBrand = async (req, res) => {
 
 
 
-const getSalesData = async (match = {}) => {
+const getSalesData = async () => {
     return Order.aggregate([
-      { $match: match },
-      { $unwind: '$products' },
+    { $unwind: '$products' },
+    {
+    $match: {
+        'products.status': { $in: ['Delivered', 'Return Requested'] }
+        },
+    },
+      {
+        $lookup: {
+            from: 'products',
+            localField: 'products.product',
+            foreignField: '_id',
+            as: 'productInfo'
+        }
+    },
       {
         $group: {
           _id: '$products.product',
-          name: { $first: '$products.name' },
+          name: { $first: { $arrayElemAt: ['$productInfo.name', 0] } },
+          gender: { $first: { $arrayElemAt: ['$productInfo.gender', 0] } },
           totalQuantity: { $sum: '$products.quantity' }
         }
       },
       { $sort: { totalQuantity: -1 } }
     ]);
-  };
-  
+};
+
 
   
 //  best procucts
   const getTopProducts = async (n = 10) => {
-    const productSales = await getSalesData({ paymentStatus: { $in: ["Paid", "Pending"] } });
+    const productSales = await getSalesData();
     return productSales.slice(0, n);
   };
   
   // best selling categories
   const getTopCategories = async (n = 10) => {
     return Order.aggregate([
-      { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
-      { $unwind: '$products' },
-      {
-        $group: {
-          _id: '$products.category',
-          name: { $first: '$products.category' },
-          totalQuantity: { $sum: '$products.quantity' }
+      { $unwind: '$products' }, 
+      { 
+        $lookup: {
+          from: 'products', 
+          localField: 'products.product', 
+          foreignField: '_id',
+          as: 'productDetails' 
         }
       },
-      { $sort: { totalQuantity: -1 } },
-      { $limit: n }
+      { $unwind: '$productDetails' },
+      { 
+        $lookup: {
+          from: 'categories', 
+          localField: 'productDetails.category', 
+          foreignField: '_id', 
+          as: 'categoryDetails'
+        }
+      },
+      { $unwind: '$categoryDetails' }, 
+      { 
+        $match: { 
+          'products.status': { $in: ['Delivered', 'Return Requested'] } 
+        } 
+      },
+      { 
+        $group: {
+          _id: '$categoryDetails._id',
+          name: { $first: '$categoryDetails.name' },
+          gender: { $first: '$categoryDetails.gender'}, 
+          totalQuantity: { $sum: '$products.quantity' } 
+        }
+      },
+      { $sort: { totalQuantity: -1 } }, 
+      { $limit: n } 
     ]);
-  };
+  }
+  
   
   const getTopBrands = async (n = 10) => {
     return Order.aggregate([
-      { $match: { paymentStatus: { $in: ["Paid", "Pending"] } } },
-      { $unwind: '$products' },
-      {
-        $group: {
-          _id: '$products.brand',
-          name: { $first: '$products.brand' },
-          totalQuantity: { $sum: '$products.quantity' }
-        }
-      },
-      { $sort: { totalQuantity: -1 } },
-      { $limit: n }
-    ]);
-  };
+        { $unwind: '$products' }, 
+        { 
+          $lookup: {
+            from: 'products', 
+            localField: 'products.product', 
+            foreignField: '_id',
+            as: 'productDetails' 
+          }
+        },
+        { $unwind: '$productDetails' },
+        { 
+          $lookup: {
+            from: 'brands', 
+            localField: 'productDetails.brand', 
+            foreignField: '_id', 
+            as: 'brandDetails'
+          }
+        },
+        { $unwind: '$brandDetails' }, 
+        { 
+          $match: { 
+            'products.status': { $in: ['Delivered', 'Return Requested'] } 
+          } 
+        },
+        { 
+          $group: {
+            _id: '$brandDetails._id',
+            name: { $first: '$brandDetails.name' }, 
+            totalQuantity: { $sum: '$products.quantity' } 
+          }
+        },
+        { $sort: { totalQuantity: -1 } }, 
+        { $limit: n } 
+      ]);
+    }
   
   
 
@@ -578,11 +637,12 @@ const getSalesData = async (match = {}) => {
       const topProducts = await getTopProducts();
       const topCategories = await getTopCategories();
       const topBrands = await getTopBrands();
-      const { totalSales, totalRevenue, totalProductsSold } = await getSalesAndRevenue();
+      const { totalOrders, totalRevenue, totalProductsSold } = await getSalesAndRevenue();
   
+
       res.render('dashboard', {
         chartData,
-        totalSales,
+        totalOrders,
         totalRevenue,
         totalProductsSold,
         topProducts,
@@ -601,7 +661,7 @@ const getSalesData = async (match = {}) => {
 const salesGraph = async (req, res) => {
     try {
         const { filterSales, date } = req.query;
-        let matchStage = {};
+
         let groupStage = {};
         let startDate, endDate;
 
@@ -612,7 +672,7 @@ const salesGraph = async (req, res) => {
             groupStage = {
                 $group: {
                     _id: { $dayOfMonth: '$createdAt' },
-                    totalSales: { $sum: '$finalTotal' }
+                    totalSales: { $sum: '$products.totalPrice' }
                 }
             };
         } else if (filterSales === 'monthly') {
@@ -621,7 +681,7 @@ const salesGraph = async (req, res) => {
             groupStage = {
                 $group: {
                     _id: { $month: '$createdAt' },
-                    totalSales: { $sum: '$finalTotal' }
+                    totalSales: { $sum: '$products.totalPrice' }
                 }
             };
         } else if (filterSales === 'yearly') {
@@ -630,20 +690,25 @@ const salesGraph = async (req, res) => {
             groupStage = {
                 $group: {
                     _id: { $year: '$createdAt' },
-                    totalSales: { $sum: '$finalTotal' }
+                    totalSales: { $sum: '$products.totalPrice' }
                 }
             };
         }
 
-        matchStage = {
-            $match: {
-                paymentStatus: { $in: ['Paid', 'Pending'] },
-                createdAt: { $gte: startDate, $lte: endDate }
+        const matchStage = [
+            {
+              $unwind: '$products'  // Unwind the products array to treat each product as a separate document
+            },
+            {
+              $match: {
+                'products.status': { $in: ['Delivered', 'Return Requested'] },  // Filter by product status
+                createdAt: { $gte: startDate, $lte: endDate }  // Filter by order creation date
+              }
             }
-        };
-        
+          ];
+            
         const salesData = await Order.aggregate([
-            matchStage,
+            ...matchStage,
             groupStage,
             { $sort: { _id: 1 } }
         ]);
@@ -707,7 +772,6 @@ const salesGraph = async (req, res) => {
 
 
 
-
 module.exports = {
     login,
     dashboard, 
@@ -728,4 +792,5 @@ module.exports = {
     unlistBrand,
     listBrand,
     salesGraph,
+
 }
