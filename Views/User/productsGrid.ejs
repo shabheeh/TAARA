@@ -35,6 +35,43 @@
             text-decoration: line-through;
 
         }
+        .color-label {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.color-preview {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  margin: 5px;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.color-label:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
     </style>
 </head>
 
@@ -254,8 +291,12 @@
                                       </div><!-- End .col-sm-6 -->
                                       <% }); %>
                                       <% } else { %>
-                                        <div class="col-12 text-center align-items-center">
-                                            <p class="text-center">No Products Found</p>
+                                        <div class="col-12 text-center d-flex flex-column align-items-center my-5">
+                                            <img src="/User/assets/images/no-products.png" alt="No Products Found" style="width: 250px; height: auto; margin-bottom: 20px;">
+                                            <h2 class="mb-3">Oops! No Products Found</h2>
+                                            <p class="mb-4">It seems we couldn't find what you're looking for.</p>
+                                            <!-- <a href="/all-products" class="btn btn-primary mb-2">Browse All Products</a>
+                                            <button onclick="location.reload()" class="btn btn-outline-secondary">Refresh</button> -->
                                         </div>
                                     <% } %>
                                     
@@ -389,27 +430,29 @@
 
 									<div class="collapse show" id="widget-3">
                                         <div class="widget-body">
-                                            <div class="filter-colors m-0">
-                                                <% colors.slice(0, 8).forEach(color => { %>
-                                                    <label>
-                                                        <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
-                                                        <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
-                                                        <span class="color-preview" style="background: <%= color.code %>;"></span>
-                                                    </label>
-                                                <% }); %>
-                                            </div><!-- End.filter-colors -->
-                                            <div class="filter-colors">
-                                                <% colors.slice(8).forEach(color => { %>
-                                                    <label>
-                                                        <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
-                                                        <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
-                                                        <span class="color-preview" style="background: <%= color.code %>;"></span>
-                                                    </label>
-                                                <% }); %>
-                                            </div><!-- End.filter-colors -->
+                                          <div class="filter-colors m-0">
+                                            <% colors.slice(0, 8).forEach(color => { %>
+                                              <label class="color-label">
+                                                <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
+                                                <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
+                                                <span class="color-preview" style="background: <%= color.code %>;"></span>
+                                                <span class="tooltip-text"><%= color.name %></span>
+                                              </label>
+                                            <% }); %>
+                                          </div><!-- End.filter-colors -->
+                                          <div class="filter-colors">
+                                            <% colors.slice(8).forEach(color => { %>
+                                              <label class="color-label">
+                                                <input type="checkbox" name="color" value="<%= color.name %>" style="position: absolute; opacity: 0; cursor: pointer;" 
+                                                <%= filteredColors.includes(color.name) ? 'checked' : '' %>>
+                                                <span class="color-preview" style="background: <%= color.code %>;"></span>
+                                                <span class="tooltip-text"><%= color.name %></span>
+                                              </label>
+                                            <% }); %>
+                                          </div><!-- End.filter-colors -->
                                         </div><!-- End.widget-body -->
-                                    </div><!-- End.collapse -->
-        						</div><!-- End .widget -->
+                                      </div><!-- End.collapse -->
+                                      
 
         						<div class="widget widget-collapsible">
                                     <h3 class="widget-title">

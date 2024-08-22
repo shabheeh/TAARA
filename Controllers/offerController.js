@@ -21,7 +21,7 @@ const offers = async ( req, res ) => {
             categories
         })
     } catch (error) {
-        console.log('Error loading offers', error.message)
+        console.error('Error loading offers', error.message)
     }
 }
 

@@ -1,9 +1,6 @@
 const Banner = require('../Models/bannerModel')
 
 
-
-
-
 // -----banners----->
 
 const banners = async ( req, res ) => {
@@ -13,7 +10,7 @@ const banners = async ( req, res ) => {
             banners,
         })
     } catch (error) {
-        console.log('error loading banners', error.message)
+        console.error('error loading banners', error.message)
     }
 }
 
@@ -26,7 +23,7 @@ const loadEditBanner = async (req, res) => {
       banner,
     });
   } catch (error) {
-    console.log("error loading edit banner", error.message);
+    console.error("error loading edit banner", error.message);
   }
 };
 
@@ -39,8 +36,6 @@ const editBanner = async ( req, res ) => {
       
       const { id, title, link, description} = req.body
 
-
-  
       let image;
 
     if (req.file) {
@@ -71,7 +66,7 @@ const editBanner = async ( req, res ) => {
             message: "Banner updated successfully",
           });
         } catch (error) {
-          console.log("Error Editing Banner", error.message);
+          console.error("Error Editing Banner", error.message);
         
           res.json({
             success: false,

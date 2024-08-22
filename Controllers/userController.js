@@ -94,7 +94,7 @@ const loadHome = async (req, res) => {
       banners: banners ? banners : []
     });
   } catch (error) {
-    console.log("Error loading home:", error.message);
+    console.error("Error loading home:", error.message);
     res.render("404");
   }
 };
@@ -113,7 +113,7 @@ const authentication = async ( req, res) => {
             activeTab: 'signin',
         });
         } catch (error) {
-            console.log('Error loading authentication:', error.message);
+            console.error('Error loading authentication:', error.message);
             res.render('404')
         }
             
@@ -127,13 +127,10 @@ const insertUser = async (req, res) => {
         const email = req.body.signupEmail;
         const password = req.body.signupPassword;
 
-        console.log('Received email:', email);
-        console.log('Received password:', password);
-
         // Check if user already exists 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log('User already exists:', existingUser);
+
             return res.render('signin-signup', { 
                 signupMessage: 'Email already exists',
                 activeTab: 'signup',
@@ -150,13 +147,10 @@ const insertUser = async (req, res) => {
             password: securePassword,
         };
 
-        
-        console.log('session user:', user);
-
         await sendSignupOtp(user, req, res);
 
     } catch (error) {
-        console.log('Error inserting user:', error.message);
+        console.error('Error inserting user:', error.message);
         res.render('404')
     }
 };
@@ -169,7 +163,6 @@ const sendSignupOtp = async (user, req, res) => {
         const { email, password } = user;
 
         const otp = `${100000 + Math.floor(Math.random() * 900000)}`;
-        console.log('Generated OTP:', otp);
 
         // Send the OTP to the user's email
         const mailOptions = {
@@ -191,12 +184,11 @@ const sendSignupOtp = async (user, req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        console.log('OTP email sent to:', email);
 
         res.redirect(`/otpVerify`);
 
     } catch (error) {
-        console.log('Error sending OTP:', error.message);
+        console.error('Error sending OTP:', error.message);
         res.render('404')
     }
 };
@@ -211,7 +203,7 @@ const resendOtp = async (req, res) => {
             res.redirect('/authentication')
         }
 
-        const { email, password } = req.session.otp; // Get email from session
+        const { email, password } = req.session.otp; 
 
         if (!email) {
             return res.render('signupOtp', {
@@ -224,7 +216,7 @@ const resendOtp = async (req, res) => {
         await sendSignupOtp(user, req, res, true);
 
     } catch (error) {
-        console.log('Error resending OTP:', error.message);
+        console.error('Error resending OTP:', error.message);
         res.render('404')
     }
 };  
@@ -240,7 +232,7 @@ const loadOtp = async (req, res) => {
 
         res.render('signupOtp');
     } catch (error) {
-        console.log('Error loading OTP page:', error.message);
+        console.error('Error loading OTP page:', error.message);
         res.render('404')
     }
 };
@@ -266,8 +258,6 @@ const verifyOtp = async (req, res) => {
             });
         }
 
-        console.log(otp);
-        console.log(sessionOtp.hashedOtp);
         // Verify the OTP
         const isOtpValid = await bcrypt.compare(otp, sessionOtp.hashedOtp);
 
@@ -296,7 +286,7 @@ const verifyOtp = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Error verifying OTP:', error.message);
+        console.error('Error verifying OTP:', error.message);
         return res.render('signupOtp', {
             otpError: 'Server error please try again later'
         });
@@ -352,7 +342,8 @@ const verifySignIn = async (req, res) => {
             });
         }
     } catch ( error ) {
-        console.log(error.message + ' user verifySignIn');
+        console.error(error.message + ' user verifySignIn');
+        res.render('500')
 
     }
 };
@@ -362,12 +353,10 @@ const verifySignIn = async (req, res) => {
 const forgotPass = async (req, res) => {
     try {
 
-            res.render('forgotPass')
+        res.render('forgotPass')
             
-
-        
     } catch (error) {
-        console.log('Error loading forgot password page:', error.message);
+        console.error('Error loading forgot password page:', error.message);
         res.render('404')
     }
 };
@@ -406,7 +395,7 @@ const sendResetPasswordLink = async (user, req, res) => {
             successMessage: 'An email has been sent to ' + user.email 
         });
     } catch (error) {
-        console.log('Error sending password reset email:', error.message);
+        console.error('Error sending password reset email:', error.message);
         res.render('404')
     }
 };
@@ -418,7 +407,6 @@ const forgotPassVerify = async (req, res) => {
 
     try {
         
-
         const { forgotEmail } = req.body;
 
         const user = await User.findOne({ email: forgotEmail });
@@ -433,14 +421,11 @@ const forgotPassVerify = async (req, res) => {
         // sent link
         await sendResetPasswordLink(user, req, res);
 
-        
-
     } catch (error) {
-        console.log('Error in forgot password route:', error.message);
+        console.error('Error in forgot password route:', error.message);
         res.render('404')
     }
 };
-
 
 // ------Reset Password page------>
 
@@ -452,7 +437,7 @@ const resetPass = async (req, res) => {
         });
 
         if (!resetToken) {
-            console.log('Token not found or expired');
+
             return res.render('signin-signup', {
                 activeTab: 'signin',
                 emailError: 'Password reset token is invalid or has expired.'
@@ -463,9 +448,8 @@ const resetPass = async (req, res) => {
 
         res.render('resetPass', { token: req.params.token });
 
-
     } catch (error) {
-        console.log('Error in reset token route:', error.message);
+        console.error('Error in reset token route:', error.message);
         res.render('404')
     }
 };
@@ -512,7 +496,7 @@ const resetPassVerify = async ( req, res) => {
         });
 
     } catch (error) {
-        console.log('Error resetting password:', error.message);
+        console.error('Error resetting password:', error.message);
         res.render('404')
     }
 }
@@ -524,9 +508,9 @@ const signout = async (req, res) => {
         res.redirect('/')
 
         } catch (error) {
-            console.log(error.message + ' user singout');
+            console.error(error.message + ' user singout');
+            res.render('404')
         }
-
 }
 
 // ------User Account------>
@@ -547,9 +531,6 @@ const userAccount = async (req, res) => {
             Review.find({'user': userId})
         ]);
 
-        
-
-        // Creating deep copy for not manipulating the original orders
         const ordersCopy = JSON.parse(JSON.stringify(orders));
 
         // Cancelled orders
@@ -607,7 +588,7 @@ const updateProfile = async (req, res) => {
             message: 'Profile updated successfully'
         })
         } catch (error) {
-            console.log('Error updating profile:', error.message);
+            console.error('Error updating profile:', error.message);
             res.json({
                 success: false,
                 message: 'Error updating profile'
@@ -621,8 +602,6 @@ const changePassword = async ( req, res ) => {
     try {
 
         const { currentPassword, password } = req.body
-
-        console.log(req.body)
 
         const userId = req.userId;
 
@@ -652,8 +631,6 @@ const changePassword = async ( req, res ) => {
                     message: 'Password updated successfully'
                 })
             }
-
-            
     
         } else {
             res.json({
@@ -663,7 +640,7 @@ const changePassword = async ( req, res ) => {
         }
 
     } catch (error) {
-        console.log('Error updating password:', error.message);
+        console.error('Error updating password:', error.message);
         res.json({
             success: false,
             message: 'Error updating password'
@@ -698,7 +675,7 @@ const addAddress = async ( req, res ) => {
 
 
     } catch (error) {
-        console.log('Error adding address:', error.message);
+        console.error('Error adding address:', error.message);
         res.json({
             success: false,
             message: 'Error adding address'
@@ -713,7 +690,6 @@ const editAddress = async ( req, res ) => {
 
     try {
         const { addressId, name, phone, address, street, city, landmark, state, pincode} = req.body
-
 
         const updateAddress = await Address.findOneAndUpdate(
             { _id: addressId },
@@ -737,7 +713,7 @@ const editAddress = async ( req, res ) => {
 
 
     } catch (error) {
-        console.log('Error finding address:', error.message);
+        console.error('Error finding address:', error.message);
         res.json({
             success: false,
             message: 'Error finding address'
@@ -767,7 +743,11 @@ const deleteAddress = async ( req, res ) => {
         })
             
     } catch (error) {
-        console.log('Error finding address:', error.message);
+        console.error('Error finding address:', error.message);
+        res.json({
+            success: false,
+            message: 'Error finding address'
+        })
         
     }
 }
@@ -783,8 +763,27 @@ const fourNotFour = async ( req, res ) => {
             user: user ? user : null
         })
     } catch (error) {
-        console.log('Error rendering 404:', error.message);
-        res.render('404')
+        console.error('Error rendering 404:', error.message);
+        res.render('500')
+
+    }
+}
+
+// --------500------->
+
+const serverError = async ( req, res ) => {
+    try {
+        let user = null;
+        if (req.userId) {
+          
+          user = await User.findById(req.userId);
+        }
+        res.render('500', {
+            user: user ? user : null
+        })
+    } catch (error) {
+        console.error('Error rendering 404:', error.message);
+        res.render('500')
 
     }
 }
@@ -804,7 +803,8 @@ const about = async ( req, res ) => {
 
         })
     } catch (error) {
-        console.log('Error rendering about:', error.message);
+        console.error('Error rendering about:', error.message);
+        res.render('500')
     }
 }
 
@@ -829,6 +829,7 @@ module.exports = {
     editAddress,
     deleteAddress,
     fourNotFour,
+    serverError,
     about,
 
 

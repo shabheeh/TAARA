@@ -11,20 +11,14 @@ const { bestSellingBrands, getSalesAndRevenue } = require('../Helpers/dashboard'
 const login = async (req, res) => {
 
     try {
-        
-         
     res.redirect('/admin/login')
         
         
     } catch (error) {
-        console.log(error.message + ' user loadhome');
+        console.error(error.message + ' user loadhome');
+        res.render('500')
     }
 }
-
-// ------Dashboard------>
-
-
-
 
 // ------Admin Signin------>
 
@@ -33,7 +27,8 @@ const loadSignin = async (req, res) => {
     try {
         res.render('login')
     } catch (error) {
-        console.log(error.message + ' user loadlogin');
+        console.error(error.message + ' user loadlogin');
+        res.render('500')
     }
             
 }
@@ -61,7 +56,8 @@ const verifySignIn = async ( req, res) => {
         }
         
     } catch (error) {
-        console.log(error.message + ' admin verify signin');
+        console.error(error.message + ' admin verify signin');
+        res.render('500')
         
     }
 }
@@ -76,7 +72,8 @@ const logout = async (req, res) => {
     })
 
     } catch (error) {
-        console.log(error.message + ' admin logout');
+        console.error(error.message + ' admin logout');
+        res.render('500')
     }
 
 }
@@ -121,8 +118,8 @@ const loadUsers = async ( req, res ) => {
             });
 
         } catch (error) {
-        console.error("Error fetching users:", error.message);
-        res.status(500).send("Internal Server Error");
+            console.error("Error fetching users:", error.message);
+            res.render(500)
         }
 }
 
@@ -172,42 +169,61 @@ const unBlockUser = async (req, res) => {
 
 // ------Category List------>
 
-const category = async ( req, res ) => {
-
+const category = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = 5;
-        const skip = (page - 1) * limit;
-        let searchTerm = '';
-        let query = {};
-
-        if (req.query.search) {
-            searchTerm = req.query.search.trim();
-            query = { 
-                $or: [
-                    { name: new RegExp(searchTerm, 'i') },
-                    { description: new RegExp(searchTerm, 'i') }
-                ]
-            };
-        }
-        const categories = await Category.find(query).skip(skip).limit(limit);
-        const totalCategories = await Category.countDocuments();
-
-            res.render("categories", {
-                categories,
-                totalCategories,
-                page,
-                limit,
-                totalPages: Math.ceil(totalCategories / limit),
-                searchTerm
-            });
-
-    } catch (error) { 
-        console.error('Error getting categories:', error.message);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }   
-}
-
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+      const skip = (page - 1) * limit;
+      let searchTerm = '';
+      let query = {};
+  
+      if (req.query.search) {
+        searchTerm = req.query.search.trim();
+        query = { 
+          $or: [
+            { name: new RegExp(searchTerm, 'i') },
+            { description: new RegExp(searchTerm, 'i') }
+          ]
+        };
+      }
+  
+      const categories = await Category.aggregate([
+        { $match: query },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'products', 
+            localField: '_id', 
+            foreignField: 'category', 
+            as: 'products' 
+          }
+        },
+        {
+          $addFields: {
+            productsCount: { $size: '$products' } 
+          }
+        },
+        
+      ]);
+  
+      const totalCategories = await Category.countDocuments(query);
+  
+      res.render('categories', {
+        categories,
+        totalCategories,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCategories / limit),
+        searchTerm
+      });
+  
+    } catch (error) {
+      console.error('Error getting categories:', error.message);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+  
  
 // ------Add Category----->
 
@@ -295,7 +311,7 @@ const editCategory = async (req, res) => {
             message: "Category updated successfully",
           });
         } catch (error) {
-          console.log("Error updating Product", error.message);
+          console.error("Error updating Product", error.message);
           res.json({
             success: false,
             message: "An error occurred while updating the category",
@@ -366,7 +382,27 @@ const brand = async ( req, res ) => {
                 ]
             };
         }
-        const brands = await Brand.find(query).skip(skip).limit(limit);
+        const brands = await Brand.aggregate([
+            {$match: query},
+            {$skip: skip},
+            {$limit: limit},
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: 'brand',
+                    as: 'products',
+                }
+            },
+            {
+                $addFields: {
+                    productsCount: { $size: "$products" }
+                }
+            }
+        ])
+
+
+
         const totalBrands = await Brand.countDocuments();
 
             res.render("brands", {
@@ -431,8 +467,6 @@ const addBrand = async (req, res) => {
     try {
         const { name, description,  status } = req.body;
 
-        
-
         const existingBrand = await Brand.findOne({
           name: new RegExp(`^${name}$`, "i"),
         });
@@ -470,7 +504,6 @@ const editBrand = async (req, res) => {
     try {
         const { name, description, id } = req.body;
         
-
         const existingBrand = await Brand.findOne({
           name: new RegExp(`^${name}$`, "i"),
           _id: { $ne: id },
@@ -503,7 +536,7 @@ const editBrand = async (req, res) => {
             id: id,
         });
     } catch (error) {
-        console.error(error.message);
+        console.error('error editing brand', error.message);
         res.json({
         message: "Server error",
         });
@@ -628,7 +661,7 @@ const getSalesData = async () => {
     }
   
   
-
+// ------Dashboard------>
 
   const dashboard = async (req, res) => {
     try {
@@ -650,7 +683,7 @@ const getSalesData = async () => {
         topBrands
       });
     } catch (error) {
-      console.log('error loading dashboard', error.message);
+      console.error('error loading dashboard', error.message);
       res.status(500).json({ success: false, message: 'Error loading dashboard' });
     }
   };
@@ -713,7 +746,7 @@ const salesGraph = async (req, res) => {
             { $sort: { _id: 1 } }
         ]);
 
-        // console.log('salesData:', salesData);
+
 
         // Transform and fill in missing data
         let transformedData;
@@ -748,11 +781,7 @@ const salesGraph = async (req, res) => {
             });
         }
 
-        // console.log('transformedData:', transformedData);
-
         const totalSales = transformedData.reduce((sum, item) => sum + item.value, 0);
-
-        // console.log('totalSales:', totalSales);
 
         res.json({
             success: true,
@@ -761,7 +790,7 @@ const salesGraph = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Error fetching the sales data:', error.message);
+        console.error('Error fetching the sales data:', error.message);
         res.status(500).json({
             success: false,
             message: 'Error fetching sales data'

@@ -91,7 +91,8 @@
                                 <tr>
                                     <th style="width: 10px;">SI</th>
                                     <th class="name-column" style="width: 500px;">Name</th>
-                                    <th class="gender-column">Gender</th>
+                                    <th class="gender-column ">Gender</th>
+                                    <th class="products-column text-center">Products</th>
                                     <th class="text-center action-column">Action</th>
                                 </tr>
                             </thead>
@@ -118,6 +119,9 @@
                                             </td>
                                             <td>
                                                 <%= category.gender %>
+                                            </td>
+                                            <td class="text-center">
+                                                <%= category.productsCount %>
                                             </td>
                                             <td class="text-center">
                                                 <a href="#" class="badge rounded-pill bg-label-primary align-items-center editButton" id="<%= category._id %>"

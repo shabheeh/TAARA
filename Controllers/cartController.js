@@ -2,7 +2,6 @@ const User = require("../Models/userModel");
 const Cart = require("../Models/cartModel");
 const Product = require("../Models/productModel");
 const Variant = require("../Models/variantModel");
-const Offer = require('../Models/offerModel')
 const Wishlist = require('../Models/wishlistModel')
 
 // -------View Cart--------->
@@ -76,7 +75,7 @@ const cart = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log('Error loading cart', error);
+    console.error('Error loading cart', error);
     res.status(500).send('An error occurred while loading the cart.');
   }
 }
@@ -160,7 +159,7 @@ const addToCart = async (req, res) => {
       message: "Added to cart.",
     });
   } catch (error) {
-    console.log("Error adding product to cart", error);
+    console.error("Error adding product to cart", error);
     res.json({
       success: false,
       message: "An error occurred while adding the product to the cart.",
@@ -361,7 +360,7 @@ const proceedToCheckout = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Error proceeding to checkout', error.message);
+    console.error('Error proceeding to checkout', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -485,7 +484,7 @@ const addToWishlist = async (req, res) => {
       message: "Added to wishlist",
     });
   } catch (error) {
-    console.log("Error adding product to Wishlist", error);
+    console.error("Error adding product to Wishlist", error);
     return res.status(500).json({
       success: false,
       message: "An error occurred while adding the product to the wishlist.",
@@ -499,7 +498,7 @@ const addToWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     const { variantId, wishlistId } = req.params;
-console.log(variantId)
+
     const wishlist = await Wishlist.findById(wishlistId)
       .populate('products.product')
       .populate('products.variant');

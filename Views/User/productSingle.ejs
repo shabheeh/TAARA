@@ -86,11 +86,11 @@
                               <h1 class="product-title"><%= product.name %></h1><!-- End.product-title -->
                                 <% if (reviews && reviews.length > 0) { %>
                                     <div class="ratings-container">
-                                        <div class="ratings-container">
+                                        <div class="mb-1">
                                                                             
-                                            <% for( let i = 0; i < reviews[1].rating; i++ ) { %>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14px"
-                                                height="14px" viewBox="0 0 20 20" fill="gray">
+                                            <% for( let i = 0; i < avgRating; i++ ) { %>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16px"
+                                                height="16px" viewBox="0 0 22 22" fill="gray">
                                                 <path
                                                   d="M12.0002 17L6.12223 20.59L7.72023 13.89L2.49023 9.41L9.35523 8.86L12.0002 2.5L14.6452 8.86L21.5112 9.41L16.2802 13.89L17.8782 20.59L12.0002 17Z"
                                                   fill="#FFB400"></path>
@@ -98,7 +98,7 @@
                                               <% } %><!-- End .ratings-val -->
                                         
                                     </div><!-- End .rating-container -->
-                                        <a class="ratings-text" href="#product-accordion" id="review-link">( 2 Reviews )</a>
+                                        <a class="ratings-text" href="#product-accordion" id="review-link">( <%= reviews.length %> Reviews )</a>
                                       </div><!-- End.rating-container -->
                                 <% } %>
                               

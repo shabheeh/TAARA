@@ -17,9 +17,6 @@ const orderController = require('../Controllers/orderController')
 
 //             middlewares
 const authUser = require("../Middlewares/authUser");
-const { auth } = require("firebase-admin");
-
-
 
 //                  landing page
 router.get('/', authUser.authorization, userController.loadHome)

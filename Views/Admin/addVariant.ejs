@@ -79,7 +79,7 @@
                                                                 <select id="variantColor" class="select2 form-select" name="productColor" data-placeholder="Color" data-allow-clear="true">
                                                                     <option value="">Color</option>
                                                                     <option value="Black" data-color-code="#000000">Black</option>
-                                                                    <option value="White" data-color-code="#fff1f1">White</option>
+                                                                    <option value="White" data-color-code="#FFFFFF">White</option>
                                                                     <option value="Red" data-color-code="#FF0000">Red</option>
                                                                     <option value="Green" data-color-code="#00FF00">Green</option>
                                                                     <option value="Blue" data-color-code="#0000FF">Blue</option>
@@ -89,24 +89,11 @@
                                                                     <option value="Pink" data-color-code="#FFC0CB">Pink</option>
                                                                     <option value="Brown" data-color-code="#A52A2A">Brown</option>
                                                                     <option value="Gray" data-color-code="#808080">Gray</option>
-                                                                    <option value="Cyan" data-color-code="#00FFFF">Cyan</option>
-                                                                    <option value="Magenta" data-color-code="#FF00FF">Magenta</option>
-                                                                    <option value="Lime" data-color-code="#00FF00">Lime</option>
                                                                     <option value="Maroon" data-color-code="#800000">Maroon</option>
                                                                     <option value="Navy" data-color-code="#000080">Navy</option>
-                                                                    <option value="Olive" data-color-code="#808000">Olive</option>
                                                                     <option value="Teal" data-color-code="#008080">Teal</option>
-                                                                    <option value="Silver" data-color-code="#C0C0C0">Silver</option>
-                                                                    <option value="Gold" data-color-code="#FFD700">Gold</option>
                                                                     <option value="Beige" data-color-code="#F5F5DC">Beige</option>
-                                                                    <option value="Salmon" data-color-code="#FA8072">Salmon</option>
-                                                                    <option value="Turquoise" data-color-code="#40E0D0">Turquoise</option>
-                                                                    <option value="Indigo" data-color-code="#4B0082">Indigo</option>
-                                                                    <option value="Violet" data-color-code="#EE82EE">Violet</option>
-                                                                    <option value="Coral" data-color-code="#FF7F50">Coral</option>
                                                                     <option value="Khaki" data-color-code="#F0E68C">Khaki</option>
-                                                                    <option value="Lavender" data-color-code="#E6E6FA">Lavender</option>
-                                                                    <option value="Chocolate" data-color-code="#D2691E">Chocolate</option>
                                                                 </select>
                                                                 <label for="variantColor" id="colorLabel">Color</label>
                                                             </div>
@@ -311,8 +298,8 @@
     document.getElementById('cropButton').addEventListener('click', function () {
         if (cropper) {
             cropper.getCroppedCanvas({
-                width: 1440,
-                height: 1440,
+                width: 900,
+                height: 900,
             }).toBlob(function (blob) {
                 const url = URL.createObjectURL(blob);
                 const img = document.getElementById(currentImageInput.id.replace('Input', 'Preview'));

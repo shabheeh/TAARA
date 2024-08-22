@@ -784,6 +784,12 @@
                                                                             <div>
                                                                                 <p><strong>Payment Method: </strong><%= order.payment %></p>
                                                                             </div>
+                                                                            <% if (order.appliedCoupon) { %>
+                                                                                <div>
+                                                                                    <p class="m-0"><strong>Coupon Applied: </strong><%= order.appliedCoupon.code %></p>
+                                                                                    <p class="m-0"><strong>Discount OFF: </strong><%= order.appliedCoupon.discount %></p>
+                                                                                </div>
+                                                                            <% } %>
                                                                             <div class="address-details">
                                                                                 <p class="address-content">
                                                                                     <strong>Shipping Address: </strong><br>

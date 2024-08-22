@@ -11,6 +11,37 @@
         .og-price {
             text-decoration: line-through;
         }
+        @media (max-width: 768px) {
+    .table-cart thead {
+        display: none;
+    }
+
+    .table-cart tr {
+        display: block;
+        margin-bottom: 20px;
+    }
+
+    .table-cart td {
+        display: block;
+        width: 100%;
+        text-align: right;
+    }
+
+    .table-cart td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+    }
+
+    .product-media {
+        text-align: center;
+    }
+
+    .product-title {
+        text-align: center;
+    }
+}
+
     </style>
 
 </head>

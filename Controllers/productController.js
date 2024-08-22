@@ -10,9 +10,6 @@ const Order = require('../Models/orderModel')
 
 
 
-
-
-
 // ------Products List Admin side----->
 
 const products = async (req, res) => {
@@ -61,7 +58,7 @@ const products = async (req, res) => {
 
 
     } catch (error) {
-    console.log('Error loading products', error.message);
+    console.error('Error loading products', error.message);
     }
 };
 
@@ -80,7 +77,7 @@ const loadAddProduct = async (req, res) => {
         });
 
     } catch (error) {
-    console.log("Error loading add products", error.message);
+    console.error("Error loading add products", error.message);
     }
 };
 
@@ -150,14 +147,14 @@ const addProduct = async (req, res) => {
     res.json({
       id: product._id,
       success: true,
-      message: "Varintes Added successfully",
+      message: "Product Added successfully",
     });
 
   } catch (error) {
-    console.log("Error Adding Variant", error.message);
+    console.error("Error Adding Product", error.message);
     res.json({
       success: false,
-      message: "An error occurred while adding the variant",
+      message: "An error occurred while adding the Product",
     });
   }
 };
@@ -187,7 +184,7 @@ const editProduct = async (req, res) => {
       message: "Product updated successfully",
     });
   } catch (error) {
-    console.log("Error Editing Product", error.message);
+    console.error("Error Editing Product", error.message);
     res.json({
       id: req.body.id,
       success: false,
@@ -254,7 +251,7 @@ const variants = async (req, res) => {
 
     
   } catch (error) {
-    console.log('Error loading variants' , error.message)
+    console.error('Error loading variants' , error.message)
   }
 }
 
@@ -273,7 +270,7 @@ const loadAddVariant = async (req, res) => {
 
     
   } catch (error) {
-    console.log('Error loading add variants' , error)
+    console.error('Error loading add variants' , error)
   }
 }
 
@@ -330,7 +327,7 @@ const addVariant = async ( req, res ) => {
     });
 
   } catch (error) {
-    console.log("Error Adding Variant", error.message);
+    console.error("Error Adding Variant", error.message);
     res.json({
       success: false,
       message: "An error occurred while adding the variant",
@@ -352,7 +349,7 @@ const loadEditVariant = async ( req, res) => {
 
     
   } catch (error) {
-    console.log('Error loading edit variants' , error)
+    console.error('Error loading edit variants' , error)
   }
 }
 
@@ -423,7 +420,7 @@ for (let i = 1; i <= 4; i++) {
           message: "Variant updated successfully",
         });
       } catch (error) {
-        console.log("Error Editing Variant", error.message);
+        console.error("Error Editing Variant", error.message);
         if(req.fileValidationError){
           return res.json({
             success: false,
@@ -474,6 +471,12 @@ const productsGrid = async (req, res) => {
       matchStage.gender = 'Men';
     } else if (title === 'Women') {
       matchStage.gender = 'Women';
+    } 
+
+    // Filter for new arrivals
+    if (title === 'newArrivals') {
+      const newProductDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      matchStage.createdAt = { $gt: newProductDate };
     }
 
     if (categories) {
@@ -530,7 +533,7 @@ const productsGrid = async (req, res) => {
 
     // Add sorting stage
     pipeline.push({
-      $sort: sortProducts ? getSortStage(sortProducts) : { createdAt: -1 }
+      $sort: sortProducts ? getSortStage(sortProducts) : { createdAt: 1 }
     });
 
     // Add pagination
@@ -561,6 +564,13 @@ const productsGrid = async (req, res) => {
       }}
     ];
 
+    let catGenderMatch = {};
+    if (title === 'Men') {
+      catGenderMatch.gender = 'Men';
+    } else if ( title === 'Women'){
+      catGenderMatch.gender = 'Women';
+    }
+
     const genderCounts = await Product.aggregate(genderCountPipeline);
     const menCount = genderCounts.find(g => g._id === 'Men')?.count || 0;
     const womenCount = genderCounts.find(g => g._id === 'Women')?.count || 0;
@@ -569,6 +579,7 @@ const productsGrid = async (req, res) => {
     const categoryCountPipeline = [
       { $match: {
         isListed: true,
+        ...catGenderMatch 
       } },
       { $group: {
         _id: '$category',
@@ -680,6 +691,7 @@ const productsGrid = async (req, res) => {
       { name: 'Navy', code: '#000080' },
       { name: 'Gold', code: '#FFD700' },
       { name: 'Cyan', code: '#00FFFF' },
+      { name: 'Khaki', code: '#F0E68C'},
     ];
 
     let user = null;
@@ -811,7 +823,11 @@ const productView = async (req, res) => {
     });
 
     let user = null;
-
+    let avgRating = null
+    if( reviews){
+      const ratings = reviews.reduce((acc, curr) => acc + curr.rating ,0)
+      avgRating = ratings/reviews.length
+    }
 
     if (req.userId) {
       // Fetch the user
@@ -822,12 +838,13 @@ const productView = async (req, res) => {
       user,
       product,
       reviews: reviews ? reviews : [],
+      avgRating,
       variant,
       similarProducts,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('500')
   }
 };
 
@@ -886,7 +903,7 @@ const review = async (req, res) => {
       variantId
     });
   } catch (error) {
-    console.log('Error submitting review:', error.message);
+    console.error('Error submitting review:', error.message);
     return res.json({
       success: false,
       message: 'Error submitting review'
@@ -942,7 +959,7 @@ const editReview = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('error editing review', error.message);
+    console.error('error editing review', error.message);
     return res.json({
       success: false,
       message: 'Error editing review'
@@ -1033,7 +1050,7 @@ const reviews = async (req, res) => {
       filter,
     });
   } catch (error) {
-    console.log('Error listing reviews:', error.message);
+    console.error('Error listing reviews:', error.message);
     res.render('error', { error });
   }
 };
@@ -1067,7 +1084,7 @@ const reviewStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('error changing listed reviews', error.message);
+    console.error('error changing listed reviews', error.message);
     res.json({
       success: false,
       message: 'Error changing review status'

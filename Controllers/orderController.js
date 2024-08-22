@@ -1,7 +1,6 @@
 
 const Order = require('../Models/orderModel')
 const User = require('../Models/userModel')
-const Product = require('../Models/productModel')
 const Variant = require("../Models/variantModel")
 const Cart = require('../Models/cartModel')
 const Address = require('../Models/addressModel')
@@ -12,8 +11,6 @@ const Razorpay = require('razorpay')
 const moment = require('moment')
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
-const path = require('path');
-const fs = require('fs');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -96,7 +93,7 @@ const loadCheckout = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Error loading checkout:', error.message);
+        console.error('Error loading checkout:', error.message);
         res.status(500).send('An error occurred while loading the checkout page.');
     }
 };
@@ -281,7 +278,7 @@ const checkout = async (req, res) => {
         couponDiscount = Math.min(couponDiscount, discountedSubTotal);
         couponDiscount = Number(couponDiscount.toFixed(2));
 
-        // Distribute coupon discount across products
+        // distribute coupon discount across products
         const productCount = filteredProducts.length;
         const discountPerProduct = couponDiscount / productCount;
 
@@ -488,7 +485,7 @@ const checkout = async (req, res) => {
       await wishlist.save();
     }
   } catch (error) {
-    console.log("Error placing order:", error);
+    console.error("Error placing order:", error);
     res.json({ success: false, message: "Error placing order" });
   }
 };
@@ -520,7 +517,7 @@ const updatePaymentStatus = async ( req, res ) => {
       })
 
   } catch (error) {
-    console.log('Error updating payment status:', error);
+    console.error('Error updating payment status:', error);
     res.json({ 
       success: false, 
       message: 'Error updating payment status' 
@@ -559,7 +556,7 @@ const confirmOrder = async ( req, res ) => {
 
 
     } catch (error) {
-        console.log('Error placing order:', error.message);
+        console.error('Error placing order:', error.message);
         res.json({ success: false, message: 'Error viewing success order' });
         
     }
@@ -598,7 +595,7 @@ const retryPayment = async ( req, res ) => {
 
 
   } catch (error) {
-    console.log('error retrying payment', error.message)
+    console.error('error retrying payment', error.message)
     res.json({
       sucess: false,
       message: 'error retrying payment'
@@ -878,7 +875,7 @@ const updateOrderStatus = async (req, res) => {
       });
 
   } catch (error) {
-      console.log(`Error updating order status user`, error.message);
+      console.error(`Error updating order status user`, error.message);
       res.json({
           success: false,
           orderId: req.body.orderId,
@@ -949,12 +946,12 @@ const createSalesAggregate = (matchStage) => [
       }
     }
   },
-  { $unwind: "$filteredProducts" }, // Unwind the filteredProducts array
+  { $unwind: "$filteredProducts" }, 
   {
     $group: {
       _id: null,
       totalSalesCount: { $sum: 1 },
-      totalProductCount: { $sum: 1 }, // Count each unwound product
+      totalProductCount: { $sum: 1 }, 
       totalOriginalSum: { $sum: "$filteredProducts.originalPrice" },
       totalDiscountedSum: { $sum: "$filteredProducts.discountedPrice" },
       totalPriceSum: { $sum: "$filteredProducts.totalPrice" },
@@ -1103,11 +1100,67 @@ const generatePdf = async ( req, res ) => {
       totalSales: 0 
     };
 
-    // Fetch orders based on the filter
-    const orders = await Order.find(matchStage)
-      .sort({ createdAt: -1 })
-      .populate('user', 'name')
-      .populate('products.product', 'name price');
+
+    const orders = await Order.aggregate([
+      { $match: matchStage },
+      {
+        $addFields: {
+          products: {
+            $filter: {
+              input: "$products",
+              as: "product",
+              cond: { $in: ["$$product.status", ['Delivered', 'Return Requested']] }
+            }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products.product',
+          foreignField: '_id',
+          as: 'populatedProducts'
+        }
+      },
+      {
+        $addFields: {
+          products: {
+            $map: {
+              input: '$products',
+              as: 'product',
+              in: {
+                $mergeObjects: [
+                  '$$product',
+                  {
+                    product: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$populatedProducts',
+                            cond: { $eq: ['$$this._id', '$$product.product'] }
+                          }
+                        },
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      { $project: { populatedProducts: 0 } }
+    ]);
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-disposition', 'attachment; filename="sales_report.pdf"');
@@ -1146,15 +1199,17 @@ const table = {
 // Table rows
 orders.forEach(order => {
   const products = order.products.map(p => `${p.product.name} (${p.quantity})`).join(', ');
-  const originalPrice = order.products.reduce((sum, p) => sum + p.product.price, 0);
+  const originalPrice = order.products.reduce((sum, p) => sum + p.originalPrice, 0);
   const totalPrice = order.products.reduce((sum, p) => sum + p.totalPrice, 0);
-  const discount = totalPrice - originalPrice;
+  const discount = order.products.reduce((sum, p) => {
+    return sum + (p.discountedPrice - p.originalPrice);
+  }, 0)
 
   table.rows.push([
     order.orderId.toString(),
     moment(order.createdAt).format('YYYY-MM-DD'),
     products,
-    // order.user.firstName ? order.user.firstName : 'N/A',
+
     `Rs.${originalPrice.toFixed(2)}`,
     `Rs.${discount.toFixed(2)}`,
     `Rs.${totalPrice.toFixed(2)}`,
@@ -1230,10 +1285,66 @@ const generateExcel = async (req, res) => {
     };
 
     // Fetch orders based on the filter
-    const orders = await Order.find(matchStage)
-      .sort({ createdAt: -1 })
-      .populate('user', 'name')
-      .populate('products.product', 'name price');
+    const orders = await Order.aggregate([
+      { $match: matchStage },
+      {
+        $addFields: {
+          products: {
+            $filter: {
+              input: "$products",
+              as: "product",
+              cond: { $in: ["$$product.status", ['Delivered', 'Return Requested']] }
+            }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products.product',
+          foreignField: '_id',
+          as: 'populatedProducts'
+        }
+      },
+      {
+        $addFields: {
+          products: {
+            $map: {
+              input: '$products',
+              as: 'product',
+              in: {
+                $mergeObjects: [
+                  '$$product',
+                  {
+                    product: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$populatedProducts',
+                            cond: { $eq: ['$$this._id', '$$product.product'] }
+                          }
+                        },
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      { $project: { populatedProducts: 0 } }
+    ]);
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');
@@ -1262,16 +1373,18 @@ const generateExcel = async (req, res) => {
     // Table rows
     orders.forEach(order => {
       const products = order.products.map(p => `${p.product.name} (${p.quantity})`).join(', ');
-      const discountedPrice = order.products.reduce((sum, p) => sum + p.discountedPrice, 0);
+      const originalPrice = order.products.reduce((sum, p) => sum + p.originalPrice, 0);
       const totalPrice = order.products.reduce((sum, p) => sum + p.totalPrice, 0);
-      const discount = totalPrice - discountedPrice;
+      const discount = order.products.reduce((sum, p) => {
+        return sum + (p.discountedPrice - p.originalPrice);
+      }, 0)
 
       worksheet.addRow([
         order.orderId.toString(),
         moment(order.createdAt).format('YYYY-MM-DD'),
-        `Rs.${discountedPrice.toFixed(2)}`,
-        `Rs.${totalPrice.toFixed(2)}`,
+        `Rs.${originalPrice.toFixed(2)}`,
         `Rs.${discount.toFixed(2)}`,
+        `Rs.${totalPrice.toFixed(2)}`,
         products
       ]);
     });
@@ -1405,7 +1518,7 @@ const generateInvoice = async (req, res) => {
     // Finalize PDF file
     doc.end();
   } catch (error) {
-    console.log('Error generating invoice:', error.message);
+    console.error('Error generating invoice:', error.message);
     res.status(500).json({ success: false, message: 'Error generating invoice' });
   }
 }
