@@ -355,84 +355,85 @@ const loadEditVariant = async ( req, res) => {
 
 // ------Edit Variant------>
 
-const editVariant = async ( req, res ) => {
-
+const editVariant = async (req, res) => {
   try {
-    
-    const { variantId, variantColor, variantColorCode, variantQuantity} = req.body
+    const { variantId, variantColor, variantColorCode, variantQuantity } =
+      req.body;
 
     const sizes = JSON.parse(req.body.variantSize);
 
     const imageFiles = req.files;
-const images = [];
+    const images = [];
 
-// Process each uploaded file
-for (let i = 1; i <= 4; i++) {
-    const fieldName = `productImage${i}`;
-    if (imageFiles[fieldName] && imageFiles[fieldName][0]) {
+    // Process each uploaded file
+    for (let i = 1; i <= 4; i++) {
+      const fieldName = `productImage${i}`;
+      if (imageFiles[fieldName] && imageFiles[fieldName][0]) {
         images.push(imageFiles[fieldName][0].filename);
-    } else {
+      } else {
         // Keep the existing image if no new image is uploaded
         const existingImageField = `existingImage${i}`;
         if (req.body[existingImageField]) {
-            images.push(req.body[existingImageField]);
+          images.push(req.body[existingImageField]);
         }
+      }
     }
-}
 
-    const updateVariant = await Variant.findByIdAndUpdate({ _id: variantId }, {
-
+    const updateVariant = await Variant.findByIdAndUpdate(
+      { _id: variantId },
+      {
         color: variantColor,
         colorCode: variantColorCode,
         sizes: sizes,
         quantity: variantQuantity,
         images: images,
-        }, { new: true,});
+      },
+      { new: true }
+    );
 
-        if (!updateVariant) {
-          return res.json({
-            success: false,
-            message: "Variant not found",
-          });
+    if (!updateVariant) {
+      return res.json({
+        success: false,
+        message: "Variant not found",
+      });
+    }
+
+    // update product quantity in carts according to the quantity of that products.
+    const carts = await Cart.find({ "products.variant": variantId });
+
+    for (const cart of carts) {
+      for (const item of cart.products) {
+        if (
+          item.variant == variantId &&
+          item.quantity > updateVariant.quantity
+        ) {
+          item.quantity = updateVariant.quantity;
         }
-
-        // update product quantity in carts according to the quantity of that products.
-        const carts = await Cart.find({'products.variant': variantId});
-
-        
-
-        for (const cart of carts) {
-            for (const item of cart.products) {
-                if (item.variant == variantId && item.quantity > updateVariant.quantity) {
-                    item.quantity = updateVariant.quantity;
-                }
-            }
-            await cart.save();
-        }
-
-          
-
-        const variant = await Variant.findById({_id: variantId})
-
-        res.json({
-          id: variant.product._id,
-          success: true,
-          message: "Variant updated successfully",
-        });
-      } catch (error) {
-        console.error("Error Editing Variant", error.message);
-        if(req.fileValidationError){
-          return res.json({
-            success: false,
-            message: req.fileValidationError
-          })
-        }
-        res.json({
-          success: false,
-          message: "An error occurred while updating the Variant",
-        });
       }
-}
+      await cart.save();
+    }
+
+    const variant = await Variant.findById({ _id: variantId });
+
+    res.json({
+      id: variant.product._id,
+      success: true,
+      message: "Variant updated successfully",
+    });
+  } catch (error) {
+    console.error("Error Editing Variant", error.message);
+    if (req.fileValidationError) {
+      return res.json({
+        success: false,
+        message: req.fileValidationError,
+      });
+    }
+    res.json({
+      success: false,
+      message: "An error occurred while updating the Variant",
+    });
+  }
+};
 
 // ------Products Grid---->
 
