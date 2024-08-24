@@ -77,8 +77,6 @@ router.get('/invoice/:orderId', authUser.isLogin, orderController.generateInvoic
 router.post('/review', authUser.authorization, productController.review)
 router.put('/review', authUser.authorization, productController.editReview)
 
-//            404
-// router.get('/404', userController.fourNotFour)
 
 //            google auth 
 router.get('/auth/google', passport.authenticate('google', {

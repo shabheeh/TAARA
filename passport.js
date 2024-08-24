@@ -5,7 +5,7 @@ const User = require('./Models/userModel'); // Adjust the path as necessary
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:5000/googleAuth"
+    callbackURL: "https://taarafashion.shop/googleAuth"
   },
   async (accessToken, refreshToken, profile, done) => {
 

@@ -318,6 +318,19 @@ const checkout = async (req, res) => {
       finalTotal = discountedSubTotal + shippingCharge;
     }
 
+
+
+    // Check wallet balance before creating order
+    if (paymentMethod === "Wallet" && wallet) {
+      if (wallet.balance < finalTotal) {
+        return res.json({
+          success: false,
+          message: "Insufficient wallet balance",
+        });
+      }
+    }
+      
+
     // Prepare the products data for the order
     const products = filteredProducts.map((product) => ({
       product: product.product._id,

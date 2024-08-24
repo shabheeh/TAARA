@@ -277,6 +277,16 @@ const verifyOtp = async (req, res) => {
 
         await newUser.save();
 
+        // create wallet for new user
+        const newWallet = new Wallet({
+            user: newUser._id,
+            balance: 0,
+            transactions: [],
+        });
+
+        await newWallet.save();
+
+
         // Clear the session
         req.session.destroy();
  
