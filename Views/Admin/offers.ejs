@@ -973,7 +973,7 @@
 
                     const selectedOptions = document.querySelectorAll(`#applied-categories-${offerId} option:checked`);
                     const appliedCategories = Array.from(selectedOptions).map(option => option.value);
-                    console.log(appliedCategories)
+                
                     const formData = {
                         id: offerId,
                         title: document.getElementById(`category-offer-title-${offerId}`).value.trim(),

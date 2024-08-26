@@ -292,7 +292,7 @@
   <!-- Main JS -->
   <script src="/Admin/assets/js/main.js"></script>
   
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 
   <script>
      
@@ -337,10 +337,26 @@
                 document.getElementById('blockedUsersCount').innerText = data.blockedUsersCount;
       
             } else {
-                console.error('Error blocking user:', data.message);
+           
+                // Show error alert
+                Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
             }
         })
         .catch(error => console.error('Error blocking user:', error));
+        // Show error alert
+        Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
     }
 
     // Function to handle unblock user request
@@ -362,10 +378,25 @@
                 document.getElementById('blockedUsersCount').innerText = data.blockedUsersCount;
                 
             } else {
-                console.error('Error unblocking user:', data.message);
+                // Show error alert
+                Swal.fire({
+                  title: 'Error',
+                  text: data.message,
+                  icon: 'error',
+                  confirmButtonColor: '#d33',
+                  confirmButtonText: 'OK'
+                });
             }
         })
         .catch(error => console.error('Error unblocking user:', error));
+        // Show error alert
+        Swal.fire({
+          title: 'Error',
+          text: error.message,
+          icon: 'error',
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'OK'
+        });
     }
 
     // Event listener blockbutton

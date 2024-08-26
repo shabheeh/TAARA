@@ -494,10 +494,27 @@
                                 .addClass('bg-label-danger')
                                 .text('Unlist');
                         } else {
-                            console.error('Error listing category:', data.message);
+                        
+                            // Show error alert
+                        Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
+                            
                         }
                     })
                     .catch(error => console.error('Error listing category:', error));
+                    // Show error alert
+                    Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
             }
 
             // Function to handle unlist category request
@@ -618,7 +635,7 @@
     });
 
     function updateCategory(data) {
-            console.log(data)
+            
             fetch('/admin/categories', {
                 method: 'PUT',
                 headers: {
@@ -631,7 +648,7 @@
             if (data.success) {
                 // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
-                console.log(modal)
+         
                 modal.hide();
 
                 // Show success alert

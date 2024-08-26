@@ -145,7 +145,7 @@
 
         <%- include('../Layouts/User/footer') -%>
 
-    
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const forgotForm = document.getElementById('forgot-form');
@@ -153,14 +153,14 @@
             const emailLabel = document.getElementById('forgotMessage');
     
             forgotForm.addEventListener('submit', function(event) {
-                console.log('Form submitted'); // Debug log to check if the event is triggered
+
                 const isValid = validateForgot();
     
                 if (!isValid) {
-                    console.log('Validation failed'); // Debug log to check if validation failed
+  
                     event.preventDefault(); // Prevent form submission if validation fails
                 } else {
-                    console.log('Validation passed'); // Debug log to check if validation passed
+  
                 }
             });
     
@@ -168,7 +168,7 @@
                 const email = emailInput.value.trim();
                 const emailRegex = /^([a-zA-Z0-9._]+)@([a-zA-Z0-9])+\.([a-z]+)(\.[a-z]+)?$/;
     
-                console.log('Email:', email); // Debug log to check email value
+   
     
                 if (!email) {
                     emailLabel.textContent = 'Email is required';

@@ -170,7 +170,7 @@
 </div><!-- End .login-page section-bg -->
 
 <%- include('../Layouts/User/footer') -%>
-    
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 
     <script>
         
@@ -256,15 +256,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (response.ok) {
-                    console.log('OTP resent successfully');
+
                     countdownValue = 30;
                     document.getElementById('countdown').textContent = ` in ${countdownValue} seconds`;
                     startCountdown();
                 } else {
-                    console.log('Failed to resend OTP');
+                    Swal.fire({
+                    title: 'Error',
+                    text: 'failed to sent otp',
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                });
                 }
             } catch (error) {
                 console.error('Error resending OTP:', error);
+                 // Show error alert
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                });
             }
         }
     });

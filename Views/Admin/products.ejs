@@ -440,7 +440,7 @@
   
                   // Validate Name
                   if (name === '') {
-                      console.log('name error')
+                  
                       nameLabel.innerText = 'Name cannot be empty';
                       nameLabel.classList.add('error-message');
                       isValid = false;
@@ -524,7 +524,7 @@
             if (data.success) {
                 // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
-                console.log(modal)
+               
                 modal.hide();
 
                 // Show success alert
@@ -541,7 +541,7 @@
                 });
             } else {
               const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal${data.id}`));
-                console.log(modal)
+      
                 modal.hide();
                 // Show error alert
                 Swal.fire({
@@ -607,10 +607,25 @@
                             .addClass('bg-label-danger')
                             .text('Unlist');
                     } else {
-                        console.error('Error listing product:', data.message);
+                        // Show error alert
+                        Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                     }
                 })
                 .catch(error => console.error('Error listing product:', error));
+                // Show error alert
+                Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
         }
 
         // Function to handle unlist product request
@@ -630,10 +645,26 @@
                             .addClass('bg-label-success')
                             .text('List');
                     } else {
-                        console.error('Error unlisting product:', data.message);
+                       
+                        // Show error alert
+                        Swal.fire({
+                                title: 'Error',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                     }
                 })
                 .catch(error => console.error('Error unlisting product:', error));
+                // Show error alert
+                Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
         }
 
     // Event listener for list/unlist buttons

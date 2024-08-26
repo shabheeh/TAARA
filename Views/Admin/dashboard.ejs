@@ -362,7 +362,7 @@
   </div>
   <!-- / Layout wrapper -->
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -468,10 +468,25 @@
                     renderSalesChart(result.data, filter);
                     // updateTotals(result.totalSales);
                 } else {
-                    console.error('Error in API response:', result.message);
+                    // Show error alert
+                    Swal.fire({
+                                title: 'Error',
+                                text: result.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                 }
             })
             .catch(error => console.error('Error fetching sales data:', error));
+            // Show error alert
+            Swal.fire({
+                                title: 'Error',
+                                text: error.message,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
     }
 
     function renderSalesChart(data, filter) {

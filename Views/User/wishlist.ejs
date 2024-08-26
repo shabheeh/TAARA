@@ -65,7 +65,7 @@
             </nav><!-- End .breadcrumb-nav -->
 
             <div class="page-content">
-            	<div class="container">
+            	<div class="container" id="wishlist-container">
                     <% if (wishlist && wishlist.products.length > 0 ) { %>
                         <table class="table table-wishlist table-mobile">
                             <thead>
@@ -135,7 +135,11 @@
                                     </tr>
                                 <% }) %>
                                 <% } else { %>
-                                    <h4 class="text-center" style="color: rgb(102, 102, 102);">Your wishlist is empty. Add products to view </h4>
+                                    <div id="empty-wishlist-div" style="text-align: center; margin: 0 auto; width: 300px;">
+                                        <img class="image-fluid" style="width: 100%;" src="/User/assets/images/empty-wishlist.png" alt="">
+                                        <h4 class="mb-3">Your wishlist is feeling a bit empty!</h4>
+                                        <p class="mb-4">Add items to it and make your future shopping spree even more exciting!</p>
+                                    </div>
                             <% } %>
 							
 							
@@ -235,7 +239,7 @@ document.querySelectorAll('.removeItem').forEach(button => {
 
         const variantId = button.getAttribute('data-variantId');
         const wishlistId = button.getAttribute('data-wishlist-id');
-        console.log(variantId)
+
         removeFromWishlist(variantId, wishlistId);
     });
 });
@@ -249,12 +253,50 @@ function removeFromWishlist(variantId, wishlistId) {
         if (data.success) {
             document.getElementById(`wishlistItem-${variantId}`).remove();
 
+            if (data.wishlist.products.length === 0) {
+            
+            // Get the cart container element
+            const wishlistContainer = document.getElementById('wishlist-container');
+    
+            // Create the empty cart div if it doesn't exist
+            const emptyWishlistDiv = document.getElementById('empty-wishlist-div');
+            if (!emptyWishlistDiv) {
+                const emptyWishlistHtml = `
+                    <div id="empty-wishlist-div" style="text-align: center; margin: 0 auto; width: 300px;">
+                        <img class="image-fluid" style="width: 100%;" src="/User/assets/images/empty-wishlist.png" alt="">
+                        <h4 class="mb-3">Your wishlist is feeling a bit empty!</h4>
+                        <p class="mb-4">Add items to it and make your future shopping spree even more exciting!</p>
+                    </div>
+                `;
+                wishlistContainer.innerHTML = emptyWishlistHtml;
+            }
         } else {
-            console.error(data.message);
+            // Remove the empty cart div if it exists
+            const emptyWishlistDiv = document.getElementById('empty-wishlist-div');
+            if (emptyWishlistDiv) {
+                emptyWishlistDiv.remove();
+            }
+        }
+
+        } else {
+            Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                });
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                });
     });
 }
 

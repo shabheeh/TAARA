@@ -575,7 +575,6 @@
 
                             // Validate Name
                             if (name === '') {
-                                console.log('name error')
                                 nameLabel.innerText = 'Name cannot be empty';
                                 nameLabel.classList.add('error-message');
                                 isValid = false;
@@ -609,7 +608,7 @@
                 });
 
                 function updateBrand(data) {
-                    console.log(data)
+
                     fetch('/admin/brands', {
                         method: 'PUT',
                         headers: {

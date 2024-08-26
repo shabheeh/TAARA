@@ -33,74 +33,93 @@ const transporter = nodemailer.createTransport({
 // ------Home Page------>
 
 const loadHome = async (req, res) => {
-  try {
-    let user = null;
-    if (req.userId) {
-      user = await User.findById(req.userId);
-    }
-    const products = await Product.find()
-      .populate("variants")
-      .populate("category")
-      .populate("brand");
-
-    const banners = await Banner.find()
-
-    const offerIds = products.reduce((ids, product) => {
-      if (product.offers && Array.isArray(product.offers)) {
-        return ids.concat(product.offers);
+    try {
+      let user = null;
+      if (req.userId) {
+        user = await User.findById(req.userId);
       }
-      return ids;
-    }, []);
-
-    const offers = await Offer.find({
-      _id: { $in: offerIds },
-      status: "Active",
-    }).lean();
-
-    // Process offers for each product
-    const newProduct = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-    products.forEach((product) => {
-      product.isNew = product.createdAt > newProduct;
-      if (
-        product.offers &&
-        Array.isArray(product.offers) &&
-        product.offers.length > 0
-      ) {
-        const productOffers = offers.filter((offer) =>
-          product.offers.some(
-            (offerId) => offerId.toString() === offer._id.toString()
-          )
-        );
-        if (productOffers.length > 0) {
-          const bestOffer = productOffers.reduce((best, current) =>
-            current.discount > best.discount ? current : best
+  
+      const products = await Product.find()
+        .populate("variants")
+        .populate("category")
+        .populate("brand");
+  
+      const banners = await Banner.find();
+  
+      const offerIds = products.reduce((ids, product) => {
+        if (product.offers && Array.isArray(product.offers)) {
+          return ids.concat(product.offers);
+        }
+        return ids;
+      }, []);
+  
+      const offers = await Offer.find({
+        _id: { $in: offerIds },
+        status: "Active",
+      }).lean();
+  
+      const newProduct = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  
+      // Process offers and filter t-shirts for men and women
+      const productsMen = [];
+      const productsWomen = [];
+  
+      products.forEach((product) => {
+        product.isNew = product.createdAt > newProduct;
+  
+        if (
+          product.offers &&
+          Array.isArray(product.offers) &&
+          product.offers.length > 0
+        ) {
+          const productOffers = offers.filter((offer) =>
+            product.offers.some(
+              (offerId) => offerId.toString() === offer._id.toString()
+            )
           );
-          product.bestOffer = bestOffer;
-          product.discountedPrice = Math.round(
-            (product.price * (1 - bestOffer.discount / 100)).toFixed(2)
-          );
+  
+          if (productOffers.length > 0) {
+            const bestOffer = productOffers.reduce((best, current) =>
+              current.discount > best.discount ? current : best
+            );
+            product.bestOffer = bestOffer;
+            product.discountedPrice = Math.round(
+              (product.price * (1 - bestOffer.discount / 100)).toFixed(2)
+            );
+          } else {
+            product.discountedPrice = Number(product.price.toFixed(2));
+          }
         } else {
           product.discountedPrice = Number(product.price.toFixed(2));
         }
-      } else {
-        product.discountedPrice = Number(product.price.toFixed(2));
-      }
-    });
-
-    res.render("home", {
-      user: user ? user : null,
-      products: products,
-      banners: banners ? banners : []
-    });
-  } catch (error) {
-    console.error("Error loading home:", error.message);
-    res.render("404");
+  
+        if (product.category && product.category.name && product.category.gender) {
+            if (
+              product.category.name.toLowerCase() === "t-shirts" &&
+              product.category.gender.toLowerCase() === "men"
+            ) {
+              productsMen.push(product);
+            } else if (
+              product.category.name.toLowerCase() === "t-shirts" &&
+              product.category.gender.toLowerCase() === "women"
+            ) {
+              productsWomen.push(product);
+            }
+          }
+        });
+  
+      res.render("home", {
+        user: user ? user : null,
+        productsMen: productsMen,
+        productsWomen: productsWomen,
+        banners: banners ? banners : [],
+      });
+    } catch (error) {
+      console.error("Error loading home:", error.message);
+      res.render("404");
+    }
   }
-};
-
-
-
+  
 
 // ------SiginIn and SignUp------>
 

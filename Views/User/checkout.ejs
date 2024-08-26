@@ -707,7 +707,7 @@ input[type="radio"]:checked + label::after {
                 form.addEventListener('submit', function (event) {
                     event.preventDefault();
     
-                    console.log('hekk')
+
                     //inputs
                     const addressId = this.id.split('edit-address-')[1];
                     const name = document.getElementById(`editName-${addressId}`).value.trim();
@@ -892,10 +892,10 @@ input[type="radio"]:checked + label::after {
 
 document.addEventListener('DOMContentLoaded', () => {
         const addAddressForm = document.getElementById('add-address');
-        console.log(addAddressForm)
+
         if (addAddressForm) {
             addAddressForm.addEventListener('submit', (event) => {
-                console.log('form called')
+
                 event.preventDefault();
 
 
@@ -1326,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // COD flow
         window.location.href = `/checkout/success/${data.orderId}`;
       }
-      console.log('Success:', data.message);
+
     } else {
       Swal.fire({
         title: 'Error',
@@ -1334,7 +1334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icon: 'error',
         confirmButtonText: 'Ok'
       });
-      console.log('failed', data.message);
+
     }
   })
   .catch(error => {

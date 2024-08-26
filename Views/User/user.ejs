@@ -1179,7 +1179,6 @@
             
             const phone = document.getElementById('phone').value.trim();
         
-            console.log(firstName, lastName, email, phone);
         
             const firstNameLabel = document.getElementById('firstNameLabel');
             const lastNameLabel = document.getElementById('lastNameLabel');
@@ -1278,7 +1277,6 @@
                 const newPassLabel = document.getElementById('newPassLabel');
                 const newPassLabel2 = document.getElementById('newPassLabel2');
 
-                console.log(currentPass, newPass, newPass2)
 
                 const passwordRegex = 	/^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$/;
 
@@ -1848,9 +1846,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('form[id^="delete-address-form-"]').forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            console.log('here')
+
             const addressId = this.querySelector('input[name="addressId"]').value;
-            console.log(addressId)
+
 
             fetch(`/deleteAddress`, {
                 method: 'DELETE',
@@ -2125,7 +2123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     event.preventDefault(); // Prevent the default link behavior
     
     var orderId = this.getAttribute('data-order-id');
-    console.log('Order ID:', orderId);
+
     
     retryPayment(orderId);
   });
@@ -2179,7 +2177,7 @@ function retryPayment(orderId) {
         icon: 'error',
         confirmButtonText: 'Ok'
       });
-      console.log('failed', data.message);
+
     }
   })
   .catch(error => {

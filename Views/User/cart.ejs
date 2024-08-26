@@ -162,9 +162,13 @@
 
             <div class="page-content">
             	<div class="cart">
-	                <div class="container">
-                        <% if (cart.products.length === 0) { %>
-                            <h4 class="text-center" style="color: rgb(102, 102, 102);">Your cart is empty. Add products to view </h4>
+	                <div class="container" id="cart-container">
+                        <% if (!cart || cart.products.length === 0) { %>
+                            <div id="empty-cart-div" style="text-align: center; margin: 0 auto; width: 300px;">
+                                <img class="image-fluid" style="width: 100%;" src="/User/assets/images/empty-cart.png" alt="">
+                                <h4 class="mb-3">Empty cart alert!</h4>
+                                <p class="mb-4">Your cart is starting to feel a bit neglected. Add some goodies and give it a purpose!</p>
+                            </div>
                         <% } else { %>
                             <div class="row">
                                 <div class="col-lg-9">
@@ -308,24 +312,66 @@ function removeFromCart(variantId, cartId) {
             document.getElementById(`cartItem-${variantId}`).remove();
             updateCartSummary(data);
         } else {
-            console.error(data.message);
+                            // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: data.message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
+            
         }
+
+
     })
     .catch(error => {
         console.error('Error:', error);
+                        // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
     });
 }
 
-function updateCartSummary(data) {
-    // const subTotal = cart.products.reduce((sum, product) => sum + parseFloat(product.discountedPrice) * parseInt(product.quantity), 0);
-    // const shippingCharge = (subTotal <= 500 && subTotal !== 0) ? 50 : 0;
-    // const totalPrice = subTotal + shippingCharge;
+    function updateCartSummary(data) {
 
-// Update the cart summary using backend-calculated values
-document.getElementById('original-subtotal').textContent = `Rs.${data.originalSubTotal.toFixed(2)}`;
-                document.getElementById('discounted-subtotal').textContent = `- Rs.${(data.originalSubTotal - data.discountedSubTotal).toFixed(2)}`;
-                document.getElementById('shipping-charge').textContent = `Rs.${data.shippingCharge.toFixed(2)}`;
-                document.getElementById('total-price').textContent = `Rs.${data.totalPriceCart.toFixed(2)}`;
+
+        // Update the cart summary using backend-calculated values
+        document.getElementById('original-subtotal').textContent = `Rs.${data.originalSubTotal.toFixed(2)}`;
+        document.getElementById('discounted-subtotal').textContent = `- Rs.${(data.originalSubTotal - data.discountedSubTotal).toFixed(2)}`;
+        document.getElementById('shipping-charge').textContent = `Rs.${data.shippingCharge.toFixed(2)}`;
+        document.getElementById('total-price').textContent = `Rs.${data.totalPriceCart.toFixed(2)}`;
+ 
+        if (data.cart.products.length === 0) {
+            
+        // Get the cart container element
+        const cartContainer = document.getElementById('cart-container');
+
+        // Create the empty cart div if it doesn't exist
+        const emptyCartDiv = document.getElementById('empty-cart-div');
+        if (!emptyCartDiv) {
+            const emptyCartHtml = `
+                <div id="empty-cart-div" style="text-align: center; margin: 0 auto; width: 300px;">
+                    <img class="image-fluid" style="width: 100%;" src="/User/assets/images/empty-cart.png" alt="">
+                    <h4 class="mb-3">Empty cart alert!</h4>
+                    <p class="mb-4">Your cart is starting to feel a bit neglected. Add some goodies and give it a purpose!</p>
+                </div>
+            `;
+            cartContainer.innerHTML = emptyCartHtml;
+        }
+    } else {
+        // Remove the empty cart div if it exists
+        const emptyCartDiv = document.getElementById('empty-cart-div');
+        if (emptyCartDiv) {
+            emptyCartDiv.remove();
+        }
+    }
+
 }
 
 
@@ -373,18 +419,40 @@ function updateCart(data) {
                 document.getElementById('shipping-charge').textContent = `Rs.${data.shippingCharge.toFixed(2)}`;
                 document.getElementById('total-price').textContent = `Rs.${data.totalPriceCart.toFixed(2)}`;
 
-                // Calculate and display savings
-                // const savings = data.originalSubTotal - data.discountedSubTotal;
-                // document.getElementById('total-savings').textContent = `Rs.${savings.toFixed(2)}`;
+
             } else {
-                console.log(`Product with variantId ${data.variantId} not found in cart.`);
+
+                // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: `Product with variantId ${data.variantId} not found in cart.`,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
             }
         } else {
-            console.log(data.message);
+
+            // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: data.message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
         }
     })
     .catch(error => {
-        console.log('Error:', error);
+        console.error('Error:', error);
+        // Show error alert
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
     });
 }
 
@@ -419,7 +487,14 @@ async function proceedToCheckout() {
     }
   } catch (error) {
     console.error('Error proceeding to checkout:', error);
-    alert('An error occurred while proceeding to checkout. Please try again.');
+        // Show error alert
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'OK',
+      });
   }
 }
 

@@ -47,17 +47,7 @@
                         <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
                     </ol>
 
-                    <!-- <nav class="product-pager ml-auto" aria-label="Product">
-                        <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
-                            <i class="icon-angle-left"></i>
-                            <span>Prev</span>
-                        </a>
-
-                        <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
-                            <span>Next</span>
-                            <i class="icon-angle-right"></i>
-                        </a>
-                    </nav>End .pager-nav -->
+                    
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
 
@@ -71,11 +61,7 @@
                               <% variant.images.forEach((image, index) => { %>
                                 <figure class="product-separated-item">
                                   <img src="/Admin/assets/Products-Images/<%= image %>" data-zoom-image="/Admin/assets/Products-Images/<%= image %>" alt="product image">
-                                  <% if (index === 0) { %>
-                                    <a href="#" id="btn-separated-gallery" class="btn-product-gallery">
-                                      <i class="icon-arrows"></i>
-                                    </a>
-                                  <% } %>
+                                  
                                 </figure>
                               <% }); %>
                             </div><!-- End.product-gallery -->

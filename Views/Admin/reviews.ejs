@@ -295,7 +295,15 @@
                 var notyf = new Notyf();
                 notyf.success(data.message, 1000);
               } else {
-                console.error('Could not find pill element to update');
+
+                // Show error alert
+                Swal.fire({
+                                title: 'Error',
+                                text: 'Could not find pill element to update',
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                            });
                 // Optionally, show an error message to the user
               }
             } else {
