@@ -109,23 +109,26 @@
 
             <div class="container">
                 <div class="row">
-                    <div class="col-12 mt-7">
+                    <div class="col-12 mt-5">
                         <div class="banner banner-big">
-                            <a href="#">
-                                <img src="/Admin/assets/Banner-Images/<%= banners[1].image %>" alt="Banner">
+                            <a href="#" class="d-block">
+                                <img src="/Admin/assets/Banner-Images/<%= banners[1].image %>" alt="Banner" class="img-fluid w-100">
                             </a>
-
-                            <div class="banner-content">
-                                
-                                <h3 class="banner-title text-white"><%= banners[1].title %></h3><!-- End .banner-title -->
-                                <p class="d-none d-lg-block text-white"><%= banners[1].description %></p> 
-
-                                <a href="<%= banners[1].link %>" class="btn btn-primary btn-rounded"><span>Click Here</span><i class="icon-long-arrow-right"></i></a>
+            
+                            <div class="banner-content text-center text-md-left p-3 p-md-5">
+                                <h3 class="banner-title text-white mb-3"><%= banners[1].title %></h3><!-- End .banner-title -->
+                                <p class="d-none d-lg-block text-white mb-4"><%= banners[1].description %></p> 
+            
+                                <a href="<%= banners[1].link %>" class="btn btn-primary btn-rounded">
+                                    <span>Click Here</span>
+                                    <i class="icon-long-arrow-right"></i>
+                                </a>
                             </div><!-- End .banner-content -->
                         </div><!-- End .banner -->
                     </div><!-- End .col-12 -->
                 </div><!-- End .row -->
             </div>
+            
 
             <div class="container">
                 <div class="row mb-6">
@@ -160,108 +163,110 @@
             </div>
             
             <% if (productsMen && productsMen.length > 1) { %>
-                <div class="display-row" id="scroll-to-content" style="background-color: #f2f2f2;">
+                <div class="display-row pb-0" id="scroll-to-content" style="background-color: #f2f2f2;">
                     <div class="container-fluid">
                         <div class="row align-items-center">
-                            <div class="col-lg-6 order-lg-last">
+                            <!-- Banner Image Section -->
+                            <div class="col-lg-6 order-lg-last text-center text-lg-right">
                                 <div class="banner banner-overlay">
                                     <a href="/product/<%= productsMen[0]._id %>/variant/<%= productsMen[0].variants[0]._id %>">
-                                        <img src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[3] %>" alt="Banner" style="width: 638px; height: 538px;">
+                                        <img class="img-fluid" src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[3] %>" alt="Banner" style="max-width: 100%; height: auto;">
                                     </a>
-    
-                                    <div class="banner-content men">
-                                        <h2 class="banner-title text-white">01. Get your <br>inspiration <br>in the street.</h2><!-- End .banner-title -->
-                                        <h3 class="banner-subtitle text-brightblack">IN THIS LOOK</h3><!-- End .banner-subtitle -->
-    
-                                        <ul class="text-white">
+                
+                                    <div class="banner-content men mt-4">
+                                        <h2 class="banner-title text-white">01. Get your <br>inspiration <br>in the street.</h2>
+                                        <h3 class="banner-subtitle text-brightblack">IN THIS LOOK</h3>
+                
+                                        <ul class="text-white list-unstyled">
                                             <li><%= productsMen[0].name %></li>
                                             <li><%= productsMen[1].name %></li>
                                         </ul>
-    
-                                        <div class="banner-text text-brightblack">Rs.<%= productsMen[0].price %></div><!-- End .banner-text -->
+                
+                                        <div class="banner-text text-brightblack mb-3">Rs.<%= productsMen[0].price %></div>
                                         <a href="/product/<%= productsMen[0]._id %>/variant/<%= productsMen[0].variants[0]._id %>" class="btn btn-outline-primary-2"><span>Buy All</span><i class="icon-long-arrow-right"></i></a>
-                                    </div><!-- End .banner-content -->
-                                </div><!-- End .banner -->
-                            </div><!-- End .col-lg-6 -->
-    
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Product Info Section -->
                             <div class="col-lg-6">
-                                <div class="heading text-center">
-                                    <h2 class="title">Essential Tees & Shirts</h2><!-- End .title text-center -->
-                                    <p class="title-desc">Refresh your style with men's T-shirts and vests. From graphic tees to everyday basics, find the perfect fit for any look. Pair them with jeans for effortless, all-day comfort.</p><!-- End .title-desc -->
-                                </div><!-- End .heading -->
-    
+                                <div class="heading text-center mb-5">
+                                    <h2 class="title">Essential Tees & Shirts</h2>
+                                    <p class="title-desc">Refresh your style with men's T-shirts and vests. From graphic tees to everyday basics, find the perfect fit for any look. Pair them with jeans for effortless, all-day comfort.</p>
+                                </div>
+                
                                 <div class="row">
                                     <div class="col-lg-8 offset-lg-2">
                                         <div class="row">
-                                            <div class="col-6">
+                                            <!-- Product 1 -->
+                                            <div class="col-6 mb-4">
                                                 <div class="product product-4">
                                                     <figure class="product-media">
                                                         <a href="/product/<%= productsMen[0]._id %>/variant/<%= productsMen[0].variants[0]._id %>">
-                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[1] %>" alt="Product image" class="product-image">
-                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[3] %>" alt="Product image" class="product-image-hover">
+                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[0] %>" alt="Product image" class="img-fluid product-image">
+                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[0].variants[0].images[3] %>" alt="Product image" class="img-fluid product-image-hover">
                                                         </a>
-    
+                
                                                         <div class="product-action-vertical">
                                                             <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                                            
-                                                        </div><!--End .product-action  -->
-    
+                                                        </div>
+                
                                                         <div class="product-action">
                                                             <a href="#" id="addToCart-<%= productsMen[0].variants[0]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
-                                                        </div><!-- End .product-action-->
-                                                    </figure><!-- End .product-media -->
-    
+                                                        </div>
+                                                    </figure>
+                
                                                     <div class="product-body">
-                                                        <h3 class="product-title"><a href="/product/<%= productsMen[0]._id %>/variant/<%= productsMen[0].variants[0]._id %>"><%= productsMen[0].name %></a></h3><!-- End .product-title -->
+                                                        <h3 class="product-title"><a href="/product/<%= productsMen[0]._id %>/variant/<%= productsMen[0].variants[0]._id %>"><%= productsMen[0].name %></a></h3>
                                                         <div class="product-price">
                                                             Rs.<%= productsMen[0].discountedPrice %>
-                                                        </div><!-- End .product-price -->
-    
+                                                        </div>
+                
                                                         <div class="product-nav product-nav-dots">
                                                             <% productsMen[0].variants.forEach(function(variant, index) { %>
                                                                 <a href="/product/<%= productsMen[0]._id %>/variant/<%= variant._id %>" class="<%= index === 0 ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
                                                                     <span class="sr-only">Color name</span>
                                                                 </a>
                                                             <% }); %>
-                                                        </div><!-- End .product-nav -->
-                                                    </div><!-- End .product-body -->
-                                                </div><!-- End .product -->
-                                            </div><!-- End .col-sm-6 -->
-    
-                                            <div class="col-6">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <!-- Product 2 -->
+                                            <div class="col-6 mb-4">
                                                 <div class="product product-4">
                                                     <figure class="product-media">
                                                         <a href="/product/<%= productsMen[1]._id %>/variant/<%= productsMen[1].variants[0]._id %>">
-                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[1].variants[0].images[0] %>" alt="Product image" class="product-image">
-                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[1].variants[0].images[3] %>" alt="Product image" class="product-image-hover">
+                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[1].variants[0].images[0] %>" alt="Product image" class="img-fluid product-image">
+                                                            <img src="/Admin/assets/Products-Images/<%= productsMen[1].variants[0].images[3] %>" alt="Product image" class="img-fluid product-image-hover">
                                                         </a>
-    
+                
                                                         <div class="product-action-vertical">
                                                             <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                                            
-                                                        </div><!-- End .product-action -->
-    
+                                                        </div>
+                
                                                         <div class="product-action">
                                                             <a href="#" id="addToCart-<%= productsMen[1].variants[0]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
-                                                        </div><!-- End .product-action -->
-                                                    </figure><!-- End .product-media -->
-    
+                                                        </div>
+                                                    </figure>
+                
                                                     <div class="product-body">
-                                                        <h3 class="product-title"><a href="/product/<%= productsMen[1]._id %>/variant/<%= productsMen[1].variants[0]._id %>"><%= productsMen[1].name %></a></h3><!-- End .product-title -->
+                                                        <h3 class="product-title"><a href="/product/<%= productsMen[1]._id %>/variant/<%= productsMen[1].variants[0]._id %>"><%= productsMen[1].name %></a></h3>
                                                         <div class="product-price">
                                                             Rs.<%= productsMen[1].discountedPrice %>
-                                                        </div><!-- End .product-price -->
-    
+                                                        </div>
+                
                                                         <div class="product-nav product-nav-dots">
                                                             <% productsMen[1].variants.forEach(function(variant, index) { %>
                                                                 <a href="/product/<%= productsMen[1]._id %>/variant/<%= variant._id %>" class="<%= index === 0 ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
                                                                     <span class="sr-only">Color name</span>
                                                                 </a>
                                                             <% }); %>
-                                                        </div><!-- End .product-nav -->
-                                                    </div><!-- End .product-body -->
-                                                </div><!-- End .product -->
-                                            </div><!-- End .col-sm-6 -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div><!-- End .row -->
                                     </div><!-- End .col-lg-8 offset-lg-2 -->
                                 </div><!-- End .row -->
@@ -269,42 +274,45 @@
                         </div><!-- End .row -->
                     </div><!-- End .container-fluid -->
                 </div><!-- End .display-row -->
+                
              
             <% } %>
 
             
 
             <% if (productsWomen && productsWomen.length > 2) { %>
-                <div class="display-row" style="background-color: #f2f2f2;">
+                <div class="display-row pt-0" style="background-color: #f2f2f2;">
                     <div class="container-fluid">
                         <div class="row align-items-center">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6 col-md-12 mb-4 mb-lg-0">
                                 <div class="banner banner-light banner-overlay">
                                     <a href="/product/<%= productsWomen[0]._id %>/variant/<%= productsWomen[0].variants[0]._id %>">
-                                        <img src="/Admin/assets/Products-Images/<%= productsWomen[0].variants[0].images[3] %>" alt="Banner" style="width: 638px; height: 538px;">
+                                        <img src="/Admin/assets/Products-Images/<%= productsWomen[0].variants[0].images[3] %>" alt="Banner" class="img-fluid">
                                     </a>
-    
                                     <div class="banner-content women">
                                         <h2 class="banner-title">02. Dresses for <br>every spring day.</h2><!-- End .banner-title -->
                                         <h3 class="banner-subtitle text-darkblack">IN THIS LOOK</h3><!-- End .banner-subtitle -->
-    
+                
                                         <ul>
                                             <li><%= productsWomen[0].name %></li>
                                             <li><%= productsWomen[1].name %></li>
                                             <li><%= productsWomen[2].name %></li>
                                         </ul>
-    
+                
                                         <div class="banner-text text-darkblack">$20.00 - $96.00</div><!-- End .banner-text -->
-                                        <a href="/product/<%= productsWomen[0]._id %>/variant/<%= productsWomen[0].variants[0]._id %>"  class="btn btn-outline-primary-2"><span>Buy All</span><i class="icon-long-arrow-right"></i></a>
+                                        <a href="/product/<%= productsWomen[0]._id %>/variant/<%= productsWomen[0].variants[0]._id %>" class="btn btn-outline-primary-2">
+                                            <span>Buy All</span><i class="icon-long-arrow-right"></i>
+                                        </a>
                                     </div><!-- End .banner-content -->
                                 </div><!-- End .banner -->
                             </div><!-- End .col-lg-6 -->
-    
-                            <div class="col-lg-6">
-                                <div class="heading text-center">
+                
+                            <div class="col-lg-6 col-md-12">
+                                <div class="heading text-center mb-4">
                                     <h2 class="title">Chic Tees & Tops</h2><!-- End .title text-center -->
                                     <p class="title-desc">
-                                        Elevate your wardrobe with our range of women's T-shirts and vests. From chic graphic tees to versatile basics, find the perfect pieces to match any style. Pair with jeans or skirts for a trendy, effortless look.</p><!-- End .title-desc -->
+                                        Elevate your wardrobe with our range of women's T-shirts and vests. From chic graphic tees to versatile basics, find the perfect pieces to match any style. Pair with jeans or skirts for a trendy, effortless look.
+                                    </p><!-- End .title-desc -->
                                 </div><!-- End .heading -->
     
                                 <div class="row">
