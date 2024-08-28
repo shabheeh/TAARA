@@ -404,7 +404,7 @@ const sendResetPasswordLink = async (user, req, res) => {
 
         await resetToken.save();
 
-        const resetUrl = `http://localhost:5000/reset/${token}`;
+        const resetUrl = `http://taarafashion.shop/reset/${token}`;
 
 
         const mailOptions = {

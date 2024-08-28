@@ -289,7 +289,7 @@
         }
         
         function validateSignupPassword(password, passwordError) {
-            const passwordRegex = 	/^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$/
+            const passwordRegex = 	/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&])[A-Za-z\d@.#$!%*?&]{6,15}$/
         
             if (!password) {
                 passwordError.textContent = 'Password is required';
@@ -298,7 +298,7 @@
             }
         
             if (!passwordRegex.test(password)) {
-                passwordError.textContent = 'Password must contain at least one letter, at least one number, and be longer than six charaters.';
+                passwordError.textContent = 'Password must contain at least one letter, at least one number and special character, and minimum six charaters.';
                 passwordError.classList.add('error-message');
                 return false;
             }
