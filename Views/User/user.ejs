@@ -350,36 +350,50 @@
 
 								    <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
                                         <div class="row">
-                                            <div class="col">
-                                                <h4 class="profile-title text-center">Profile Information</h4><!-- End .profile-title -->
-                                                <div class="card card-dashboard">
-                                                    <div class="card-body col-md-8 col-lg-9">
-                                                        <form id="profile-form">
-                                                            <div class="form-row">
-                                                                <div class="form-group col-md-6">
-                                                                    <label for="first-name" id="firstNameLabel">First Name:</label>
-                                                                    <input type="text" id="first-name" class="form-control" value="<%= user.firstName %>" placeholder="Enter your first name" disabled>
-                                                                </div>
-                                                                <div class="form-group col-md-6">
-                                                                    <label for="last-name" id="lastNameLabel">Last Name:</label>
-                                                                    <input type="text" id="last-name" class="form-control" value="<%= user.lastName %>" placeholder="Enter your last name" disabled>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="email" id="emailLabel">Email:</label>
-                                                                <input class="form-control" value="<%= user.email %>" disabled readonly>
-                                                              </div>
-                                                            <div class="form-group">
-                                                                <label for="phone" id="phoneLabel">Phone:</label>
-                                                                <input type="text" id="phone" class="form-control" value="<%= user.phone %>" placeholder="Enter your phone number" disabled>
-                                                            </div>
-                                                            <button type="button" class="btn btn-primary" id="edit-button">Edit</button>
-                                                            <button type="button" class="btn btn-primary" id="save-button" style="display: none;">Save</button>
-                                                            <button type="button" class="btn btn-secondary" id="cancel-button" style="display: none;">Cancel</button>
-                                                        </form>
-                                                    </div><!-- End .card-body -->
-                                                </div><!-- End .card-dashboard -->
-                                            </div><!-- End .col -->
+<div class="col">
+  <h4 class="profile-title text-center">Profile Information</h4>
+  <div class="card card-dashboard">
+    <div class="card-body col-md-8 col-lg-9">
+      <form id="profile-form">
+        <!-- DISPLAY MODE -->
+        <div id="profile-display">
+          <p><strong>First Name:</strong> <span id="display-first-name"><%= user.firstName %></span></p>
+          <p><strong>Last Name:</strong> <span id="display-last-name"><%= user.lastName %></span></p>
+          <p><strong>Email:</strong> <span id="display-email"><%= user.email %></span></p>
+          <p><strong>Phone:</strong> <span id="display-phone"><%= user.phone %></span></p>
+        </div>
+
+        <!-- EDIT MODE (Hidden by default) -->
+        <div id="profile-edit" style="display: none;">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="first-name" id="firstNameLabel">First Name:</label>
+              <input type="text" id="first-name" class="form-control" value="<%= user.firstName %>">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="last-name" id="lastNameLabel">Last Name:</label>
+              <input type="text" id="last-name" class="form-control" value="<%= user.lastName %>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input class="form-control" id="email" value="<%= user.email %>" disabled readonly>
+          </div>
+          <div class="form-group">
+            <label for="phone" id="phoneLabel">Phone:</label>
+            <input type="text" id="phone" class="form-control" value="<%= user.phone %>">
+          </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <button type="button" class="btn btn-primary" id="edit-button">Edit</button>
+        <button type="submit" class="btn btn-success" id="save-button" style="display: none;">Save</button>
+        <button type="button" class="btn btn-secondary" id="cancel-button" style="display: none;">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
                                         </div><!-- End .row -->
                                         
 
@@ -1140,129 +1154,127 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script src="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.js"></script>
 
-    <script>
-        document.getElementById('edit-button').addEventListener('click', function() {
-            const inputs = document.querySelectorAll('#profile-form input');
-            inputs.forEach(input => input.disabled = false);
-        
-            document.getElementById('edit-button').style.display = 'none';
-            document.getElementById('save-button').style.display = 'inline-block';
-            document.getElementById('cancel-button').style.display = 'inline-block';
-        });
-        
-        document.getElementById('cancel-button').addEventListener('click', function() {
+   <script>
+  document.getElementById('edit-button').addEventListener('click', function () {
+    document.getElementById('profile-display').style.display = 'none';
+    document.getElementById('profile-edit').style.display = 'block';
 
-            const inputs = document.querySelectorAll('#profile-form input');
-            inputs.forEach(input => input.disabled = true);
+    document.getElementById('edit-button').style.display = 'none';
+    document.getElementById('save-button').style.display = 'inline-block';
+    document.getElementById('cancel-button').style.display = 'inline-block';
+  });
 
-            document.getElementById('edit-button').style.display = 'inline-block';
-            document.getElementById('save-button').style.display = 'none';
-            document.getElementById('cancel-button').style.display = 'none';
+  document.getElementById('cancel-button').addEventListener('click', function () {
+    document.getElementById('profile-display').style.display = 'block';
+    document.getElementById('profile-edit').style.display = 'none';
 
-            const labels = document.querySelectorAll('#profile-form label');
-            labels.forEach(label => label.classList.remove('error-message'));
+    document.getElementById('edit-button').style.display = 'inline-block';
+    document.getElementById('save-button').style.display = 'none';
+    document.getElementById('cancel-button').style.display = 'none';
 
-            document.getElementById('firstNameLabel').innerHTML = "First Name:";
-            document.getElementById('lastNameLabel').innerHTML = "Last Name:";
-            document.getElementById('emailLabel').innerHTML = "Email:";
-            document.getElementById('phoneLabel').innerHTML = "Phone:";
-        });
+    document.getElementById('first-name').value = document.getElementById('display-first-name').textContent;
+    document.getElementById('last-name').value = document.getElementById('display-last-name').textContent;
+    document.getElementById('phone').value = document.getElementById('display-phone').textContent;
 
-        
-        document.getElementById('save-button').addEventListener('click', async function(event) {
-            event.preventDefault();
-        
-            let isValid = true;
-        
-            const firstName = document.getElementById('first-name').value.trim();
-            const lastName = document.getElementById('last-name').value.trim();
-            
-            const phone = document.getElementById('phone').value.trim();
-        
-        
-            const firstNameLabel = document.getElementById('firstNameLabel');
-            const lastNameLabel = document.getElementById('lastNameLabel');
-            
-            const phoneLabel = document.getElementById('phoneLabel');
-        
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const phonePattern = /^\d{10}$/;
-        
-            if (!firstName) {
-                firstNameLabel.innerHTML = "First Name is required";
-                firstNameLabel.classList.add('error-message');
-                isValid = false;
-            } else {
-                firstNameLabel.innerHTML = "First Name:";
-                firstNameLabel.classList.remove('error-message');
-            }
-        
-            if (!lastName) {
-                lastNameLabel.innerHTML = "Last Name is required";
-                lastNameLabel.classList.add('error-message');
-                isValid = false;
-            } else {
-                lastNameLabel.innerHTML = "Last Name:";
-                lastNameLabel.classList.remove('error-message');
-            }
-        
-            if (!phone) {
-                phoneLabel.innerHTML = "Phone is required";
-                phoneLabel.classList.add('error-message');
-                isValid = false;
-            } else if (!phonePattern.test(phone)) {
-                phoneLabel.innerHTML = "Phone is not valid";
-                phoneLabel.classList.add('error-message');
-                isValid = false;
-            } else {
-                phoneLabel.innerHTML = "Phone:";
-                phoneLabel.classList.remove('error-message');
-            }
-        
-            if (isValid) {
-                const data = {
-                    firstName,
-                    lastName,
-                    phone
-                };
-        
-                updateProfile(data);
-            }
-        });
-        
-        async function updateProfile(data) {
-            try {
-                const response = await fetch('/profile', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-        
-                const result = await response.json();
-        
-                if (result.success) {
-                    const inputs = document.querySelectorAll('#profile-form input');
-                    inputs.forEach(input => input.disabled = true);
-        
-                    document.getElementById('edit-button').style.display = 'inline-block';
-                    document.getElementById('save-button').style.display = 'none';
-                    document.getElementById('cancel-button').style.display = 'none';
-                    var notyf = new Notyf();
-                    notyf.success('Profile updated successfully');
-                } else {
-                    var notyf = new Notyf();
-                    notyf.error('Error updating profile');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                var notyf = new Notyf();
-                notyf.error('Error updating profile');
-                
-            }
-        }
-        </script>
+    const labels = document.querySelectorAll('#profile-form label');
+    labels.forEach(label => label.classList.remove('error-message'));
+
+    document.getElementById('firstNameLabel').innerHTML = "First Name:";
+    document.getElementById('lastNameLabel').innerHTML = "Last Name:";
+    document.getElementById('phoneLabel').innerHTML = "Phone:";
+  });
+
+  document.getElementById('save-button').addEventListener('click', async function (event) {
+    event.preventDefault();
+
+    let isValid = true;
+
+    const firstName = document.getElementById('first-name').value.trim();
+    const lastName = document.getElementById('last-name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    const firstNameLabel = document.getElementById('firstNameLabel');
+    const lastNameLabel = document.getElementById('lastNameLabel');
+    const phoneLabel = document.getElementById('phoneLabel');
+    const phonePattern = /^\d{10}$/;
+
+    if (!firstName) {
+      firstNameLabel.innerHTML = "First Name is required";
+      firstNameLabel.classList.add('error-message');
+      isValid = false;
+    } else {
+      firstNameLabel.innerHTML = "First Name:";
+      firstNameLabel.classList.remove('error-message');
+    }
+
+    if (!lastName) {
+      lastNameLabel.innerHTML = "Last Name is required";
+      lastNameLabel.classList.add('error-message');
+      isValid = false;
+    } else {
+      lastNameLabel.innerHTML = "Last Name:";
+      lastNameLabel.classList.remove('error-message');
+    }
+
+    if (!phone) {
+      phoneLabel.innerHTML = "Phone is required";
+      phoneLabel.classList.add('error-message');
+      isValid = false;
+    } else if (!phonePattern.test(phone)) {
+      phoneLabel.innerHTML = "Phone is not valid";
+      phoneLabel.classList.add('error-message');
+      isValid = false;
+    } else {
+      phoneLabel.innerHTML = "Phone:";
+      phoneLabel.classList.remove('error-message');
+    }
+
+    if (isValid) {
+      const data = { firstName, lastName, phone };
+      updateProfile(data);
+    }
+  });
+
+  async function updateProfile(data) {
+    try {
+      const response = await fetch('/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update display section with new values
+        document.getElementById('display-first-name').textContent = data.firstName;
+        document.getElementById('display-last-name').textContent = data.lastName;
+        document.getElementById('display-phone').textContent = data.phone;
+
+        // Hide edit section and show display
+        document.getElementById('profile-display').style.display = 'block';
+        document.getElementById('profile-edit').style.display = 'none';
+
+        document.getElementById('edit-button').style.display = 'inline-block';
+        document.getElementById('save-button').style.display = 'none';
+        document.getElementById('cancel-button').style.display = 'none';
+
+        const notyf = new Notyf();
+        notyf.success('Profile updated successfully');
+      } else {
+        const notyf = new Notyf();
+        notyf.error('Error updating profile');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      const notyf = new Notyf();
+      notyf.error('Error updating profile');
+    }
+  }
+</script>
+
 
         <script>
             document.getElementById('password-form').addEventListener('submit', (event) => {
@@ -1639,6 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Close the modal using Bootstrap's modal method
             $('#addAddressModal').modal('hide');
+            document.getElementById('add-address').reset();
 
         } else {
             notyf.error(data.message);

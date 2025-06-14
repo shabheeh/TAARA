@@ -45,76 +45,58 @@
 
 </div>
 <div class="card mb-6">
-  
-  <!-- <div class="card-widget-separator-wrapper">
-    <div class="card-body card-widget-separator">
-      <div class="row gy-4 gy-sm-1">
-        <div class="col-sm-6 col-lg-3">
-          
-          <div class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-4 pb-sm-0">
-            
-            <div>
-              <h4 class="mb-0">56</h4>
-              <p class="mb-0">Pending Payment</p>
-            </div>
-            <div class="avatar me-sm-6">
-              <span class="avatar-initial rounded bg-label-secondary text-heading">
-                <i class="ri-calendar-2-line ri-24px"></i>
-              </span>
-            </div>
-          </div>
-          <hr class="d-none d-sm-block d-lg-none me-6">
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-4 pb-sm-0">
-            <div>
-              <h4 class="mb-0">12,689</h4>
-              <p class="mb-0">Completed</p>
-            </div>
-            <div class="avatar me-lg-6">
-              <span class="avatar-initial rounded bg-label-secondary text-heading">
-                <i class="ri-check-double-line ri-24px"></i>
-              </span>
-            </div>
-          </div>
-          <hr class="d-none d-sm-block d-lg-none">
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="d-flex justify-content-between align-items-start border-end pb-4 pb-sm-0 card-widget-3">
-            <div>
-              <h4 class="mb-0">124</h4>
-              <p class="mb-0">Refunded</p>
-            </div>
-            <div class="avatar me-sm-6">
-              <span class="avatar-initial rounded bg-label-secondary text-heading">
-                <i class="ri-wallet-3-line ri-24px"></i>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <h4 class="mb-0">32</h4>
-              <p class="mb-0">Failed</p>
-            </div>
-            <div class="avatar">
-              <span class="avatar-initial rounded bg-label-secondary text-heading">
-                <i class="ri-error-warning-line ri-24px"></i>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
+
 
 <!-- Order List Table -->
 <div class="card">
   <div class="card-datatable table-responsive">
+    <div class="card-header">
+
+  <div class="row g-3 align-items-end pt-3">
+    <!-- Payment Status -->
+    <div class="col-md-2">
+      <label for="paymentStatus" class="form-label">Payment Status</label>
+      <select id="paymentStatus" class="form-select text-capitalize">
+        <option value="">All</option>
+        <option value="Paid" <%= paymentStatus === 'Paid' ? 'selected' : '' %>>Paid</option>
+        <option value="Pending" <%= paymentStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+      </select>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="col-md-2">
+      <label for="paymentMethod" class="form-label">Payment Method</label>
+      <select id="paymentMethod" class="form-select text-capitalize">
+        <option value="">All</option>
+        <option value="COD" <%= paymentMethod === 'COD' ? 'selected' : '' %>>COD</option>
+        <option value="Razorpay" <%= paymentMethod === 'Razorpay' ? 'selected' : '' %>>Razorpay</option>
+        <option value="Wallet" <%= paymentMethod === 'Wallet' ? 'selected' : '' %>>Wallet</option>
+      </select>
+    </div>
+
+    <!-- Start Date -->
+    <div class="col-md-3">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" id="startDate" class="form-control" value="<%= startDate %>">
+    </div>
+
+    <!-- End Date -->
+    <div class="col-md-3">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" id="endDate" class="form-control" value="<%= endDate %>">
+    </div>
+
+    <!-- Apply Button -->
+    <div class="col-md-2 text-end">
+      <button id="applyDateFilter" class="btn btn-primary w-100" type="button">Apply</button>
+    </div>
+  </div>
+</div>
     <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      
       <div class="row mx-1">
+
+
         <div class="col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4">
           <div class="dt-action-buttons mt-4 mt-md-0">
             <div class="col-sm-12 col-md-6">
@@ -138,7 +120,7 @@
             <div class="me-4">
               <div class="dataTables_filter">
                 <label>
-                  <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                  <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" style="width: 450px;"  placeholder="Search product">
                 </label>
             </div>
             </div>
@@ -272,30 +254,50 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
-   
-  
+    const paymentStatusSelect = document.getElementById('paymentStatus');
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const applyDateBtn = document.getElementById('applyDateFilter');
+
     function performSearch() {
       const searchTerm = searchInput.value.trim();
-      if (searchTerm) {
-        // If there's a search term, add it to the URL and navigate
-        window.location.href = `/admin/orders?search=${encodeURIComponent(searchTerm)}`;
-      } else {
-        // If no search term, just load all products
-        window.location.href = '/admin/orders';
-      }
+      const paymentStatus = paymentStatusSelect.value;
+      const paymentMethod = paymentMethodSelect.value;
+      const startDate = startDateInput.value;
+      const endDate = endDateInput.value;
+
+      const params = new URLSearchParams();
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (paymentStatus) params.append('paymentStatus', paymentStatus);
+      if (paymentMethod) params.append('paymentMethod', paymentMethod);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const queryString = params.toString();
+      const url = queryString ? `/admin/orders?${queryString}` : '/admin/orders';
+
+      window.location.href = url;
     }
-  
-    searchInput.addEventListener('keypress', function(e) {
+
+    searchInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         performSearch();
       }
     });
+
+    paymentStatusSelect.addEventListener('change', performSearch);
+    paymentMethodSelect.addEventListener('change', performSearch);
+    applyDateBtn.addEventListener('click', performSearch);
   });
-  </script>
+</script>
+
 
   
 

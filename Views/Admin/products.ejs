@@ -48,56 +48,102 @@
         </div>
 
         <div class="card">
-          <!-- <div class="card-header">
-    <h5 class="mb-0">Filter</h5>
-    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
-      <div class="col-md-4 product_status"><select id="ProductStatus" class="form-select text-capitalize">
-          <option value="">Select Status</option>
-          <option value="Scheduled">Scheduled</option>
-          <option value="Publish">Publish</option>
-          <option value="Inactive">Inactive</option>
-        </select></div>
-      <div class="col-md-4 product_category"><select id="ProductCategory" class="form-select text-capitalize">
-          <option value="">Category</option>
-          <option value="Household">Household</option>
-          <option value="Office">Office</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Shoes">Shoes</option>
-          <option value="Accessories">Accessories</option>
-          <option value="Game">Game</option>
-        </select></div>
-      <div class="col-md-4 product_stock"><select id="ProductStock" class="form-select text-capitalize">
-          <option value=""> Stock </option>
-          <option value="Out_of_Stock">Out of Stock</option>
-          <option value="In_Stock">In Stock</option>
-        </select></div>
+<div class="card-header">
+  <h5 class="mb-0">Filter</h5>
+
+  <!-- First row: Gender, Category, Brand -->
+  <div class="row pt-4 g-3 align-items-end">
+    <!-- Gender -->
+    <div class="col-md-4">
+      <label for="ProductGender" class="form-label">Gender</label>
+      <select id="ProductGender" class="form-select text-capitalize">
+        <option value="">Select gender</option>
+        <option value="Men" <%= selectedGender === 'Men' ? 'selected' : '' %>>Men</option>
+        <option value="Women" <%= selectedGender === 'Women' ? 'selected' : '' %>>Women</option>
+      </select>
+
     </div>
-  </div> -->
+
+    <!-- Category -->
+    <div class="col-md-4">
+      <label for="ProductCategory" class="form-label">Category</label>
+      <select id="ProductCategory" class="form-select text-capitalize">
+        <option value="">Category</option>
+        <% categories.forEach(category => { %>
+          <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+        <% }) %>
+      </select>
+
+    </div>
+
+    <!-- Brand -->
+    <div class="col-md-4">
+      <label for="ProductBrand" class="form-label">Brand</label>
+      <select id="ProductBrand" class="form-select text-capitalize">
+        <option value="">Brand</option>
+        <% brands.forEach(brand => { %>
+          <option value="<%= brand._id %>" <%= selectedBrand === brand._id.toString() ? 'selected' : '' %>><%= brand.name %></option>
+        <% }) %>
+      </select>
+
+    </div>
+  </div>
+
+  <!-- Second row: Date filters -->
+  <div class="row pt-4 g-3">
+  <h6 class="mb-0">Products Added Date</h6>
+
+  <!-- Start Date -->
+  <div class="col-md-5">
+    <label for="startDate" class="form-label">Start Date</label>
+    <input type="date" id="startDate" class="form-control" value="<%= selectedStartDate %>">
+  </div>
+
+  <!-- End Date -->
+  <div class="col-md-5">
+    <label for="endDate" class="form-label">End Date</label>
+    <input type="date" id="endDate" class="form-control" value="<%= selectedEndDate %>">
+  </div>
+
+  <!-- Apply Button -->
+  <div class="col-2 text-end">
+    <button id="applyDateFilter" class="btn btn-primary mt-6" type="button">Apply</button>
+  </div>
+</div>
+
+</div>
+
+
           <div class="card-datatable table-responsive">
             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
               <div class="card-header d-flex border-top rounded-0 flex-wrap py-0 pb-5 pb-md-0">
-                <div class="me-5 ms-n2">
+                <div class="me-8 ms-n2">
                   <div class="dataTables_filter">
                     <label>
-                      <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                      <input type="search" id="searchInput"
+                        value="<%= locals.searchTerm ? searchTerm : '' %>"
+                        class="form-control form-control-md"
+                        style="width: 450px;" 
+                        placeholder="Search by name, price, gender, category and brand">
+
                     </label>
                   </div>
                 </div>
                 <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
                   <div
                     class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
-                    <!-- <div class="dataTables_length my-0" id="DataTables_Table_0_length">
+                    <div class="dataTables_length my-0" id="DataTables_Table_0_length">
               <label>
-                <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
-                  <option value="7">7</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="70">70</option>
-                  <option value="100">100</option>
-                </select>
+                <label>
+                  <select name="DataTables_Table_0_length" id="listLimit" aria-controls="DataTables_Table_0" class="form-select form-select-sm">
+                    <% [5, 10, 20, 50, 70, 100].forEach(l => { %>
+                      <option value="<%= l %>" <%= l === limit ? 'selected' : '' %>><%= l %></option>
+                    <% }) %>
+                  </select>
+                </label>
+
               </label>
-            </div> -->
+            </div>
                     <div class="dt-buttons btn-group flex-wrap d-flex">
                       <a href="/admin/products/addProduct"
                         class="btn btn-secondary add-new btn-primary waves-effect waves-light" tabindex="0"
@@ -306,23 +352,21 @@
                 <div class="col-sm-12 col-md-6">
                   <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
                     <ul class="pagination">
-                      <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
-                        <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
-                          class="page-link">Previous</a>
+                    <li class="paginate_button page-item previous <%= page === 1 ? 'disabled' : '' %>">
+                      <a href="?page=<%= page - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= '&limit=' + limit %>" class="page-link">Previous</a>
+                    </li>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                      <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
+                        <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= '&limit=' + limit %>" class="page-link">
+                          <%= i %>
+                        </a>
                       </li>
-                      <% for (let i=1; i <=totalPages; i++) { %>
-                        <li class="paginate_button page-item <%= i === page ? 'active' : '' %>">
-                          <a href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
-                            class="page-link">
-                            <%= i %>
-                          </a>
-                        </li>
-                        <% } %>
-                          <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
-                            <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>"
-                              class="page-link">Next</a>
-                          </li>
-                    </ul>
+                    <% } %>
+                    <li class="paginate_button page-item next <%= page === totalPages ? 'disabled' : '' %>">
+                      <a href="?page=<%= page + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %><%= '&limit=' + limit %>" class="page-link">Next</a>
+                    </li>
+                  </ul>
+
                   </div>
               
                 </div>
@@ -682,29 +726,70 @@
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('searchInput');
- 
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const genderSelect = document.getElementById('ProductGender');
+    const categorySelect = document.getElementById('ProductCategory');
+    const brandSelect = document.getElementById('ProductBrand');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const applyDateBtn = document.getElementById('applyDateFilter');
 
-  function performSearch() {
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm) {
-      // If there's a search term, add it to the URL and navigate
-      window.location.href = `/admin/products?search=${encodeURIComponent(searchTerm)}`;
-    } else {
-      // If no search term, just load all products
-      window.location.href = '/admin/products';
+    function performSearch() {
+      const searchTerm = searchInput.value.trim();
+      const gender = genderSelect.value;
+      const category = categorySelect.value;
+      const brand = brandSelect.value;
+      const startDate = startDateInput.value;
+      const endDate = endDateInput.value;
+
+      const params = new URLSearchParams();
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (gender) params.append('gender', gender);
+      if (category) params.append('category', category);
+      if (brand) params.append('brand', brand);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      const queryString = params.toString();
+      const url = queryString ? `/admin/products?${queryString}` : '/admin/products';
+
+      window.location.href = url;
     }
-  }
 
-  searchInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+    searchInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+    });
+
+    genderSelect.addEventListener('change', performSearch);
+    categorySelect.addEventListener('change', performSearch);
+    brandSelect.addEventListener('change', performSearch);
+
+    applyDateBtn?.addEventListener('click', function () {
       performSearch();
-    }
+    });
   });
-});
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const limitSelect = document.getElementById('listLimit');
+
+    limitSelect?.addEventListener('change', function () {
+      const selectedLimit = this.value;
+      const params = new URLSearchParams(window.location.search);
+      params.set('limit', selectedLimit);
+      params.set('page', 1); 
+
+      window.location.href = `${window.location.pathname}?${params.toString()}`;
+    });
+  });
+</script>
+
 
 
     </body>

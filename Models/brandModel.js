@@ -1,19 +1,21 @@
 const mongoose = require("mongoose");
 
-const brandShcema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
+const brandShcema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
 
-  description: {
-    type: String,
-  },
+    description: {
+      type: String,
+    },
 
-  isListed: {
-    type: Boolean,
+    isListed: {
+      type: Boolean,
+    },
   },
-  
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Brand", brandShcema);

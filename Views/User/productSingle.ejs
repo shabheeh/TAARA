@@ -182,13 +182,41 @@
                                             
                                         </div><!-- End .product-cat -->
 
+                                        <% const productUrl = `https://taarafashion.shop/product/${product._id}/variant/${variant._id}`; %>
+
                                         <div class="social-icons social-icons-sm">
                                             <span class="social-label">Share:</span>
-                                            <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                            <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                            <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                            <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+
+                                            <!-- WhatsApp -->
+                                            <a href="https://api.whatsapp.com/send?text=<%= encodeURIComponent('Check out this product: ' + productUrl) %>" 
+                                            class="social-icon" title="WhatsApp" target="_blank">
+                                                <i class="icon-whatsapp"></i>
+                                            </a>
+
+                                            <!-- Facebook -->
+                                            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(productUrl) %>" 
+                                            class="social-icon" title="Facebook" target="_blank">
+                                                <i class="icon-facebook-f"></i>
+                                            </a>
+
+                                            <!-- Twitter -->
+                                            <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(productUrl) %>&text=Check this product!" 
+                                            class="social-icon" title="Twitter" target="_blank">
+                                                <i class="icon-twitter"></i>
+                                            </a>
+
+                                            <!-- Instagram (Note: Instagram does not support direct web sharing) -->
+                                            <a href="https://www.instagram.com" class="social-icon" title="Instagram" target="_blank">
+                                                <i class="icon-instagram"></i>
+                                            </a>
+
+                                            <!-- Pinterest -->
+                                            <a href="https://pinterest.com/pin/create/button/?url=<%= encodeURIComponent(productUrl) %>" 
+                                            class="social-icon" title="Pinterest" target="_blank">
+                                                <i class="icon-pinterest"></i>
+                                            </a>
                                         </div>
+
                                     </div><!-- End .product-details-footer -->
 
                                     <div class="accordion accordion-plus product-details-accordion" id="product-accordion">
@@ -436,13 +464,27 @@
             .then(data => {
                 if (data.success) {
                     
-                    var notyf = new Notyf({
-                        position: {
+                    // var notyf = new Notyf({
+                    //     position: {
+                    //         x: 'center',
+                    //         y: 'center'
+                    //     }
+                    //     });
+                    // notyf.success(data.message)
+
+                    const notyf = new Notyf({
+                    duration: 5000,
+                    dismissible: true,
+                    position: {
                             x: 'center',
                             y: 'center'
                         }
-                        });
-                    notyf.success(data.message)
+                    });
+
+                    notyf.open({
+                    type: 'success',
+                    message: `Added to cart. <a href="/cart" style="color:#fff;text-decoration:underline;">View Cart</a>`
+                    });
                 } 
                 else if (!data.user) {
                     // Show success alert

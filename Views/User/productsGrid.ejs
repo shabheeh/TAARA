@@ -529,13 +529,19 @@ function addToCart(data) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    var notyf = new Notyf({
-                        position: {
+                    const notyf = new Notyf({
+                    duration: 5000,
+                    dismissible: true,
+                    position: {
                             x: 'center',
                             y: 'center'
                         }
-                        });
-                    notyf.success(data.message)
+                    });
+
+                    notyf.open({
+                    type: 'success',
+                    message: `Added to cart. <a href="/cart" style="color:#fff;text-decoration:underline;">View Cart</a>`
+                    });
                 } 
                 else if (!data.user) {
 

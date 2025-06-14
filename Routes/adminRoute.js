@@ -7,58 +7,64 @@ const { upload, uploadBanner } = require("../Configs/multerConfig");
 const authAdmin = require("../Middlewares/authAdmin");
 
 //            controllers
-const adminController = require("../Controllers/adminController");
-const productController = require("../Controllers/productController");
-const orderController = require("../Controllers/orderController");
-const offerController = require("../Controllers/offerController");
-const bannerController = require('../Controllers/bannerController')
-
-
-//        Set view and  static
+const authController = require("../Controllers/admin/authController");
+const productController = require("../Controllers/product/productController");
+const dashboardController = require("../Controllers/admin/dashboardController");
+const orderController = require("../Controllers/order/orderController");
+const bannerController = require("../Controllers/admin/bannerController");
+const userController = require("../Controllers/admin/userController");
+const categoryController = require("../Controllers/admin/categoryController");
+const brandController = require("../Controllers/admin/brandController");
+const variantController = require("../Controllers/product/variantController")
+const offerController = require("../Controllers/admin/offerController")
+const couponController = require("../Controllers/admin/couponController")
+const salesController = require("../Controllers/order/salesController")
+const reviewController = require("../Controllers/product/reviewController")
 
 router.set("views", path.join(__dirname, "..", "Views", "Admin"));
 router.use(express.static(path.join(__dirname, "..", "Public", "Admin")));
 
-
 //           admin login and dashboard
-router.get("/", authAdmin.isLogin, adminController.login);
-router.get("/login", authAdmin.isLogout, adminController.loadSignin);
-router.post("/login", adminController.verifySignIn);
-router.post("/logout", adminController.logout);
-router.get("/dashboard", authAdmin.isLogin, adminController.dashboard);
-router.get('/dashboard/salesgraph', authAdmin.isLogin, adminController.salesGraph)
-
-
+router.get("/", authAdmin.isLogin, authController.login);
+router.get("/login", authAdmin.isLogout, authController.loadSignin);
+router.post("/login", authController.verifySignIn);
+router.post("/logout", authController.logout);
+router.get("/dashboard", authAdmin.isLogin, dashboardController.dashboard);
+router.get(
+  "/dashboard/salesgraph",
+  authAdmin.isLogin,
+  dashboardController.salesGraph
+);
 
 //               user management
-router.get("/users", authAdmin.isLogin, adminController.loadUsers);
-router.patch("/blockUser", authAdmin.isLogin, adminController.blockUser);
-router.patch("/unblockUser", authAdmin.isLogin, adminController.unBlockUser);
+router.get("/users", authAdmin.isLogin, userController.loadUsers);
+router.patch("/blockUser", authAdmin.isLogin, userController.blockUser);
+router.patch("/unblockUser", authAdmin.isLogin, userController.unBlockUser);
 
 //                category management
-router.get("/categories", authAdmin.isLogin, adminController.category);
-router.post("/categories", authAdmin.isLogin, adminController.addCategory);
-router.put("/categories", authAdmin.isLogin, adminController.editCategory);
+router.get("/categories", authAdmin.isLogin, categoryController.category);
+router.post("/categories", authAdmin.isLogin, categoryController.addCategory);
+router.put("/categories", authAdmin.isLogin, categoryController.editCategory);
 router.patch(
   "/categories/listCategory",
   authAdmin.isLogin,
-  adminController.listCategory
+  categoryController.listCategory
 );
 router.patch(
   "/categories/unlistCategory",
   authAdmin.isLogin,
-  adminController.unlistCategory
+  categoryController.unlistCategory
 );
 
 //               brand management
-router.get("/brands", authAdmin.isLogin, adminController.brand);
-router.put("/brands", authAdmin.isLogin, adminController.editBrand);
-router.post("/brands", authAdmin.isLogin, adminController.addBrand);
-router.patch("/brands/listBrand", authAdmin.isLogin, adminController.listBrand);
+router.get("/brands", authAdmin.isLogin, brandController.brand);
+router.put("/brands", authAdmin.isLogin, brandController.editBrand);
+router.post("/brands", authAdmin.isLogin, brandController.addBrand);
+router.patch("/brands/listBrand", authAdmin.isLogin, brandController.listBrand);
 router.patch(
   "/brands/unlistBrand",
   authAdmin.isLogin,
-  adminController.unlistBrand
+  brandController.unlistBrand
 );
 
 //            product management
@@ -87,12 +93,12 @@ router.patch("/products/unlistProduct", productController.unlistProduct);
 router.get(
   "/products/variants/single/:id",
   authAdmin.isLogin,
-  productController.variants
+  variantController.variants
 );
 router.get(
   "/products/variants/addVariant/:id",
   authAdmin.isLogin,
-  productController.loadAddVariant
+  variantController.loadAddVariant
 );
 router.post(
   "/products/variants/addVariant",
@@ -103,12 +109,12 @@ router.post(
     { name: "productImage3", maxCount: 1 },
     { name: "productImage4", maxCount: 1 },
   ]),
-  productController.addVariant
+  variantController.addVariant
 );
 router.get(
   "/products/variants/editVariant/:id",
   authAdmin.isLogin,
-  productController.loadEditVariant
+  variantController.loadEditVariant
 );
 router.put(
   "/products/variants/editVariant",
@@ -116,9 +122,9 @@ router.put(
     { name: "productImage1", maxCount: 1 },
     { name: "productImage2", maxCount: 1 },
     { name: "productImage3", maxCount: 1 },
-    { name: "productImage4", maxCount: 1 }, 
+    { name: "productImage4", maxCount: 1 },
   ]),
-  productController.editVariant
+  variantController.editVariant
 );
 
 //              order management
@@ -128,28 +134,36 @@ router.patch("/order", authAdmin.isLogin, orderController.updateStatus);
 
 //             offer and coupon Mangagement
 router.get("/offers", authAdmin.isLogin, offerController.offers);
-router.post('/offers', authAdmin.isLogin, offerController.addOffer)
-router.put('/offers', authAdmin.isLogin, offerController.updateOffer)
-router.delete('/offers', authAdmin.isLogin, offerController.deleteOffer)
+router.post("/offers", authAdmin.isLogin, offerController.addOffer);
+router.put("/offers", authAdmin.isLogin, offerController.updateOffer);
+router.delete("/offers", authAdmin.isLogin, offerController.deleteOffer);
 
-router.get('/coupons', authAdmin.isLogin, offerController.coupons)
-router.post('/coupons', authAdmin.isLogin, offerController.addCoupon)
-router.put('/coupons', authAdmin.isLogin, offerController.updateCoupon)
-router.delete('/coupons', authAdmin.isLogin, offerController.deleteCoupon)
+router.get("/coupons", authAdmin.isLogin, couponController.coupons);
+router.post("/coupons", authAdmin.isLogin, couponController.addCoupon);
+router.put("/coupons", authAdmin.isLogin, couponController.updateCoupon);
+router.delete("/coupons", authAdmin.isLogin, couponController.deleteCoupon);
 
 //                 sales mangement
-router.get("/sales", authAdmin.isLogin, orderController.sales)
-router.get('/sales/pdf', authAdmin.isLogin, orderController.generatePdf)
-router.get('/sales/excel', authAdmin.isLogin, orderController.generateExcel)
+router.get("/sales", authAdmin.isLogin, salesController.sales);
+router.get("/sales/pdf", authAdmin.isLogin, salesController.generatePdf);
+router.get("/sales/excel", authAdmin.isLogin, salesController.generateExcel);
 
 //                    review management
-router.get('/reviews', authAdmin.isLogin, productController.reviews)
-router.post('/reviews', authAdmin.isLogin, productController.reviewStatus)
-router.delete('/reviews', authAdmin.isLogin, productController.deleteReview)
+router.get("/reviews", authAdmin.isLogin, reviewController.reviews);
+router.post("/reviews", authAdmin.isLogin, reviewController.reviewStatus);
+router.delete("/reviews", authAdmin.isLogin, reviewController.deleteReview);
 
 //                     banners mangement
-router.get('/banners', authAdmin.isLogin, bannerController.banners)
-router.get('/editBanner/:id', authAdmin.isLogin, bannerController.loadEditBanner)
-router.put("/banners", uploadBanner.single('bannerImage'), bannerController.editBanner);
+router.get("/banners", authAdmin.isLogin, bannerController.banners);
+router.get(
+  "/editBanner/:id",
+  authAdmin.isLogin,
+  bannerController.loadEditBanner
+);
+router.put(
+  "/banners",
+  uploadBanner.single("bannerImage"),
+  bannerController.editBanner
+);
 
 module.exports = router;

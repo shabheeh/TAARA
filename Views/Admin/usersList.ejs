@@ -131,7 +131,7 @@
                     <div class="me-4">
                       <div class="dataTables_filter">
                         <label>
-                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search product">
+                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search user">
                         </label>
                     </div>
                     </div>
@@ -180,7 +180,12 @@
                           <%= user.email %>
                         </td>
                         <td>
-                          <%= user.dateOfJoined %>
+                          <%= new Date(user.createdAt).toLocaleDateString('en-IN', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) %>
+
                         </td>
                         <td>
                           <%= user.orders.length %>

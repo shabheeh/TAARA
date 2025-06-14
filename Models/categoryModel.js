@@ -1,30 +1,28 @@
-const mongoose = require ('mongoose')
+const mongoose = require("mongoose");
 
-const categoryShcema = new mongoose.Schema ({
-
+const categoryShcema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-
+      type: String,
     },
 
     description: {
-        type: String,
+      type: String,
     },
 
     photo: {
-        type: String,
+      type: String,
     },
 
     gender: {
-        type: String,
-
+      type: String,
     },
 
     isListed: {
-        type: Boolean,
-    }
+      type: Boolean,
+    },
+  },
+  { timestamps: true }
+);
 
-})
-
-module.exports = mongoose.model('Category', categoryShcema)
-
+module.exports = mongoose.model("Category", categoryShcema);

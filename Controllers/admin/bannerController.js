@@ -1,6 +1,4 @@
-const Banner = require("../Models/bannerModel");
-
-// -----banners----->
+const Banner = require("../../Models/bannerModel");
 
 const banners = async (req, res) => {
   try {
@@ -13,8 +11,6 @@ const banners = async (req, res) => {
   }
 };
 
-// -----load edit banner---->
-
 const loadEditBanner = async (req, res) => {
   try {
     const id = req.params.id;
@@ -26,8 +22,6 @@ const loadEditBanner = async (req, res) => {
     console.error("error loading edit banner", error.message);
   }
 };
-
-// -----edit Banner------>
 
 const editBanner = async (req, res) => {
   try {
