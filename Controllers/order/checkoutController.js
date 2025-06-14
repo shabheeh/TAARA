@@ -467,7 +467,7 @@ const checkout = async (req, res) => {
         We'll notify you when your items are on the way.
 
         Regards,
-        Your Company Team`,
+        taara fashion`,
     };
 
     await transporter.sendMail(mailOptions);
