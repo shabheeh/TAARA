@@ -125,22 +125,39 @@ const reviews = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const searchTerm = req.query.search ? req.query.search.trim() : "";
+
+    const searchTerm = req.query.search?.trim() || "";
     const filter = req.query.filter || "";
+    const from = req.query.from || "";
+    const to = req.query.to || "";
+    const rating = parseInt(req.query.rating) || null;
 
     let matchStage = {};
 
     if (searchTerm) {
-      matchStage["product.name"] = { $regex: searchTerm, $options: "i" };
+      matchStage.$or = [
+        { "product.name": { $regex: searchTerm, $options: "i" } },
+        { comment: { $regex: searchTerm, $options: "i" } },
+      ];
     }
 
-    if (filter === "published") {
+    if (filter === "true") {
       matchStage.isListed = true;
-    } else if (filter === "unpublished") {
+    } else if (filter === "false") {
       matchStage.isListed = false;
     }
 
-    let pipeline = [
+    if (rating && rating >= 1 && rating <= 5) {
+      matchStage.rating = rating;
+    }
+
+    if (from || to) {
+      matchStage.createdAt = {};
+      if (from) matchStage.createdAt.$gte = new Date(from);
+      if (to) matchStage.createdAt.$lte = new Date(to);
+    }
+
+    const pipeline = [
       {
         $lookup: {
           from: "products",
@@ -184,8 +201,20 @@ const reviews = async (req, res) => {
 
     const reviews = await Review.aggregate(pipeline);
 
+    // Total count for pagination
     const totalReviews = await Review.aggregate([
-      { $match: matchStage },
+      {
+        $lookup: {
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: "$product" },
+      {
+        $match: matchStage,
+      },
       { $count: "count" },
     ]);
 
@@ -199,6 +228,9 @@ const reviews = async (req, res) => {
       limit,
       searchTerm,
       filter,
+      from,
+      to,
+      rating,
     });
   } catch (error) {
     console.error("Error listing reviews:", error.message);

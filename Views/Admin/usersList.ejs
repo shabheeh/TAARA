@@ -107,37 +107,78 @@
         <div class="card">
           <div class="card-datatable table-responsive">
             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
-              <div class="row mx-1">
-                <div class="col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4">
-                  <div class="dt-action-buttons mt-4 mt-md-0">
-                    <div class="col-sm-12 col-md-6">
-                      <div class="dataTables_length" id="DataTables_Table_0_length">
-                        <label>Show
-                          <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm"
-                              onchange="window.location.href = '?page=<%= page %>&limit=' + this.value">
-                              <option value="10" <% if (limit === 10) { %> selected <% } %>>10</option>
-                              <option value="25" <% if (limit === 25) { %> selected <% } %>>25</option>
-                              <option value="50" <% if (limit === 50) { %> selected <% } %>>50</option>
-                              <option value="100" <% if (limit === 100) { %> selected <% } %>>100</option>
-                          </select>
+              <!-- Row 1: Filters -->
+<div class="row mx-1 mt-4 mb-2">
+  <!-- Blocked/Unblocked Filter -->
+  <div class="col-md-2 mb-2">
+    <label for="statusFilter" class="form-label">Status</label>
+    <select id="statusFilter" class="form-select form-select-sm">
+      <option value="">All</option>
+      <option value="true" <% if (status === 'true') { %> selected <% } %>>Blocked</option>
+      <option value="false" <% if (status === 'false') { %> selected <% } %>>Unblocked</option>
+    </select>
+  </div>
 
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-10">
-                  <div class="d-flex align-items-center justify-content-md-end justify-content-center">
-                    <div class="me-4">
-                      <div class="dataTables_filter">
-                        <label>
-                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search user">
-                        </label>
-                    </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <!-- Order Count Filter -->
+  <div class="col-md-2 mb-2">
+    <label for="orderFilter" class="form-label">Orders</label>
+    <select id="orderFilter" class="form-select form-select-sm">
+      <option value="">All Orders</option>
+      <option value="lt5" <% if (orderFilter === 'lt5') { %> selected <% } %>>< 5 Orders</option>
+      <option value="5to10" <% if (orderFilter === '5to10') { %> selected <% } %>>5 – 10 Orders</option>
+      <option value="gt10" <% if (orderFilter === 'gt10') { %> selected <% } %>>10+ Orders</option>
+    </select>
+  </div>
+
+  <!-- Joined Date From -->
+  <div class="col-md-3 mb-2">
+    <label for="joinedFrom" class="form-label">Joined From</label>
+    <input type="date" id="joinedFrom" class="form-control form-control-sm"
+           value="<%= from || '' %>">
+  </div>
+
+  <!-- Joined Date To -->
+  <div class="col-md-3 mb-2">
+    <label for="joinedTo" class="form-label">Joined To</label>
+    <input type="date" id="joinedTo" class="form-control form-control-sm"
+           value="<%= to || '' %>">
+  </div>
+
+  
+
+  <!-- Apply Button -->
+  <div class="col-md-1 mb-2 d-grid">
+    <label class="form-label invisible">Apply</label>
+    <button class="btn btn-primary btn-sm" style="min-width: 160px;" id="applyDateFilter">Apply</button>
+  </div>
+</div>
+
+<!-- Row 2: Show Limit and Search -->
+<div class="row mx-1 align-items-end justify-content-between">
+  <!-- Show Limit Dropdown -->
+
+
+  <!-- Search -->
+  <div class="col-md-4 mb-2">
+    <label for="userSearch" class="form-label">Search</label>
+    <input type="text" id="userSearch" class="form-control form-control-sm"
+           value="<%= locals.searchTerm ? searchTerm : '' %>"
+           placeholder="Search by name or email">
+  </div>
+
+    <div class="col-md-2 mb-2">
+    <label class="form-label">Show</label>
+    <select class="form-select form-select-sm"
+            onchange="window.location.href='?page=<%= page %>&limit=' + this.value">
+      <option value="10" <% if (limit == 10) { %> selected <% } %>>10</option>
+      <option value="25" <% if (limit == 25) { %> selected <% } %>>25</option>
+      <option value="50" <% if (limit == 50) { %> selected <% } %>>50</option>
+      <option value="100" <% if (limit == 100) { %> selected <% } %>>100</option>
+    </select>
+  </div>
+</div>
+
+
               <table class="datatables-users table dataTable no-footer dtr-column" id="DataTables_Table_0"
                 aria-describedby="DataTables_Table_0_info">
                 <thead>
@@ -418,29 +459,52 @@
   </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('searchInput');
- 
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('userSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const orderFilter = document.getElementById('orderFilter');
+    const joinedFrom = document.getElementById('joinedFrom');
+    const joinedTo = document.getElementById('joinedTo');
+    const applyDateBtn = document.getElementById('applyDateFilter');
 
-  function performSearch() {
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm) {
-      // If there's a search term, add it to the URL and navigate
-      window.location.href = `/admin/users?search=${encodeURIComponent(searchTerm)}`;
-    } else {
-      // If no search term, just load all products
-      window.location.href = '/admin/users';
-    }
-  }
+    function performSearch(includeDate = false) {
+      const searchTerm = searchInput.value.trim();
+      const status = statusFilter.value;
+      const order = orderFilter.value;
+      const fromDate = joinedFrom.value;
+      const toDate = joinedTo.value;
 
-  searchInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      performSearch();
+      const params = new URLSearchParams();
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (status) params.append('status', status);
+      if (order) params.append('orderFilter', order);
+
+      if (includeDate) {
+        if (fromDate) params.append('from', fromDate);
+        if (toDate) params.append('to', toDate);
+      }
+
+      const queryString = params.toString();
+      const url = queryString ? `/admin/users?${queryString}` : '/admin/users';
+      window.location.href = url;
     }
+
+    searchInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch(false);
+      }
+    });
+
+    statusFilter.addEventListener('change', () => performSearch(false));
+    orderFilter.addEventListener('change', () => performSearch(false));
+
+  
+    applyDateBtn.addEventListener('click', () => performSearch(true));
   });
-});
 </script>
+
 
 
   

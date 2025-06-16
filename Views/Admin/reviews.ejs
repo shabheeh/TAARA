@@ -38,29 +38,73 @@
             <div class="card">
               <div class="card-datatable table-responsive">
                 <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
-                  <div class="card-header d-flex align-items-md-center flex-wrap pb-md-0 pt-0 flex-column flex-md-row">
-                    <div class="me-5 ms-n1">
-                      <div class="dataTables_filter">
-                        <label>
-                          <input type="search" id="searchInput" value="<%= locals.searchTerm ? searchTerm : '' %>" class="form-control form-control-sm" placeholder="Search review">
-                        </label>
-                    </div>
-                    </div>
-                    <div
-                      class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-md-end pt-0 gap-4 flex-wrap">
-                      
-                      <div class="review_filter">
-                        <form id="filter-form">
-                        <select id="review-status" name="filter" class="form-select form-select-sm">
-                          <option value="" <%=filter==='' ? 'selected' : '' %>>All</option>
-                          <option value="published" <%=filter==='published' ? 'selected' : '' %>>Published</option>
-                          <option value="unpublished" <%=filter==='unpublished' ? 'selected' : '' %>>Unpublished</option>
-                        </select>
-                        </form>
-                      </div>
-                      
-                    </div>
-                  </div>
+                  <!-- Filter Container -->
+<div class="container mb-4 p-3 border rounded">
+  <!-- Row 1: Search, Rating, and Status -->
+  <div class="row mb-3">
+    <!-- Search Input -->
+    <div class="col-md-4">
+      <label for="searchInput" class="form-label">Search</label>
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="form-control form-control-sm" 
+        placeholder="Search by reviewer or product..." 
+        value="<%= locals.searchTerm ? searchTerm : '' %>">
+    </div>
+
+    <!-- Rating Filter -->
+    <div class="col-md-4">
+      <label for="ratingFilter" class="form-label">Filter by Rating</label>
+      <select id="ratingFilter" class="form-select form-select-sm">
+        <option value="">All Ratings</option>
+        <% for (let i = 1; i <= 5; i++) { %>
+          <option value="<%= i %>" <%= rating == i ? 'selected' : '' %>><%= i %> Star</option>
+        <% } %>
+      </select>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="col-md-4">
+      <label for="statusFilter" class="form-label">Filter by Status</label>
+      <select id="statusFilter" class="form-select form-select-sm">
+        <option value="">All</option>
+        <option value="true" <%= filter === 'true' ? 'selected' : '' %>>Published</option>
+        <option value="false" <%= filter === 'false' ? 'selected' : '' %>>Unpublished</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Row 2: Date Range with Apply Button -->
+  <div class="row">
+    <!-- From Date -->
+    <div class="col-md-4">
+      <label for="dateFrom" class="form-label">From Date</label>
+      <input 
+        type="date" 
+        id="dateFrom" 
+        class="form-control form-control-sm" 
+        value="<%= from || '' %>">
+    </div>
+
+    <!-- To Date -->
+    <div class="col-md-4">
+      <label for="dateTo" class="form-label">To Date</label>
+      <input 
+        type="date" 
+        id="dateTo" 
+        class="form-control form-control-sm" 
+        value="<%= to || '' %>">
+    </div>
+
+    <!-- Apply Button -->
+    <div class="col-md-4 align-self-end">
+      <button id="applyDateFilter" class="btn btn-primary btn-sm w-100">Apply</button>
+    </div>
+  </div>
+</div>
+
+
                   <table class="datatables-review table dataTable no-footer dtr-column collapsed" id="DataTables_Table_0"
                     aria-describedby="DataTables_Table_0_info" style="width: 1214px;">
                     <thead>
@@ -392,51 +436,53 @@
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
-    const filterForm = document.getElementById('filter-form');
-    const paginationLinks = document.querySelectorAll('.pagination a.page-link');
+    const ratingSelect = document.getElementById('ratingFilter');
+    const publishStatusSelect = document.getElementById('statusFilter');
+    const fromDateInput = document.getElementById('dateFrom');
+    const toDateInput = document.getElementById('dateTo');
+    const applyDateBtn = document.getElementById('applyDateFilter');
 
+    
 
-    function updateURLParams() {
-      const params = new URLSearchParams(new FormData(filterForm));
+    function performReviewFilter() {
+      
+      const searchTerm = searchInput.value.trim();
+      const rating = ratingSelect.value;
+      const filter = publishStatusSelect.value;
+      const from = fromDateInput.value;
+      const to = toDateInput.value;
 
-      if (searchInput.value.trim()) {
-        params.set('search', searchInput.value.trim());
-      } else {
-        params.delete('search');
-      }
+      console.log(searchInput.value, "ser")
 
-      return params;
+      const params = new URLSearchParams();
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (rating) params.append('rating', rating);
+      if (filter) params.append('filter', filter);
+      if (from) params.append('from', from);
+      if (to) params.append('to', to);
+
+      const queryString = params.toString();
+      const url = queryString ? `/admin/reviews?${queryString}` : '/admin/reviews';
+
+      window.location.href = url;
     }
 
-    function handleFormChange() {
-      const params = updateURLParams();
-      window.location.href = `/admin/reviews?${params.toString()}`;
-    }
-
-    function handlePagination(event) {
-      event.preventDefault();
-      const page = event.target.getAttribute('data-page');
-      const params = updateURLParams();
-      params.set('page', page);
-      window.location.href = `/admin/reviews?${params.toString()}`;
-    }
-
-    filterForm.addEventListener('change', handleFormChange);
-
-    paginationLinks.forEach(link => {
-      link.addEventListener('click', handlePagination);
-    });
-
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        handleFormChange();
+        performReviewFilter();
       }
     });
+
+    ratingSelect.addEventListener('change', performReviewFilter);
+    publishStatusSelect.addEventListener('change', performReviewFilter);
+    applyDateBtn.addEventListener('click', performReviewFilter);
   });
 </script>
+
 
 
   <!-- Core JS -->

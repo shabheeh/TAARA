@@ -12,6 +12,7 @@ const isLogin = async (req, res, next) => {
         } else {
             res.redirect(`/authentication`);
         }
+        res.locals.isAuthenticated = !!req.session.user; 
     } catch (error) {
         console.log(error.message);
     }
@@ -22,6 +23,8 @@ const isLogout = async (req, res, next) => {
         if (req.session.user) {
             return res.redirect('/');
         }
+
+        res.locals.isAuthenticated = !!req.session.user; 
         next();
     } catch (error) {
         console.log(error.message);
@@ -34,6 +37,8 @@ const authorization = async (req, res, next) => {
         if (req.session.user) {
             req.userId = req.session.user;
         }
+
+        res.locals.isAuthenticated = !!req.session.user; 
 
         next();
 

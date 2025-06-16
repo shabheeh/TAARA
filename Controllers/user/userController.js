@@ -7,7 +7,9 @@ const Cart = require("../../Models/cartModel");
 const Wallet = require("../../Models/walletModel");
 const Order = require("../../Models/orderModel");
 const Banner = require("../../Models/bannerModel")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const crypto = require('crypto');
+const Token = require("../../Models/resetToken")
 
 const nodemailer = require("nodemailer");
 
@@ -339,7 +341,7 @@ const sendResetPasswordLink = async (user, req, res) => {
     const resetToken = new Token({
       userId: user._id,
       token: token,
-      expiresAt: Date.now() + 300000, // 5 min
+      expiresAt: Date.now() + 300000,
     });
 
     await resetToken.save();
