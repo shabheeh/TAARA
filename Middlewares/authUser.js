@@ -1,82 +1,73 @@
-const User = require('../Models/userModel')
+const User = require("../Models/userModel");
 
 const isLogin = async (req, res, next) => {
+  try {
+    if (req.session.user) {
+      req.userId = req.session.user;
 
-    try {
-        if (req.session.user) {
-
-            req.userId = req.session.user;
-
-            next();
-
-        } else {
-            res.redirect(`/authentication`);
-        }
-        res.locals.isAuthenticated = !!req.session.user; 
-    } catch (error) {
-        console.log(error.message);
+      next();
+    } else {
+      res.redirect(`/authentication`);
     }
-}
+
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 const isLogout = async (req, res, next) => {
-
-    try {
-        if (req.session.user) {
-            return res.redirect('/');
-        }
-
-        res.locals.isAuthenticated = !!req.session.user; 
-        next();
-    } catch (error) {
-        console.log(error.message);
+  try {
+    if (req.session.user) {
+      return res.redirect("/");
     }
-}
+
+    next();
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 const authorization = async (req, res, next) => {
-    try {
-
-        if (req.session.user) {
-            req.userId = req.session.user;
-        }
-
-        res.locals.isAuthenticated = !!req.session.user; 
-
-        next();
-
-    } catch (error) {
-
-        console.log(error.message);
-        res.status(500).send('Server error');
+  try {
+    if (req.session.user) {
+      req.userId = req.session.user;
     }
+
+    next();
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Server error");
+  }
 };
 
 const isBlocked = async (req, res, next) => {
-    try {
-        if (req.session.user) {
-            const userId = req.session.user;
-            const user = await User.findById(userId);
+  try {
+    if (req.session.user) {
+      const userId = req.session.user;
+      const user = await User.findById(userId);
 
-            if (user.isBlocked) {
-                delete req.session.user;
-                return res.redirect('/authentication'); 
-            }
-        } else {
-            return res.redirect('/authentication'); 
-        }
-
-        next(); 
-    } catch (error) {
-        console.log(error.message);
-  
+      if (user.isBlocked) {
+        delete req.session.user;
+        return res.redirect("/authentication");
+      }
+    } else {
+      return res.redirect("/authentication");
     }
+
+    next();
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
+const setAuthStatus = (req, res, next) => {
+  res.locals.isAuthenticated = !!req.session.user;
+  next();
+};
 
-
-
-module.exports={
-    isLogin,
-    isLogout,
-    authorization,
-    isBlocked
-
-}
+module.exports = {
+  isLogin,
+  isLogout,
+  authorization,
+  isBlocked,
+  setAuthStatus,
+};

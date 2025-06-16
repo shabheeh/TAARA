@@ -23,6 +23,8 @@ const reviewController = require("../Controllers/product/reviewController")
 //             middlewares
 const authUser = require("../Middlewares/authUser");
 
+router.use(authUser.setAuthStatus)
+
 //                  landing page
 router.get("/", authUser.authorization, userController.loadHome);
 
