@@ -6,10 +6,10 @@ const Address = require("../../Models/addressModel");
 const Cart = require("../../Models/cartModel");
 const Wallet = require("../../Models/walletModel");
 const Order = require("../../Models/orderModel");
-const Banner = require("../../Models/bannerModel")
+const Banner = require("../../Models/bannerModel");
 const bcrypt = require("bcrypt");
-const crypto = require('crypto');
-const Token = require("../../Models/resetToken")
+const crypto = require("crypto");
+const Token = require("../../Models/resetToken");
 
 const nodemailer = require("nodemailer");
 
@@ -140,10 +140,7 @@ const insertUser = async (req, res) => {
     }
 
     const securePassword = await bcrypt.hash(password, 10);
-    const user = {
-      email: email,
-      password: securePassword,
-    };
+    const user = { email, password: securePassword };
 
     await sendSignupOtp(user, req, res);
   } catch (error) {
@@ -156,27 +153,55 @@ const sendSignupOtp = async (user, req, res) => {
   try {
     const { email, password } = user;
 
+    const previousOtp = req.session.otp;
+    if (
+      previousOtp &&
+      previousOtp.email === email &&
+      Date.now() - previousOtp.sentAt < 60 * 1000
+    ) {
+      return res.render("signin-signup", {
+        signupMessage: "OTP already sent recently. Please check your email.",
+        activeTab: "signup",
+        formDataSignup: email,
+      });
+    }
+
     const otp = `${100000 + Math.floor(Math.random() * 900000)}`;
+    const hashedOtp = await bcrypt.hash(otp, 10);
+
+    req.session.otp = {
+      hashedOtp,
+      email,
+      password,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+      sentAt: Date.now(),
+    };
 
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "OTP Verification",
-      text: `Your OTP is: ${otp}`,
-    };
+      subject: "Verify your email - TAARA FASHION",
+      text: `
+Hello,
 
-    const hashedOtp = await bcrypt.hash(otp, 10);
+Thank you for registering with TAARA FASHION!
 
-    req.session.otp = {
-      code: otp,
-      hashedOtp: hashedOtp,
-      email: email,
-      password: password,
-      expiresAt: Date.now() + 300000,
+Your One-Time Password (OTP) for email verification is:
+
+    ${otp}
+
+Please enter this OTP on our website to complete your registration. 
+This OTP is valid for 5 minutes.
+
+If you did not request this, please ignore this email. 
+Your account will remain secure.
+
+Warm regards,
+TAARA FASHION Team
+`,
     };
 
     await transporter.sendMail(mailOptions);
-
     res.redirect(`/otpVerify`);
   } catch (error) {
     console.error("Error sending OTP:", error.message);
@@ -515,7 +540,6 @@ const userAccount = async (req, res) => {
   }
 };
 
-
 const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, phone } = req.body;
@@ -547,7 +571,6 @@ const updateProfile = async (req, res) => {
     });
   }
 };
-
 
 const changePassword = async (req, res) => {
   try {

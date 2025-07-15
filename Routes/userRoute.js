@@ -22,6 +22,7 @@ const reviewController = require("../Controllers/product/reviewController")
 
 //             middlewares
 const authUser = require("../Middlewares/authUser");
+const { otpRateLimiter } = require("../Middlewares/rateLimiter");
 
 router.use(authUser.setAuthStatus)
 
@@ -30,7 +31,7 @@ router.get("/", authUser.authorization, userController.loadHome);
 
 //                  user authentications
 router.get("/authentication", authUser.isLogout, userController.authentication);
-router.post("/signup", userController.insertUser);
+router.post("/signup", otpRateLimiter, userController.insertUser);
 router.get("/otpVerify", authUser.isLogout, userController.loadOtp);
 router.post("/otpVerify", userController.verifyOtp);
 router.post("/resendOtp", userController.resendOtp);
