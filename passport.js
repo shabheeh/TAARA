@@ -1,6 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('./Models/userModel'); // Adjust the path as necessary
+const User = require('./Models/userModel');
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -12,23 +12,19 @@ passport.use(new GoogleStrategy({
     try {
       const { id, emails, name } = profile;
   
-      // Find the user by email
       let user = await User.findOne({ email: emails[0].value });
   
       if (user) {
-        // Check if user is listed
         if (user.isBlocked) {
           return done(null, false, { message: 'Your account is restricted from logging in.' });
         }
   
-        // Update existing user with new google data
         // user.googleId = id;
         user.firstName = name.givenName;
         user.lastName = name.familyName || '';
   
         await user.save();
       } else {
-        // Create a new user if one doesn't exist
         user = new User({
           // googleId: id,
           firstName: name.givenName,

@@ -30,8 +30,13 @@ const editBanner = async (req, res) => {
     let image;
 
     if (req.file) {
-      image = req.file.filename;
+      const uploadResult = await uploadToCloudinary(
+        req.file,
+        `TAARA/banners/${id}`,
+      );
+      image = uploadResult.url;
     } else {
+
       image = req.body.existingImage;
     }
 
@@ -67,6 +72,7 @@ const editBanner = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   banners,

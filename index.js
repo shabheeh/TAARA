@@ -13,8 +13,6 @@ const path = require('path');
 
 const app = express();
 
-
-//session 
 app.use(session({
     secret: uuidv4(),
     resave: true,
@@ -26,24 +24,15 @@ app.use(nocache());
 app.use(passport.initialize());
 app.use(passport.session());
 
- 
-//db connect
 dbConnect() 
 
-
-
-
-// bodyparser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// set View engine
 app.set("view engine", "ejs");
 
-// Admin_Routes
 app.use('/admin', adminRoute);
 
-// User_Routes 
 app.use('/', userRoute);
 
 app.use('*' , ( req, res ) => {

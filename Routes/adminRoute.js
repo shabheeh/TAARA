@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express();
 const path = require("path");
-const { upload, uploadBanner } = require("../Configs/multerConfig");
+const upload = require("../Configs/multerConfig");
 
 //          middlewares
 const authAdmin = require("../Middlewares/authAdmin");
@@ -162,7 +162,7 @@ router.get(
 );
 router.put(
   "/banners",
-  uploadBanner.single("bannerImage"),
+  upload.single("bannerImage"),
   bannerController.editBanner
 );
 

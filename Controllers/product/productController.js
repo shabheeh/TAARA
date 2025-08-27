@@ -6,6 +6,7 @@ const User = require("../../Models/userModel");
 const Offer = require("../../Models/offerModel");
 const Review = require("../../Models/reviewModel");
 const mongoose = require("mongoose");
+const uploadToCloudinary = require("../../utils/uploadToCloudinary");
 
 const products = async (req, res) => {
   try {
@@ -18,7 +19,6 @@ const products = async (req, res) => {
     const filters = {};
     const matchSearch = [];
 
-    // ✅ Filters BEFORE lookups (raw Mongo fields)
     if (gender) filters.gender = gender;
 
     if (category && mongoose.Types.ObjectId.isValid(category)) {
@@ -40,7 +40,6 @@ const products = async (req, res) => {
       filters.createdAt = dateFilter;
     }
 
-    // ✅ Search handling (needs lookup first)
     const searchTerm = search?.trim();
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
@@ -64,7 +63,6 @@ const products = async (req, res) => {
     }
 
     const pipeline = [
-      // Apply raw filters before lookup
       { $match: filters },
 
       {
@@ -94,7 +92,6 @@ const products = async (req, res) => {
         },
       },
 
-      // Apply search match after lookup
       ...(matchSearch.length > 0 ? [{ $match: { $or: matchSearch } }] : []),
 
       { $sort: { createdAt: -1 } },
@@ -150,25 +147,28 @@ const loadAddProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
   try {
-    const name = req.body.productName;
-    const description = req.body.productDescription;
-    const gender = req.body.productGender;
-    const category = req.body.productCategory;
-    const brand = req.body.productBrand;
-    const price = req.body.productPrice;
+    const {
+      productName,
+      productDescription,
+      productGender,
+      productCategory,
+      productBrand,
+      productPrice,
+      variantColor,
+      variantColorCode,
+      variantSize,
+      variantQuantity,
+    } = req.body;
 
-    const color = req.body.variantColor;
-    const colorCode = req.body.variantColorCode;
-    const sizes = JSON.parse(req.body.variantSize);
-    const quantity = req.body.variantQuantity;
+    const sizes = JSON.parse(variantSize);
 
     const product = new Product({
-      name,
-      description,
-      gender,
-      category,
-      brand,
-      price,
+      name: productName,
+      description: productDescription,
+      gender: productGender,
+      category: productCategory,
+      brand: productBrand,
+      price: productPrice,
       isListed: true,
     });
 
@@ -180,15 +180,19 @@ const addProduct = async (req, res) => {
     for (let i = 1; i <= 4; i++) {
       const fieldName = `productImage${i}`;
       if (imageFiles[fieldName] && imageFiles[fieldName][0]) {
-        images.push(imageFiles[fieldName][0].filename);
+        const uploadResult = await uploadToCloudinary(
+          imageFiles[fieldName][0],
+          `TAARA/products/${product._id}`,
+        );
+        images.push(uploadResult.url);
       }
     }
 
     const variant = new Variant({
-      color,
-      colorCode,
+      color: variantColor,
+      colorCode: variantColorCode,
       sizes,
-      quantity,
+      quantity: variantQuantity,
       images,
       product: product._id,
       isListed: true,
@@ -197,7 +201,6 @@ const addProduct = async (req, res) => {
     await variant.save();
 
     product.variants.push(variant._id);
-
     await product.save();
 
     res.json({
@@ -207,6 +210,12 @@ const addProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Error Adding Product", error.message);
+    if (req.fileValidationError) {
+      return res.json({
+        success: false,
+        message: req.fileValidationError,
+      });
+    }
     res.json({
       success: false,
       message: "An error occurred while adding the Product",

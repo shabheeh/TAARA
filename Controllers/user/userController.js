@@ -250,7 +250,7 @@ const verifyOtp = async (req, res) => {
     const { otp } = req.body;
     const sessionOtp = req.session.otp;
 
-    if (!sessionOtp) {
+    if (!sessionOtp || !sessionOtp.hashedOtp) {
       return res.render("signupOtp", {
         otpError: "OTP has expired or is invalid",
       });
@@ -291,7 +291,7 @@ const verifyOtp = async (req, res) => {
 
     res.render("signin-signup", {
       activeTab: "signin",
-      successMessage: "Account created successfully now signin",
+      successMessage: "Account created successfully. Now sign in.",
     });
   } catch (error) {
     console.error("Error verifying OTP:", error.message);
@@ -300,6 +300,7 @@ const verifyOtp = async (req, res) => {
     });
   }
 };
+
 
 const verifySignIn = async (req, res) => {
   try {

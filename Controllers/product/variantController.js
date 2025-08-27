@@ -1,3 +1,5 @@
+const uploadToCloudinary = require("../../utils/uploadToCloudinary");
+
 const Product = require("../../Models/productModel");
 const Variant = require("../../Models/variantModel");
 const Cart = require("../../Models/cartModel");
@@ -27,11 +29,15 @@ const loadAddVariant = async (req, res) => {
 
 const addVariant = async (req, res) => {
   try {
-    const id = req.body.productId;
-    const color = req.body.variantColor;
-    const colorCode = req.body.variantColorCode;
-    const sizes = JSON.parse(req.body.variantSize);
-    const quantity = req.body.variantQuantity;
+    const {
+      productId,
+      variantColor,
+      variantColorCode,
+      variantSize,
+      variantQuantity,
+    } = req.body;
+    const sizes = JSON.parse(variantSize);
+    const quantity = variantQuantity;
 
     const imageFiles = req.files;
     const images = [];
@@ -39,30 +45,37 @@ const addVariant = async (req, res) => {
     for (let i = 1; i <= 4; i++) {
       const fieldName = `productImage${i}`;
       if (imageFiles[fieldName] && imageFiles[fieldName][0]) {
-        images.push(imageFiles[fieldName][0].filename);
+        const file = imageFiles[fieldName][0];
+
+        const uploadResult = await uploadToCloudinary(
+          file,
+          `TAARA/products/${productId}`
+        );
+
+        images.push(uploadResult.url);
       }
     }
 
     const variant = new Variant({
-      color,
-      colorCode,
+      color: variantColor,
+      colorCode: variantColorCode,
       sizes,
       quantity,
       images,
-      product: id,
+      product: productId,
       isListed: true,
     });
 
     await variant.save();
 
-    const product = await Product.findByIdAndUpdate(id, {
+    await Product.findByIdAndUpdate(productId, {
       $push: { variants: variant._id },
     });
 
     res.json({
-      id,
+      id: productId,
       success: true,
-      message: "Varintes Added successfully",
+      message: "Variants added successfully",
     });
   } catch (error) {
     console.error("Error Adding Variant", error.message);
@@ -87,18 +100,22 @@ const loadEditVariant = async (req, res) => {
 
 const editVariant = async (req, res) => {
   try {
-    const { variantId, variantColor, variantColorCode, variantQuantity } =
-      req.body;
-
+    const { variantId, variantColor, variantColorCode, variantQuantity } = req.body;
     const sizes = JSON.parse(req.body.variantSize);
-
     const imageFiles = req.files;
     const images = [];
 
+
     for (let i = 1; i <= 4; i++) {
       const fieldName = `productImage${i}`;
+
       if (imageFiles[fieldName] && imageFiles[fieldName][0]) {
-        images.push(imageFiles[fieldName][0].filename);
+
+        const uploadResult = await uploadToCloudinary(
+          imageFiles[fieldName][0],
+          `TAARA/products/${variantId}`,
+        );
+        images.push(uploadResult.url);
       } else {
         const existingImageField = `existingImage${i}`;
         if (req.body[existingImageField]) {
@@ -108,59 +125,48 @@ const editVariant = async (req, res) => {
     }
 
     const updateVariant = await Variant.findByIdAndUpdate(
-      { _id: variantId },
+      variantId,
       {
         color: variantColor,
         colorCode: variantColorCode,
-        sizes: sizes,
+        sizes,
         quantity: variantQuantity,
-        images: images,
+        images,
       },
       { new: true }
     );
 
     if (!updateVariant) {
-      return res.json({
-        success: false,
-        message: "Variant not found",
-      });
+      return res.json({ success: false, message: "Variant not found" });
     }
 
     const carts = await Cart.find({ "products.variant": variantId });
-
     for (const cart of carts) {
       for (const item of cart.products) {
-        if (
-          item.variant == variantId &&
-          item.quantity > updateVariant.quantity
-        ) {
+        if (item.variant == variantId && item.quantity > updateVariant.quantity) {
           item.quantity = updateVariant.quantity;
         }
       }
       await cart.save();
     }
 
-    const variant = await Variant.findById({ _id: variantId });
-
     res.json({
-      id: variant.product._id,
+      id: updateVariant.product._id,
       success: true,
       message: "Variant updated successfully",
     });
   } catch (error) {
     console.error("Error Editing Variant", error.message);
     if (req.fileValidationError) {
-      return res.json({
-        success: false,
-        message: req.fileValidationError,
-      });
+      return res.json({ success: false, message: req.fileValidationError });
     }
     res.json({
       success: false,
-      message: "An error occurred while updating the Variant",
+      message: "An error occurred while updating the variant",
     });
   }
 };
+
 
 module.exports = {
   variants,
