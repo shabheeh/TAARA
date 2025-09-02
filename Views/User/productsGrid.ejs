@@ -248,8 +248,8 @@
                                             <% } %>
                         
                                             <a href="/product/<%= product._id %>/variant/<%= product.variants[0]._id %>">
-                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
-                                              <img src="/Admin/assets/Products-Images/<%= product.variants[0].images[3] %>" alt="Product image" class="product-image-hover">
+                                              <img src="<%= product.variants[0].images[0] %>" alt="Product image" class="product-image">
+                                              <img src="<%= product.variants[0].images[3] %>" alt="Product image" class="product-image-hover">
                                             </a>
                                   
                                             <div class="product-action-vertical">

@@ -366,7 +366,6 @@
     }
 
     function createCropper(img, imageId) {
-      // Destroy any existing cropper instance on the same image
       if (img.cropper) {
         img.cropper.destroy();
       }
@@ -376,7 +375,7 @@
         viewMode: 3,
         preview: '.preview'
       });
-      img.cropper = cropper; // Store the cropper instance on the image element
+      img.cropper = cropper;
       croppers.push({ img, cropper, imageId });
     }
 

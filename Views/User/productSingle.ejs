@@ -60,7 +60,7 @@
                               <span class="product-label label-sale">Sale</span>
                               <% variant.images.forEach((image, index) => { %>
                                 <figure class="product-separated-item">
-                                  <img src="/Admin/assets/Products-Images/<%= image %>" data-zoom-image="/Admin/assets/Products-Images/<%= image %>" alt="product image">
+                                  <img src="<%= image %>" data-zoom-image="<%= image %>" alt="product image">
                                   
                                 </figure>
                               <% }); %>
@@ -121,7 +121,7 @@
                                   <div class="product-nav product-nav-thumbs" >
                                     <% product.variants.forEach((variant) => { %>
                                       <a active style="width: 50px; height: 73px;" href="/product/<%= product._id %>/variant/<%= variant._id %>">
-                                        <img src="/Admin/assets/Products-Images/<%= variant.images[0] %>" alt="product desc" 
+                                        <img src="<%= variant.images[0] %>" alt="product desc" 
                                              width="50" height="70"
                                              title="<%= variant.name %>">
                                       </a>
@@ -358,7 +358,7 @@
                         <span class="product-label label-new">New</span>
                     <% } %>
                     <a href="/product/<%= similarProduct._id %>/variant/<%= similarProduct.variants[0]._id %>">
-                        <img src="/Admin/assets/Products-Images/<%= similarProduct.variants[0].images[0] %>" alt="Product image" class="product-image">
+                        <img src="<%= similarProduct.variants[0].images[0] %>" alt="Product image" class="product-image">
                     </a>
         
                     <div class="product-action-vertical">
@@ -383,7 +383,7 @@
                     
                     <div class="product-nav product-nav-dots">
                         <% similarProduct.variants.forEach(function(variant) { %>
-                            <a href="#" class="<%= variant.isActive ? 'active' : '' %>" style="background: <%= variant.colorCode %>;">
+                            <a href="#" class="<%= variant.isActive ? 'active' : '' %>" style="background: '<%= variant.colorCode %>'">
                                 <span class="sr-only">Color name</span>
                             </a>
                         <% }); %>

@@ -13,7 +13,7 @@ const wishlist = async (req, res) => {
       Wishlist.findOne({ user: userId })
         .populate({
           path: "products.product",
-          populate: {
+          populate: { 
             path: "offers",
             model: "Offer",
           },

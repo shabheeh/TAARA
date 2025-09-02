@@ -1,4 +1,5 @@
 const Banner = require("../../Models/bannerModel");
+const uploadToCloudinary = require("../../utils/uploadToCloudinary")
 
 const banners = async (req, res) => {
   try {
